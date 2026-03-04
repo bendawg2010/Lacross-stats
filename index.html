@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lacrosse Stats</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar: Player List -->
+    <aside id="sidebar">
+      <div id="sidebar-header">
+        <div id="app-logo">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="13" stroke="#4ade80" stroke-width="2"/>
+            <path d="M8 14 Q14 8 20 14 Q14 20 8 14Z" fill="#4ade80" opacity="0.3"/>
+            <circle cx="14" cy="14" r="3" fill="#4ade80"/>
+          </svg>
+          <span>LAX Stats</span>
+        </div>
+        <div id="game-info">
+          <input type="text" id="opponent-input" placeholder="vs. Opponent" />
+          <input type="date" id="game-date" />
+        </div>
+      </div>
+
+      <div id="search-box">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="7" cy="7" r="5" stroke="#888" stroke-width="1.5"/>
+          <path d="M11 11L14 14" stroke="#888" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="player-search" placeholder="Search players..." />
+      </div>
+
+      <div id="player-list"></div>
+
+      <div id="sidebar-footer">
+        <button id="btn-export" class="footer-btn">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Export CSV
+        </button>
+        <button id="btn-save" class="footer-btn accent">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="2" y="2" width="10" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M4 2v4h6V2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M5 8h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Save
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Panel -->
+    <main id="main-panel">
+      <!-- Empty state -->
+      <div id="empty-state">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" opacity="0.3">
+          <circle cx="40" cy="40" r="38" stroke="#4ade80" stroke-width="2"/>
+          <path d="M20 40 Q40 20 60 40 Q40 60 20 40Z" fill="#4ade80"/>
+        </svg>
+        <h2>Select a Player</h2>
+        <p>Choose a player from the list to view and edit their stats</p>
+      </div>
+
+      <!-- Player Detail Panel (hidden until player selected) -->
+      <div id="player-detail" class="hidden">
+        <!-- Player Header -->
+        <div id="player-header">
+          <div id="player-number-badge"></div>
+          <div id="player-info-block">
+            <h1 id="player-name-display"></h1>
+            <div id="player-meta">
+              <span id="player-grade-display" class="badge badge-grade"></span>
+              <span id="player-pos-display" class="badge badge-pos"></span>
+              <span id="player-team-display" class="badge badge-team"></span>
+            </div>
+          </div>
+          <div id="player-header-actions">
+            <button id="btn-prev-player" title="Previous player">&#8592;</button>
+            <button id="btn-next-player" title="Next player">&#8594;</button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div id="tabs">
+          <button class="tab-btn active" data-tab="stats">Stats</button>
+          <button class="tab-btn" data-tab="heatmap">Shot Map</button>
+          <button class="tab-btn" data-tab="profile">Profile</button>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="tab-stats" class="tab-content active">
+          <div id="stats-grid">
+            <!-- Stat cards will be injected here -->
+          </div>
+          <div id="quick-add-bar">
+            <h3>Quick Add</h3>
+            <div id="quick-buttons"></div>
+          </div>
+        </div>
+
+        <!-- Heat Map Tab -->
+        <div id="tab-heatmap" class="tab-content hidden">
+          <div id="heatmap-controls">
+            <div id="shot-type-selector">
+              <span>Mark as:</span>
+              <button class="shot-type-btn active" data-type="goal" style="--c:#4ade80">Goal</button>
+              <button class="shot-type-btn" data-type="sog" style="--c:#60a5fa">Shot on Goal</button>
+              <button class="shot-type-btn" data-type="miss" style="--c:#f87171">Miss</button>
+              <button class="shot-type-btn" data-type="gb" style="--c:#fbbf24">Ground Ball</button>
+            </div>
+            <div id="heatmap-actions">
+              <label id="heatmap-toggle-label">
+                <input type="checkbox" id="heatmap-toggle" />
+                Heat Map Overlay
+              </label>
+              <button id="btn-clear-shots" class="btn-danger-sm">Clear All</button>
+            </div>
+          </div>
+          <div id="field-container">
+            <canvas id="field-canvas"></canvas>
+            <div id="shot-count-legend">
+              <div class="legend-item"><span class="dot goal"></span>Goal</div>
+              <div class="legend-item"><span class="dot sog"></span>Shot on Goal</div>
+              <div class="legend-item"><span class="dot miss"></span>Miss</div>
+              <div class="legend-item"><span class="dot gb"></span>Ground Ball</div>
+            </div>
+          </div>
+          <div id="shot-list-panel">
+            <h4>Shot Log <span id="shot-count-badge"></span></h4>
+            <div id="shot-list"></div>
+          </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="tab-profile" class="tab-content hidden">
+          <div id="profile-form">
+            <div class="form-row">
+              <label>Jersey #</label>
+              <input type="number" id="edit-number" min="0" max="99" />
+            </div>
+            <div class="form-row">
+              <label>Full Name</label>
+              <input type="text" id="edit-name" />
+            </div>
+            <div class="form-row">
+              <label>Grade</label>
+              <select id="edit-grade">
+                <option value="Freshman">Freshman</option>
+                <option value="Sophomore">Sophomore</option>
+                <option value="Junior">Junior</option>
+                <option value="Senior">Senior</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Position</label>
+              <select id="edit-position">
+                <option value="Attack">Attack</option>
+                <option value="Midfield">Midfield</option>
+                <option value="Defense">Defense</option>
+                <option value="Goalie">Goalie</option>
+                <option value="LSM">LSM</option>
+                <option value="">—</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Team Level</label>
+              <select id="edit-team">
+                <option value="Var">Varsity</option>
+                <option value="JV">JV</option>
+                <option value="Manager">Manager</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Notes</label>
+              <textarea id="edit-notes" rows="3" placeholder="e.g. lefty, captain..."></textarea>
+            </div>
+            <button id="btn-save-profile" class="btn-accent">Save Profile</button>
+            <button id="btn-delete-player" class="btn-danger">Delete Player</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Player Modal -->
+  <div id="modal-overlay" class="hidden">
+    <div id="modal">
+      <h2>Add New Player</h2>
+      <div class="form-row">
+        <label>Jersey #</label>
+        <input type="number" id="new-number" min="0" max="99" placeholder="00" />
+      </div>
+      <div class="form-row">
+        <label>Full Name *</label>
+        <input type="text" id="new-name" placeholder="First Last" />
+      </div>
+      <div class="form-row">
+        <label>Grade</label>
+        <select id="new-grade">
+          <option value="Freshman">Freshman</option>
+          <option value="Sophomore">Sophomore</option>
+          <option value="Junior">Junior</option>
+          <option value="Senior">Senior</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Position</label>
+        <select id="new-position">
+          <option value="Attack">Attack</option>
+          <option value="Midfield">Midfield</option>
+          <option value="Defense">Defense</option>
+          <option value="Goalie">Goalie</option>
+          <option value="LSM">LSM</option>
+          <option value="">—</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Team Level</label>
+        <select id="new-team">
+          <option value="Var">Varsity</option>
+          <option value="JV">JV</option>
+        </select>
+      </div>
+      <div id="modal-actions">
+        <button id="btn-modal-cancel">Cancel</button>
+        <button id="btn-modal-add" class="btn-accent">Add Player</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
