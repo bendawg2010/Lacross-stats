@@ -43,7 +43,7 @@ function createWindow() {
     title: 'Lacrosse Stats'
   });
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile('CGLacrossStats.html');
 }
 
 app.whenReady().then(() => {

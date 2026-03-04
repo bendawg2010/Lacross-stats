@@ -1,6 +1,6 @@
 {
   "name": "lacrosse-stats",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Live lacrosse stats tracker with heat map",
   "main": "main.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "build": {
     "appId": "com.lacrosse.stats",
-    "productName": "Lacrosse Stats",
+    "productName": "CGLacross Stats",
     "directories": {
       "output": "dist"
     },
