@@ -157,6 +157,8 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
 /* ─── Player Detail ─────────────────────────── */
 #player-detail { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#player-detail.slide-in { animation: panelSlideIn 0.2s cubic-bezier(.25,.46,.45,.94); }
+@keyframes panelSlideIn { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
 
 #player-header {
   display: flex; align-items: center; gap: 18px;
@@ -206,7 +208,8 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 .tab-btn.active { color: var(--be-gold-lite); border-bottom-color: var(--be-gold); }
 
 .tab-content { display: none; flex: 1; overflow-y: auto; }
-.tab-content.active { display: flex; flex-direction: column; }
+.tab-content.active { display: flex; flex-direction: column; animation: tabFadeIn 0.18s ease; }
+@keyframes tabFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .tab-content::-webkit-scrollbar { width: 5px; }
 .tab-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
@@ -754,6 +757,25 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   75%  { opacity:1; }
   100% { opacity:0; }
 }
+@keyframes statCardIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.stat-card { animation: statCardIn 0.22s ease both; }
+
+@keyframes statBump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+@keyframes statBumpDown {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.82); }
+  100% { transform: scale(1); }
+}
+.stat-value.bump-up   { animation: statBump     0.22s cubic-bezier(.36,.07,.19,.97); }
+.stat-value.bump-down { animation: statBumpDown 0.22s cubic-bezier(.36,.07,.19,.97); }
+
 @keyframes goalLogoAnim {
   0%   { transform:scale(0.15) rotate(-15deg); opacity:0; filter:drop-shadow(0 0 0px #d4af44); }
   18%  { transform:scale(1.25) rotate(4deg);  opacity:1; filter:drop-shadow(0 0 40px #d4af44); }
@@ -1658,7 +1680,11 @@ function selectPlayer(id) {
   if (document.getElementById("team-map-view").classList.contains("active")) renderTmShotList(id);
 
   document.getElementById("empty-state").classList.add("hidden");
-  document.getElementById("player-detail").classList.remove("hidden");
+  const detail = document.getElementById("player-detail");
+  detail.classList.remove("hidden");
+  detail.classList.remove("slide-in");
+  void detail.offsetWidth;
+  detail.classList.add("slide-in");
 
   // Avatar in header
   const av = document.getElementById("player-avatar");
@@ -1693,10 +1719,11 @@ function renderStatsTab(p) {
   const grid = document.getElementById("stats-grid");
   grid.innerHTML = "";
 
-  STAT_DEFS.forEach(def => {
+  STAT_DEFS.forEach((def, i) => {
     const val = s[def.key] || 0;
     const card = document.createElement("div");
     card.className = "stat-card" + (val > 0 ? " has-value" : "");
+    card.style.animationDelay = (i * 28) + "ms";
     card.innerHTML = `
       <div class="stat-label">${def.key}</div>
       <div class="stat-desc">${def.desc}</div>
@@ -1840,6 +1867,19 @@ function adjustStat(pid, stat, delta) {
 
   const p = state.players.find(x => x.id === pid);
   if (p) { renderStatsTab(p); renderPlayerList(document.getElementById("player-search").value); }
+
+  // Bump the stat value element for tactile feedback
+  const card = [...document.querySelectorAll(".stat-card")].find(c =>
+    c.querySelector(`[data-stat="${stat}"]`)
+  );
+  if (card) {
+    const valEl = card.querySelector(".stat-value");
+    const cls = delta > 0 ? "bump-up" : "bump-down";
+    valEl.classList.remove("bump-up", "bump-down");
+    void valEl.offsetWidth; // reflow to restart animation
+    valEl.classList.add(cls);
+  }
+
   autoSave();
 }
 
