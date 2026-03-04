@@ -503,3 +503,4 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 .pos-Defense  { color: var(--yellow); }
 .pos-Goalie   { color: var(--purple); }
 .pos-LSM      { color: #fb923c; }
+.pos-FOGO     { color: #22d3ee; }

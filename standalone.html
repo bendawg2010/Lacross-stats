@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bishop England Lacrosse Stats</title>
+<style>
+/* ─── Bishop England Colors ────────────────────── */
+:root {
+  --be-green:      #005a2b;
+  --be-green-mid:  #006e35;
+  --be-green-lite: #008c45;
+  --be-gold:       #b5973a;
+  --be-gold-lite:  #d4af44;
+  --be-white:      #f5f5f0;
+
+  --bg:        #0a1a0f;
+  --surface:   #0f2317;
+  --surface2:  #163020;
+  --surface3:  #1e4028;
+  --border:    #1f4a2e;
+  --text:      #e8f0e9;
+  --text-muted:#7aaa87;
+  --accent:    var(--be-green-lite);
+  --accent-dim:#0a2415;
+  --gold:      var(--be-gold-lite);
+  --radius:    10px;
+  --sidebar-w: 290px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif; }
+body { background: var(--bg); color: var(--text); overflow: hidden; }
+
+/* ─── Layout ──────────────────────────────── */
+#app { display: flex; height: 100vh; }
+
+/* ─── Sidebar ─────────────────────────────── */
+#sidebar {
+  width: var(--sidebar-w); min-width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+#sidebar-header {
+  background: linear-gradient(135deg, var(--be-green) 0%, var(--be-green-mid) 100%);
+  padding: 18px 14px 14px;
+  border-bottom: 3px solid var(--be-gold);
+}
+#app-logo {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+}
+#logo-shield {
+  width: 40px; height: 46px; flex-shrink: 0;
+}
+#logo-text { line-height: 1.15; }
+#logo-text .school { font-size: 11px; font-weight: 700; color: var(--be-gold-lite); letter-spacing: 1.5px; text-transform: uppercase; }
+#logo-text .sport  { font-size: 17px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+
+#game-info { display: flex; flex-direction: column; gap: 6px; }
+#game-info input {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px; color: #fff; padding: 6px 10px;
+  font-size: 12px; width: 100%; outline: none;
+}
+#game-info input::placeholder { color: rgba(255,255,255,0.5); }
+#game-info input:focus { border-color: var(--be-gold-lite); }
+
+#search-box {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+}
+#player-search {
+  background: none; border: none; color: var(--text);
+  font-size: 13px; width: 100%; outline: none;
+}
+#player-search::placeholder { color: var(--text-muted); }
+
+#player-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+#player-list::-webkit-scrollbar { width: 4px; }
+#player-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.grade-header {
+  padding: 6px 14px 3px;
+  font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--be-gold);
+  border-top: 1px solid var(--border); margin-top: 4px;
+}
+.grade-header:first-child { border-top: none; margin-top: 0; }
+
+.player-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; cursor: pointer;
+  border-left: 3px solid transparent; transition: background 0.1s;
+}
+.player-item:hover { background: var(--surface2); }
+.player-item.selected { background: var(--accent-dim); border-left-color: var(--be-green-lite); }
+
+.player-jersey {
+  width: 33px; height: 33px; border-radius: 50%;
+  background: var(--surface3); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: var(--text-muted); flex-shrink: 0;
+}
+.player-item.selected .player-jersey { background: var(--be-green); border-color: var(--be-green-lite); color: #fff; }
+
+.player-item-info { flex: 1; min-width: 0; }
+.player-item-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player-item-sub  { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+.mini-stats { display: flex; gap: 3px; flex-shrink: 0; }
+.ms { font-size: 9px; font-weight: 700; background: var(--surface3); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+.ms.lit { color: var(--be-green-lite); }
+
+#sidebar-footer {
+  display: flex; gap: 8px; padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+.footer-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 7px; color: var(--text-muted); font-size: 12px;
+  padding: 8px 6px; cursor: pointer; transition: all 0.15s;
+}
+.footer-btn:hover { background: var(--surface3); color: var(--text); }
+.footer-btn.gold  { background: var(--be-gold); border-color: var(--be-gold); color: #000; font-weight: 700; }
+.footer-btn.gold:hover { background: var(--be-gold-lite); }
+
+#btn-add-player {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; background: none; border: none;
+  color: var(--be-green-lite); font-size: 13px; cursor: pointer; width: 100%;
+  border-bottom: 1px solid var(--border);
+}
+#btn-add-player:hover { background: var(--surface2); }
+
+/* ─── Main ─────────────────────────────────── */
+#main-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+#empty-state {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 18px; text-align: center; color: var(--text-muted);
+}
+#empty-state .be-crest { opacity: 0.15; }
+#empty-state h2 { font-size: 24px; color: var(--text); }
+#empty-state p  { font-size: 14px; }
+
+/* ─── Player Detail ─────────────────────────── */
+#player-detail { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+#player-header {
+  display: flex; align-items: center; gap: 18px;
+  padding: 18px 28px 14px;
+  background: linear-gradient(135deg, var(--be-green) 0%, var(--surface) 60%);
+  border-bottom: 2px solid var(--be-gold);
+  flex-shrink: 0;
+}
+#player-number-badge {
+  width: 66px; height: 66px;
+  background: linear-gradient(135deg, var(--be-green-lite), var(--be-green));
+  border: 2px solid var(--be-gold);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 900; color: #fff; flex-shrink: 0;
+}
+#player-info-block { flex: 1; }
+#player-name-display { font-size: 22px; font-weight: 800; margin-bottom: 7px; color: #fff; }
+#player-meta { display: flex; gap: 7px; flex-wrap: wrap; }
+
+.badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.badge-grade { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+.badge-pos   { background: rgba(181,151,58,0.2); color: var(--be-gold-lite); }
+.badge-team  { background: rgba(0,140,69,0.3); color: #6ee89b; }
+
+#player-header-actions { display: flex; gap: 8px; }
+#player-header-actions button {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px; color: #fff; font-size: 18px; cursor: pointer; transition: all 0.15s;
+}
+#player-header-actions button:hover { background: rgba(255,255,255,0.2); }
+
+/* ─── Tabs ──────────────────────────────────── */
+#tabs {
+  display: flex; padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface); flex-shrink: 0;
+}
+.tab-btn {
+  background: none; border: none;
+  padding: 12px 18px; color: var(--text-muted);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all 0.15s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--be-gold-lite); border-bottom-color: var(--be-gold); }
+
+.tab-content { display: none; flex: 1; overflow-y: auto; }
+.tab-content.active { display: flex; flex-direction: column; }
+.tab-content::-webkit-scrollbar { width: 5px; }
+.tab-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ─── Stats Grid ─────────────────────────────── */
+#stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 12px; padding: 20px 24px 14px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px; display: flex; flex-direction: column; gap: 7px;
+  transition: border-color 0.15s;
+}
+.stat-card:focus-within { border-color: var(--be-green-lite); }
+
+.stat-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
+.stat-desc  { font-size: 10px; color: var(--text-muted); opacity: 0.6; margin-top: -3px; }
+
+.stat-value-row { display: flex; align-items: center; gap: 8px; }
+.stat-value { font-size: 38px; font-weight: 900; color: var(--text); line-height: 1; min-width: 44px; }
+.stat-card.has-value .stat-value { color: var(--be-green-lite); }
+
+.stat-btn-group { display: flex; flex-direction: column; gap: 4px; }
+.stat-btn {
+  width: 30px; height: 28px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text);
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.1s; line-height: 1;
+}
+.stat-btn:hover { background: var(--surface3); }
+.stat-btn.plus:hover  { background: var(--accent-dim); color: var(--be-green-lite); border-color: var(--be-green-lite); }
+.stat-btn.minus:hover { background: rgba(248,113,113,0.1); color: #f87171; border-color: #f87171; }
+
+/* Quick Add */
+#quick-add-bar { padding: 12px 24px 20px; border-top: 1px solid var(--border); flex-shrink: 0; }
+#quick-add-bar h3 { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 9px; }
+#quick-buttons { display: flex; gap: 7px; flex-wrap: wrap; }
+
+.quick-btn {
+  padding: 7px 14px; border-radius: 8px; border: 1px solid;
+  font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.1s;
+}
+.quick-btn:active { transform: scale(0.95); }
+.qg  { background: rgba(0,140,69,0.15);   border-color: var(--be-green-lite);  color: var(--be-green-lite); }
+.qg:hover  { background: rgba(0,140,69,0.3); }
+.qa  { background: rgba(181,151,58,0.12); border-color: var(--be-gold-lite);   color: var(--be-gold-lite); }
+.qa:hover  { background: rgba(181,151,58,0.25); }
+.qs  { background: rgba(96,165,250,0.1);  border-color: #60a5fa; color: #60a5fa; }
+.qs:hover  { background: rgba(96,165,250,0.2); }
+.qb  { background: rgba(251,191,36,0.1);  border-color: #fbbf24; color: #fbbf24; }
+.qb:hover  { background: rgba(251,191,36,0.2); }
+.qt  { background: rgba(248,113,113,0.1); border-color: #f87171; color: #f87171; }
+.qt:hover  { background: rgba(248,113,113,0.2); }
+.qfw { background: rgba(0,140,69,0.08);   border-color: #6ee89b; color: #6ee89b; }
+.qfl { background: rgba(248,113,113,0.08);border-color: #fca5a5; color: #fca5a5; }
+
+/* ─── Heat Map ───────────────────────────────── */
+#tab-heatmap { padding: 0; overflow: hidden; }
+
+#heatmap-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 18px; border-bottom: 1px solid var(--border);
+  background: var(--surface); flex-shrink: 0; flex-wrap: wrap; gap: 8px;
+}
+#shot-type-selector { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+#shot-type-selector span { font-size: 12px; color: var(--text-muted); }
+
+.shot-type-btn {
+  padding: 5px 12px; border-radius: 6px;
+  border: 1.5px solid var(--c, #888);
+  background: transparent; color: var(--c, #888);
+  font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.1s;
+}
+.shot-type-btn:hover, .shot-type-btn.active {
+  background: color-mix(in srgb, var(--c) 20%, transparent);
+  color: var(--c);
+}
+#heatmap-actions { display: flex; align-items: center; gap: 12px; }
+#heatmap-toggle-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; }
+#heatmap-toggle { accent-color: var(--be-green-lite); }
+.btn-danger-sm {
+  background: rgba(248,113,113,0.1); border: 1px solid #f87171;
+  color: #f87171; border-radius: 6px; padding: 5px 12px;
+  font-size: 12px; cursor: pointer;
+}
+
+#field-container {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  padding: 14px; overflow: hidden; position: relative;
+}
+#field-canvas { border-radius: 10px; cursor: crosshair; max-width: 100%; max-height: 100%; }
+
+#shot-count-legend {
+  position: absolute; bottom: 22px; right: 24px;
+  background: rgba(10,26,15,0.92); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text-muted); }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.dot.goal  { background: #008c45; }
+.dot.sog   { background: #60a5fa; }
+.dot.miss  { background: #f87171; }
+.dot.gb    { background: #fbbf24; }
+
+#shot-list-panel {
+  width: 190px; min-width: 190px; border-left: 1px solid var(--border);
+  background: var(--surface); padding: 12px; overflow-y: auto;
+}
+#shot-list-panel h4 { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.6px; }
+#shot-count-badge { background: var(--surface3); padding: 1px 6px; border-radius: 10px; font-size: 10px; }
+
+.shot-entry {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 6px; border-radius: 5px; font-size: 11px;
+  margin-bottom: 3px; background: var(--surface2);
+}
+.shot-entry-label { display: flex; align-items: center; gap: 5px; }
+.shot-entry-del { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; line-height: 1; }
+.shot-entry-del:hover { color: #f87171; }
+
+/* ─── Profile Tab ────────────────────────────── */
+#tab-profile { padding: 22px 24px; }
+#profile-form { max-width: 400px; display: flex; flex-direction: column; gap: 13px; }
+.form-row { display: flex; flex-direction: column; gap: 4px; }
+.form-row label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
+.form-row input, .form-row select, .form-row textarea {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 7px; color: var(--text); padding: 8px 12px;
+  font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.15s;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--be-green-lite); }
+.form-row select option { background: var(--surface2); }
+.form-row textarea { resize: vertical; min-height: 65px; }
+
+.btn-be {
+  background: linear-gradient(135deg, var(--be-green) 0%, var(--be-green-lite) 100%);
+  color: #fff; font-weight: 700; border: none; border-radius: 8px;
+  padding: 10px 20px; font-size: 14px; cursor: pointer; transition: opacity 0.15s;
+}
+.btn-be:hover { opacity: 0.88; }
+
+.btn-danger {
+  background: rgba(248,113,113,0.1); border: 1px solid #f87171;
+  color: #f87171; font-weight: 700; border-radius: 8px;
+  padding: 10px 20px; font-size: 14px; cursor: pointer; margin-top: 6px;
+}
+.btn-danger:hover { background: rgba(248,113,113,0.2); }
+
+/* ─── Modal ──────────────────────────────────── */
+#modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; backdrop-filter: blur(4px);
+}
+#modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-top: 3px solid var(--be-gold);
+  border-radius: 14px; padding: 26px; width: 340px;
+  display: flex; flex-direction: column; gap: 13px;
+}
+#modal h2 { font-size: 18px; }
+#modal-actions { display: flex; gap: 10px; margin-top: 4px; }
+#modal-actions button { flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; }
+#btn-modal-cancel { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+#btn-modal-cancel:hover { background: var(--surface3); }
+
+/* ─── Toast ──────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(16px);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 16px;
+  font-size: 13px; font-weight: 600;
+  opacity: 0; pointer-events: none; transition: all 0.25s;
+  z-index: 200;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.success { border-color: var(--be-green-lite); color: var(--be-green-lite); }
+#toast.error   { border-color: #f87171; color: #f87171; }
+
+/* ─── Utility ─────────────────────────────────── */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div id="sidebar-header">
+      <div id="app-logo">
+        <!-- Bishop England Shield SVG -->
+        <svg id="logo-shield" viewBox="0 0 40 46" fill="none">
+          <path d="M20 2 L38 10 L38 28 Q38 40 20 44 Q2 40 2 28 L2 10 Z" fill="#003d1e" stroke="#b5973a" stroke-width="2"/>
+          <path d="M20 7 L33 13 L33 27 Q33 37 20 41 Q7 37 7 27 L7 13 Z" fill="#005a2b"/>
+          <text x="20" y="30" text-anchor="middle" font-size="13" font-weight="900" fill="#b5973a" font-family="serif">BE</text>
+        </svg>
+        <div id="logo-text">
+          <div class="school">Bishop England</div>
+          <div class="sport">Lacrosse Stats</div>
+        </div>
+      </div>
+      <div id="game-info">
+        <input type="text" id="opponent-input" placeholder="vs. Opponent" />
+        <input type="date"  id="game-date" />
+      </div>
+    </div>
+
+    <div id="search-box">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="5" stroke="#7aaa87" stroke-width="1.5"/>
+        <path d="M11 11L14 14" stroke="#7aaa87" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="player-search" placeholder="Search players…" />
+    </div>
+
+    <div id="player-list"></div>
+
+    <div id="sidebar-footer">
+      <button id="btn-export" class="footer-btn">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Export CSV
+      </button>
+      <button id="btn-save" class="footer-btn gold">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+          <rect x="2" y="2" width="10" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M4 2v4h6V2M5 8h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Save
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main id="main-panel">
+    <div id="empty-state">
+      <svg class="be-crest" width="120" height="140" viewBox="0 0 40 46" fill="none">
+        <path d="M20 2 L38 10 L38 28 Q38 40 20 44 Q2 40 2 28 L2 10 Z" fill="#005a2b" stroke="#b5973a" stroke-width="2"/>
+        <text x="20" y="30" text-anchor="middle" font-size="13" font-weight="900" fill="#b5973a" font-family="serif">BE</text>
+      </svg>
+      <h2>Select a Player</h2>
+      <p>Choose a player from the roster to track their stats</p>
+    </div>
+
+    <div id="player-detail" class="hidden">
+      <div id="player-header">
+        <div id="player-number-badge"></div>
+        <div id="player-info-block">
+          <h1 id="player-name-display"></h1>
+          <div id="player-meta">
+            <span id="player-grade-display" class="badge badge-grade"></span>
+            <span id="player-pos-display"   class="badge badge-pos"></span>
+            <span id="player-team-display"  class="badge badge-team"></span>
+          </div>
+        </div>
+        <div id="player-header-actions">
+          <button id="btn-prev-player" title="Previous">&#8592;</button>
+          <button id="btn-next-player" title="Next">&#8594;</button>
+        </div>
+      </div>
+
+      <div id="tabs">
+        <button class="tab-btn active" data-tab="stats">Stats</button>
+        <button class="tab-btn" data-tab="heatmap">Shot Map</button>
+        <button class="tab-btn" data-tab="profile">Profile</button>
+      </div>
+
+      <!-- Stats Tab -->
+      <div id="tab-stats" class="tab-content active">
+        <div id="stats-grid"></div>
+        <div id="quick-add-bar">
+          <h3>Quick Add</h3>
+          <div id="quick-buttons"></div>
+        </div>
+      </div>
+
+      <!-- Heat Map Tab -->
+      <div id="tab-heatmap" class="tab-content hidden">
+        <div id="heatmap-controls">
+          <div id="shot-type-selector">
+            <span>Mark as:</span>
+            <button class="shot-type-btn active" data-type="goal" style="--c:#008c45">Goal</button>
+            <button class="shot-type-btn" data-type="sog"  style="--c:#60a5fa">Shot on Goal</button>
+            <button class="shot-type-btn" data-type="miss" style="--c:#f87171">Miss</button>
+            <button class="shot-type-btn" data-type="gb"   style="--c:#fbbf24">Ground Ball</button>
+          </div>
+          <div id="heatmap-actions">
+            <label id="heatmap-toggle-label">
+              <input type="checkbox" id="heatmap-toggle" /> Heat Map Overlay
+            </label>
+            <button id="btn-clear-shots" class="btn-danger-sm">Clear All</button>
+          </div>
+        </div>
+        <div id="field-container">
+          <canvas id="field-canvas"></canvas>
+          <div id="shot-count-legend">
+            <div class="legend-item"><span class="dot goal"></span>Goal</div>
+            <div class="legend-item"><span class="dot sog"></span>Shot on Goal</div>
+            <div class="legend-item"><span class="dot miss"></span>Miss</div>
+            <div class="legend-item"><span class="dot gb"></span>Ground Ball</div>
+          </div>
+        </div>
+        <div id="shot-list-panel">
+          <h4>Shot Log <span id="shot-count-badge"></span></h4>
+          <div id="shot-list"></div>
+        </div>
+      </div>
+
+      <!-- Profile Tab -->
+      <div id="tab-profile" class="tab-content hidden">
+        <div id="profile-form">
+          <div class="form-row"><label>Jersey #</label><input type="number" id="edit-number" min="0" max="99"/></div>
+          <div class="form-row"><label>Full Name</label><input type="text" id="edit-name"/></div>
+          <div class="form-row">
+            <label>Grade</label>
+            <select id="edit-grade">
+              <option>Freshman</option><option>Sophomore</option><option>Junior</option><option>Senior</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Position</label>
+            <select id="edit-position">
+              <option value="Attack">Attack</option>
+              <option value="Midfield">Midfield</option>
+              <option value="Defense">Defense</option>
+              <option value="Goalie">Goalie</option>
+              <option value="LSM">LSM</option>
+              <option value="FOGO">FOGO</option>
+              <option value="">—</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Team Level</label>
+            <select id="edit-team">
+              <option value="Var">Varsity</option>
+              <option value="JV">JV</option>
+              <option value="Manager">Manager</option>
+            </select>
+          </div>
+          <div class="form-row"><label>Notes</label><textarea id="edit-notes" rows="3" placeholder="e.g. lefty, captain…"></textarea></div>
+          <button id="btn-save-profile" class="btn-be">Save Profile</button>
+          <button id="btn-delete-player" class="btn-danger">Delete Player</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Add Player Modal -->
+<div id="modal-overlay" class="hidden">
+  <div id="modal">
+    <h2>Add New Player</h2>
+    <div class="form-row"><label>Jersey #</label><input type="number" id="new-number" min="0" max="99" placeholder="00"/></div>
+    <div class="form-row"><label>Full Name *</label><input type="text" id="new-name" placeholder="First Last"/></div>
+    <div class="form-row">
+      <label>Grade</label>
+      <select id="new-grade"><option>Freshman</option><option>Sophomore</option><option>Junior</option><option>Senior</option></select>
+    </div>
+    <div class="form-row">
+      <label>Position</label>
+      <select id="new-position">
+        <option value="Attack">Attack</option>
+        <option value="Midfield">Midfield</option>
+        <option value="Defense">Defense</option>
+        <option value="Goalie">Goalie</option>
+        <option value="LSM">LSM</option>
+        <option value="FOGO">FOGO</option>
+        <option value="">—</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Team Level</label>
+      <select id="new-team"><option value="Var">Varsity</option><option value="JV">JV</option></select>
+    </div>
+    <div id="modal-actions">
+      <button id="btn-modal-cancel">Cancel</button>
+      <button id="btn-modal-add" class="btn-be">Add Player</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── Player Data ──────────────────────────────────────────────────────────
+const DEFAULT_PLAYERS = [
+  // Seniors
+  { id:  1, number:  9, name: "Tripp Grizzle",    grade: "Senior",    pos: "Midfield", team: "Var",     notes: "" },
+  { id:  2, number:  6, name: "Andrew Godfrey",   grade: "Senior",    pos: "Midfield", team: "Var",     notes: "" },
+  { id:  3, number: 11, name: "Charleston Englar",grade: "Senior",    pos: "Midfield", team: "Var",     notes: "" },
+  { id:  4, number:  8, name: "Cole McCormack",   grade: "Senior",    pos: "Midfield", team: "Var",     notes: "" },
+  { id:  5, number: 34, name: "Connor Hairfield", grade: "Senior",    pos: "Midfield", team: "Var",     notes: "" },
+  { id:  6, number: 10, name: "Eli King",         grade: "Senior",    pos: "Goalie",   team: "Var",     notes: "" },
+  { id:  7, number:  1, name: "Patrick Redican",  grade: "Senior",    pos: "Attack",   team: "Var",     notes: "" },
+  { id:  8, number: 24, name: "Peter Rosato",     grade: "Senior",    pos: "FOGO",     team: "Var",     notes: "" },
+  { id:  9, number:  3, name: "Rivers Matheney",  grade: "Senior",    pos: "Attack",   team: "Var",     notes: "Lefty" },
+  { id: 10, number: 11, name: "Tommy King",       grade: "Senior",    pos: "Attack",   team: "Var",     notes: "" },
+  { id: 11, number: 16, name: "Tyler Cubello",    grade: "Senior",    pos: "Defense",  team: "Var",     notes: "" },
+  // Juniors
+  { id: 12, number:  7, name: "Connor McGovern",  grade: "Junior",    pos: "Midfield", team: "Var",     notes: "" },
+  { id: 13, number: 27, name: "Ben Nesseralla",   grade: "Junior",    pos: "Attack",   team: "Var",     notes: "" },
+  { id: 14, number: 22, name: "Matthew Ponkow",   grade: "Junior",    pos: "Defense",  team: "Var",     notes: "" },
+  { id: 15, number: 24, name: "Tate Murray",      grade: "Junior",    pos: "Defense",  team: "Var",     notes: "" },
+  // Sophomores
+  { id: 16, number:  4, name: "Chase Tonon",      grade: "Sophomore", pos: "Midfield", team: "Var",     notes: "" },
+  { id: 17, number: 21, name: "Trever Tonon",     grade: "Sophomore", pos: "Midfield", team: "Var",     notes: "" },
+  { id: 18, number:  8, name: "Chase Jackson",    grade: "Sophomore", pos: "Attack",   team: "Var",     notes: "" },
+  { id: 19, number: 21, name: "John Shultz",      grade: "Sophomore", pos: "Midfield", team: "Var",     notes: "" },
+  { id: 20, number: 13, name: "Liam Rodgers",     grade: "Sophomore", pos: "Midfield", team: "Var",     notes: "" },
+  { id: 21, number: 29, name: "Noah Jackson",     grade: "Sophomore", pos: "Attack",   team: "Var",     notes: "Lefty" },
+  { id: 22, number:  7, name: "Tommy Romano",     grade: "Sophomore", pos: "LSM",      team: "Var",     notes: "" },
+  { id: 23, number: 22, name: "Will Garton",      grade: "Sophomore", pos: "Midfield", team: "Var",     notes: "" },
+  { id: 24, number: 23, name: "Andrew Horstman",  grade: "Sophomore", pos: "FOGO",     team: "Var",     notes: "" },
+  { id: 25, number: 21, name: "Wyatt Combs",      grade: "Sophomore", pos: "Defense",  team: "Var",     notes: "" },
+  // Freshmen
+  { id: 26, number: 10, name: "Caden Sheninger",  grade: "Freshman",  pos: "Goalie",   team: "Var",     notes: "" },
+  { id: 27, number:  3, name: "Chase Coffey",     grade: "Freshman",  pos: "Midfield", team: "Var",     notes: "" },
+  { id: 28, number:  4, name: "Luke Hanson",      grade: "Freshman",  pos: "Defense",  team: "Var",     notes: "" },
+  // Manager
+  { id: 29, number:  0, name: "Charlie Godfrey",  grade: "Sophomore", pos: "",         team: "Manager", notes: "" },
+];
+
+function emptyStats() { return { G:0, A:0, SOG:0, GB:0, TO:0, FOU:0, FOL:0, shots:[] }; }
+
+// ─── State ────────────────────────────────────────────────────────────────
+let state = {
+  players: [], stats: {}, selectedId: null,
+  game: { opponent:"", date:"" },
+  shotType: "goal", heatmapEnabled: false, nextId: 30
+};
+
+// ─── LocalStorage ─────────────────────────────────────────────────────────
+function loadData() {
+  try {
+    const raw = localStorage.getItem("be-lacrosse-stats");
+    if (raw) {
+      const d = JSON.parse(raw);
+      state.players = d.players || DEFAULT_PLAYERS;
+      state.stats   = d.stats   || {};
+      state.game    = d.game    || { opponent:"", date:"" };
+      state.nextId  = d.nextId  || 30;
+      state.players.forEach(p => { if (!state.stats[p.id]) state.stats[p.id] = emptyStats(); });
+      return;
+    }
+  } catch(e) {}
+  state.players = DEFAULT_PLAYERS;
+  state.stats   = {};
+  state.players.forEach(p => { state.stats[p.id] = emptyStats(); });
+}
+
+function saveData() {
+  localStorage.setItem("be-lacrosse-stats", JSON.stringify({
+    players: state.players, stats: state.stats,
+    game: state.game, nextId: state.nextId
+  }));
+  showToast("Saved!", "success");
+}
+
+let autoSaveTimer;
+function autoSave() { clearTimeout(autoSaveTimer); autoSaveTimer = setTimeout(saveData, 1200); }
+
+// ─── Toast ────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type="success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = ""; }, 2200);
+}
+
+// ─── Render Player List ───────────────────────────────────────────────────
+function renderPlayerList(filter="") {
+  const list = document.getElementById("player-list");
+  const q = filter.toLowerCase();
+  const filtered = q
+    ? state.players.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        String(p.number).includes(q) ||
+        (p.pos||"").toLowerCase().includes(q) ||
+        (p.grade||"").toLowerCase().includes(q))
+    : state.players;
+
+  list.innerHTML = `<button id="btn-add-player">
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+      <path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg> Add Player</button>`;
+  document.getElementById("btn-add-player").addEventListener("click", openAddModal);
+
+  const grades = ["Senior","Junior","Sophomore","Freshman","Manager"];
+  grades.forEach(grade => {
+    const group = filtered.filter(p => p.grade === grade || (grade === "Manager" && p.team === "Manager"));
+    if (!group.length) return;
+    const hdr = document.createElement("div");
+    hdr.className = "grade-header";
+    hdr.textContent = grade + "s";
+    list.appendChild(hdr);
+
+    group.forEach(p => {
+      if (grade === "Manager" && p.grade !== "Manager") return; // avoid dupes
+      const s = state.stats[p.id] || emptyStats();
+      const el = document.createElement("div");
+      el.className = "player-item" + (p.id === state.selectedId ? " selected" : "");
+      el.dataset.id = p.id;
+      const numTxt = p.number > 0 ? `#${p.number}` : "—";
+      const sub = [p.pos, p.notes].filter(Boolean).join(" · ") || p.team;
+      el.innerHTML = `
+        <div class="player-jersey">${numTxt}</div>
+        <div class="player-item-info">
+          <div class="player-item-name">${p.name}</div>
+          <div class="player-item-sub">${sub}</div>
+        </div>
+        <div class="mini-stats">
+          <div class="ms ${s.G>0?'lit':''}" title="Goals">G:${s.G}</div>
+          <div class="ms ${s.A>0?'lit':''}" title="Assists">A:${s.A}</div>
+        </div>`;
+      el.addEventListener("click", () => selectPlayer(p.id));
+      list.appendChild(el);
+    });
+  });
+}
+
+// ─── Select Player ────────────────────────────────────────────────────────
+function selectPlayer(id) {
+  state.selectedId = id;
+  renderPlayerList(document.getElementById("player-search").value);
+  const p = state.players.find(x => x.id === id);
+  if (!p) return;
+  if (!state.stats[p.id]) state.stats[p.id] = emptyStats();
+
+  document.getElementById("empty-state").classList.add("hidden");
+  document.getElementById("player-detail").classList.remove("hidden");
+
+  document.getElementById("player-number-badge").textContent = p.number > 0 ? `#${p.number}` : "—";
+  document.getElementById("player-name-display").textContent = p.name;
+  document.getElementById("player-grade-display").textContent = p.grade;
+  document.getElementById("player-pos-display").textContent  = p.pos || "—";
+  document.getElementById("player-team-display").textContent = p.team === "Var" ? "Varsity" : p.team;
+
+  renderStatsTab(p);
+  renderProfileTab(p);
+  if (document.querySelector(".tab-btn.active")?.dataset.tab === "heatmap") setTimeout(drawField, 50);
+}
+
+// ─── Stats Tab ────────────────────────────────────────────────────────────
+const STAT_DEFS = [
+  { key:"G",   label:"Goals",          desc:"Total goals scored",      color:"#008c45" },
+  { key:"A",   label:"Assists",         desc:"Passes leading to goals", color:"#d4af44" },
+  { key:"SOG", label:"Shots on Goal",   desc:"Shots on cage",           color:"#60a5fa" },
+  { key:"GB",  label:"Ground Balls",    desc:"Loose ball pickups",      color:"#fbbf24" },
+  { key:"TO",  label:"Turnovers",       desc:"Possessions lost",        color:"#f87171" },
+  { key:"FOU", label:"Face-Off Wins",   desc:"Face-offs won",           color:"#6ee89b" },
+  { key:"FOL", label:"Face-Off Losses", desc:"Face-offs lost",          color:"#fca5a5" },
+];
+
+function renderStatsTab(p) {
+  const s = state.stats[p.id];
+  const grid = document.getElementById("stats-grid");
+  grid.innerHTML = "";
+
+  STAT_DEFS.forEach(def => {
+    const val = s[def.key] || 0;
+    const card = document.createElement("div");
+    card.className = "stat-card" + (val > 0 ? " has-value" : "");
+    card.innerHTML = `
+      <div class="stat-label">${def.key}</div>
+      <div class="stat-desc">${def.desc}</div>
+      <div class="stat-value-row">
+        <div class="stat-value" style="color:${val>0?def.color:''}">${val}</div>
+        <div class="stat-btn-group">
+          <button class="stat-btn plus"  data-stat="${def.key}">+</button>
+          <button class="stat-btn minus" data-stat="${def.key}">−</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  const qb = document.getElementById("quick-buttons");
+  qb.innerHTML = "";
+  [
+    { stat:"G",   label:"+ Goal",        cls:"qg"  },
+    { stat:"A",   label:"+ Assist",      cls:"qa"  },
+    { stat:"SOG", label:"+ Shot on Goal",cls:"qs"  },
+    { stat:"GB",  label:"+ Ground Ball", cls:"qb"  },
+    { stat:"TO",  label:"+ Turnover",    cls:"qt"  },
+    { stat:"FOU", label:"+ FO Win",      cls:"qfw" },
+    { stat:"FOL", label:"+ FO Loss",     cls:"qfl" },
+  ].forEach(qd => {
+    const btn = document.createElement("button");
+    btn.className = `quick-btn ${qd.cls}`;
+    btn.textContent = qd.label;
+    btn.addEventListener("click", () => adjustStat(p.id, qd.stat, 1));
+    qb.appendChild(btn);
+  });
+
+  grid.querySelectorAll(".stat-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const stat  = e.currentTarget.dataset.stat;
+      const delta = e.currentTarget.classList.contains("plus") ? 1 : -1;
+      adjustStat(p.id, stat, delta);
+    });
+  });
+}
+
+function adjustStat(pid, stat, delta) {
+  state.stats[pid][stat] = Math.max(0, (state.stats[pid][stat] || 0) + delta);
+  const p = state.players.find(x => x.id === pid);
+  if (p) { renderStatsTab(p); renderPlayerList(document.getElementById("player-search").value); }
+  autoSave();
+}
+
+// ─── Profile Tab ──────────────────────────────────────────────────────────
+function renderProfileTab(p) {
+  document.getElementById("edit-number").value   = p.number;
+  document.getElementById("edit-name").value     = p.name;
+  document.getElementById("edit-grade").value    = p.grade;
+  document.getElementById("edit-position").value = p.pos;
+  document.getElementById("edit-team").value     = p.team;
+  document.getElementById("edit-notes").value    = p.notes || "";
+}
+
+function saveProfile() {
+  const p = state.players.find(x => x.id === state.selectedId);
+  if (!p) return;
+  p.number = parseInt(document.getElementById("edit-number").value) || 0;
+  p.name   = document.getElementById("edit-name").value.trim() || p.name;
+  p.grade  = document.getElementById("edit-grade").value;
+  p.pos    = document.getElementById("edit-position").value;
+  p.team   = document.getElementById("edit-team").value;
+  p.notes  = document.getElementById("edit-notes").value.trim();
+  renderPlayerList(document.getElementById("player-search").value);
+  selectPlayer(p.id);
+  showToast("Profile updated!"); autoSave();
+}
+
+function deletePlayer() {
+  const p = state.players.find(x => x.id === state.selectedId);
+  if (!confirm(`Delete ${p?.name}?`)) return;
+  state.players = state.players.filter(x => x.id !== state.selectedId);
+  delete state.stats[state.selectedId];
+  state.selectedId = null;
+  document.getElementById("empty-state").classList.remove("hidden");
+  document.getElementById("player-detail").classList.add("hidden");
+  renderPlayerList(); autoSave();
+}
+
+// ─── Field Canvas ─────────────────────────────────────────────────────────
+const FW = 560, FH = 330;
+const SHOT_COLORS = { goal:"#008c45", sog:"#60a5fa", miss:"#f87171", gb:"#fbbf24" };
+
+function drawField() {
+  const canvas = document.getElementById("field-canvas");
+  const ctx    = canvas.getContext("2d");
+  const dpr    = window.devicePixelRatio || 1;
+  const cont   = document.getElementById("field-container");
+  const scale  = Math.min((cont.clientWidth-28)/FW, (cont.clientHeight-28)/FH, 1);
+  const cW = Math.floor(FW*scale), cH = Math.floor(FH*scale);
+  canvas.style.width = cW+"px"; canvas.style.height = cH+"px";
+  canvas.width = cW*dpr; canvas.height = cH*dpr;
+  ctx.scale(dpr*scale, dpr*scale);
+
+  // Grass
+  const g = ctx.createLinearGradient(0,0,0,FH);
+  g.addColorStop(0,   "#0f3d18");
+  g.addColorStop(0.5, "#135220");
+  g.addColorStop(1,   "#0f3d18");
+  ctx.fillStyle = g; ctx.fillRect(0,0,FW,FH);
+  ctx.fillStyle = "rgba(0,0,0,0.07)";
+  for (let i=0; i<FW; i+=40) ctx.fillRect(i,0,20,FH);
+
+  // Lines
+  ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2;
+  ctx.strokeRect(10,10,FW-20,FH-20);
+  ctx.beginPath(); ctx.moveTo(FW/2,10); ctx.lineTo(FW/2,FH-10); ctx.stroke();
+  ctx.beginPath(); ctx.arc(FW/2,FH/2,28,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(FW/2,FH/2,3,0,Math.PI*2); ctx.fill();
+
+  // Goals & crease
+  drawGoal(ctx, 10,      FH/2);
+  drawGoal(ctx, FW-10,   FH/2);
+  ctx.strokeStyle="rgba(255,255,255,0.8)"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(10,      FH/2,55,-Math.PI/2,Math.PI/2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(FW-10,   FH/2,55,Math.PI/2,-Math.PI/2); ctx.stroke();
+
+  // Restraining lines
+  ctx.strokeStyle="rgba(255,255,255,0.45)"; ctx.lineWidth=1; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(120,10); ctx.lineTo(120,FH-10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(FW-120,10); ctx.lineTo(FW-120,FH-10); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // FO marks
+  drawX(ctx, FW/2-70, FH/2); drawX(ctx, FW/2+70, FH/2);
+
+  // Labels
+  ctx.fillStyle="rgba(255,255,255,0.2)"; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("ATTACK",  80,     FH-17);
+  ctx.fillText("DEFENSE", FW-80,  FH-17);
+
+  // Heat map
+  const pid = state.selectedId;
+  if (pid && state.heatmapEnabled) drawHeatmap(ctx, state.stats[pid]?.shots||[]);
+
+  // Dots
+  if (pid) (state.stats[pid]?.shots||[]).forEach(sh => {
+    ctx.beginPath(); ctx.arc(sh.x,sh.y,6,0,Math.PI*2);
+    ctx.fillStyle=(SHOT_COLORS[sh.type]||"#fff")+"cc"; ctx.fill();
+    ctx.strokeStyle=SHOT_COLORS[sh.type]||"#fff"; ctx.lineWidth=1.5; ctx.stroke();
+  });
+}
+
+function drawGoal(ctx, x, y) {
+  const gH=30, bDepth = x<FW/2 ? 18 : -18;
+  ctx.fillStyle="#fff";
+  ctx.fillRect(x-3,y-gH/2,6,3); ctx.fillRect(x-3,y+gH/2-3,6,3);
+  ctx.fillRect(x+bDepth-3,y-gH/2,3,gH);
+  ctx.strokeStyle="rgba(255,255,255,0.45)"; ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(x,y-gH/2); ctx.lineTo(x+bDepth,y-gH/2);
+  ctx.lineTo(x+bDepth,y+gH/2); ctx.lineTo(x,y+gH/2);
+  ctx.stroke();
+}
+
+function drawX(ctx, x, y) {
+  ctx.strokeStyle="rgba(255,255,255,0.45)"; ctx.lineWidth=1;
+  const s=8;
+  ctx.beginPath(); ctx.moveTo(x-s,y-s); ctx.lineTo(x+s,y+s); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+s,y-s); ctx.lineTo(x-s,y+s); ctx.stroke();
+}
+
+function drawHeatmap(ctx, shots) {
+  if (!shots.length) return;
+  const off = document.createElement("canvas");
+  off.width=FW; off.height=FH;
+  const oc = off.getContext("2d");
+  shots.forEach(sh => {
+    const gr = oc.createRadialGradient(sh.x,sh.y,0,sh.x,sh.y,50);
+    gr.addColorStop(0,"rgba(255,60,0,0.3)");
+    gr.addColorStop(0.5,"rgba(255,160,0,0.12)");
+    gr.addColorStop(1,"rgba(255,255,0,0)");
+    oc.fillStyle=gr; oc.beginPath(); oc.arc(sh.x,sh.y,50,0,Math.PI*2); oc.fill();
+  });
+  ctx.drawImage(off,0,0,FW,FH);
+}
+
+function canvasCoords(canvas, e) {
+  const r=canvas.getBoundingClientRect();
+  return { x:(e.clientX-r.left)*(FW/r.width), y:(e.clientY-r.top)*(FH/r.height) };
+}
+
+function addShot(x,y) {
+  const pid=state.selectedId; if(!pid) return;
+  const sh={type:state.shotType,x,y,ts:Date.now()};
+  state.stats[pid].shots.push(sh);
+  if (sh.type==="goal") { state.stats[pid].G++; state.stats[pid].SOG++; }
+  else if (sh.type==="sog") { state.stats[pid].SOG++; }
+  else if (sh.type==="gb")  { state.stats[pid].GB++;  }
+  renderShotList(); drawField();
+  const p=state.players.find(x=>x.id===pid);
+  if (p && document.getElementById("tab-stats").classList.contains("active")) renderStatsTab(p);
+  renderPlayerList(document.getElementById("player-search").value);
+  autoSave();
+}
+
+function renderShotList() {
+  const pid=state.selectedId; if(!pid) return;
+  const shots=state.stats[pid]?.shots||[];
+  document.getElementById("shot-count-badge").textContent=shots.length;
+  const listEl=document.getElementById("shot-list");
+  listEl.innerHTML="";
+  const labels={goal:"Goal",sog:"Shot on Goal",miss:"Miss",gb:"Ground Ball"};
+  shots.slice().reverse().forEach((sh,ri) => {
+    const i=shots.length-1-ri;
+    const el=document.createElement("div");
+    el.className="shot-entry";
+    el.innerHTML=`<div class="shot-entry-label"><span class="dot ${sh.type}"></span><span>${labels[sh.type]||sh.type}</span></div>
+      <button class="shot-entry-del" data-idx="${i}">×</button>`;
+    el.querySelector(".shot-entry-del").addEventListener("click",e=>{
+      const idx=parseInt(e.currentTarget.dataset.idx);
+      const s=state.stats[pid].shots[idx];
+      if(s.type==="goal"){state.stats[pid].G=Math.max(0,state.stats[pid].G-1);state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1);}
+      else if(s.type==="sog"){state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1);}
+      else if(s.type==="gb"){state.stats[pid].GB=Math.max(0,state.stats[pid].GB-1);}
+      state.stats[pid].shots.splice(idx,1);
+      renderShotList(); drawField();
+      const p=state.players.find(x=>x.id===pid);
+      if(p&&document.getElementById("tab-stats").classList.contains("active")) renderStatsTab(p);
+      renderPlayerList(document.getElementById("player-search").value);
+      autoSave();
+    });
+    listEl.appendChild(el);
+  });
+}
+
+// ─── Add Player Modal ─────────────────────────────────────────────────────
+function openAddModal() {
+  document.getElementById("new-number").value="";
+  document.getElementById("new-name").value="";
+  document.getElementById("modal-overlay").classList.remove("hidden");
+  document.getElementById("new-name").focus();
+}
+function closeModal() { document.getElementById("modal-overlay").classList.add("hidden"); }
+
+function addPlayer() {
+  const name=document.getElementById("new-name").value.trim();
+  if(!name){document.getElementById("new-name").focus();return;}
+  const p={id:state.nextId++,
+    number:parseInt(document.getElementById("new-number").value)||0,
+    name,grade:document.getElementById("new-grade").value,
+    pos:document.getElementById("new-position").value,
+    team:document.getElementById("new-team").value,notes:""};
+  state.players.push(p); state.stats[p.id]=emptyStats();
+  closeModal(); renderPlayerList(); selectPlayer(p.id); autoSave();
+}
+
+// ─── CSV Export ───────────────────────────────────────────────────────────
+function exportCSV() {
+  const h=["#","Name","Grade","Pos","Team","G","A","SOG","GB","TO","FOU","FOL"];
+  const rows=state.players.map(p=>{
+    const s=state.stats[p.id]||emptyStats();
+    return[p.number,`"${p.name}"`,p.grade,p.pos,p.team,s.G,s.A,s.SOG,s.GB,s.TO,s.FOU,s.FOL];
+  });
+  const csv=[h,...rows].map(r=>r.join(",")).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download=`be-lacrosse-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); showToast("CSV exported!");
+}
+
+// ─── Tab Switching ────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+  document.querySelectorAll(".tab-content").forEach(c=>{
+    c.classList.toggle("active",c.id===`tab-${tab}`);
+    c.classList.toggle("hidden",c.id!==`tab-${tab}`);
+  });
+  if(tab==="heatmap"){renderShotList();setTimeout(drawField,50);}
+}
+
+function navigatePlayer(dir) {
+  if(!state.selectedId) return;
+  const idx=state.players.findIndex(p=>p.id===state.selectedId);
+  const nxt=idx+dir;
+  if(nxt>=0&&nxt<state.players.length) selectPlayer(state.players[nxt].id);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────
+function init() {
+  loadData();
+  renderPlayerList();
+  if(state.game.opponent) document.getElementById("opponent-input").value=state.game.opponent;
+  if(state.game.date)     document.getElementById("game-date").value=state.game.date;
+
+  document.getElementById("player-search").addEventListener("input",e=>renderPlayerList(e.target.value));
+  document.getElementById("opponent-input").addEventListener("input",e=>{state.game.opponent=e.target.value;autoSave();});
+  document.getElementById("game-date").addEventListener("change",e=>{state.game.date=e.target.value;autoSave();});
+  document.getElementById("btn-save").addEventListener("click",saveData);
+  document.getElementById("btn-export").addEventListener("click",exportCSV);
+
+  document.querySelectorAll(".tab-btn").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+  document.getElementById("btn-save-profile").addEventListener("click",saveProfile);
+  document.getElementById("btn-delete-player").addEventListener("click",deletePlayer);
+  document.getElementById("btn-prev-player").addEventListener("click",()=>navigatePlayer(-1));
+  document.getElementById("btn-next-player").addEventListener("click",()=>navigatePlayer(1));
+
+  document.getElementById("btn-modal-cancel").addEventListener("click",closeModal);
+  document.getElementById("btn-modal-add").addEventListener("click",addPlayer);
+  document.getElementById("modal-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("modal-overlay"))closeModal();});
+  document.getElementById("new-name").addEventListener("keydown",e=>{if(e.key==="Enter")addPlayer();if(e.key==="Escape")closeModal();});
+
+  document.querySelectorAll(".shot-type-btn").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".shot-type-btn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); state.shotType=b.dataset.type;
+  }));
+  document.getElementById("heatmap-toggle").addEventListener("change",e=>{state.heatmapEnabled=e.target.checked;drawField();});
+  document.getElementById("btn-clear-shots").addEventListener("click",()=>{
+    if(!state.selectedId||!confirm("Clear all shots?")) return;
+    state.stats[state.selectedId].shots=[];
+    renderShotList(); drawField(); autoSave();
+  });
+
+  document.getElementById("field-canvas").addEventListener("click",e=>{
+    const{x,y}=canvasCoords(document.getElementById("field-canvas"),e);
+    addShot(x,y);
+  });
+
+  document.addEventListener("keydown",e=>{
+    if(["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) return;
+    if(!state.selectedId) return;
+    const pid=state.selectedId;
+    const k={g:()=>adjustStat(pid,"G",1),a:()=>adjustStat(pid,"A",1),s:()=>adjustStat(pid,"SOG",1),
+             b:()=>adjustStat(pid,"GB",1),t:()=>adjustStat(pid,"TO",1),
+             w:()=>adjustStat(pid,"FOU",1),l:()=>adjustStat(pid,"FOL",1),
+             ArrowLeft:()=>navigatePlayer(-1),ArrowRight:()=>navigatePlayer(1)};
+    if(k[e.key]) k[e.key]();
+  });
+
+  let rt;
+  window.addEventListener("resize",()=>{
+    clearTimeout(rt);
+    rt=setTimeout(()=>{if(document.getElementById("tab-heatmap").classList.contains("active"))drawField();},100);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
