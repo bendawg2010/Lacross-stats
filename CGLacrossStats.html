@@ -625,6 +625,131 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 .btn-match-del { padding: 5px 8px; border-radius: 6px; border: none;
   background: none; color: var(--text-muted); font-size: 14px; cursor: pointer; flex-shrink: 0; }
 .btn-match-del:hover { color: #f87171; background: rgba(248,113,113,0.1); }
+
+/* ─── Scoreboard ─────────────────────────────── */
+#scoreboard { padding: 10px 12px 8px; border-bottom: 1px solid var(--border); background: var(--surface2); flex-shrink: 0; }
+.sb-row1 { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.sb-team { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; }
+.sb-team-name { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); }
+.sb-digit { font-size: 44px; font-weight: 900; line-height: 1; color: var(--text); min-width: 38px; text-align: center; cursor: default; }
+.sb-digit.be { color: var(--be-green-lite); }
+.sb-colon { font-size: 36px; font-weight: 900; color: var(--border); padding: 0 2px; align-self: center; }
+.sb-row2 { display: flex; align-items: center; justify-content: space-between; margin-top: 5px; gap: 8px; }
+.sb-adj { display: flex; gap: 4px; }
+.sb-btn { width: 28px; height: 22px; border-radius: 5px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font-size: 15px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; transition: all 0.1s; }
+.sb-btn:hover { border-color: var(--be-green-lite); color: var(--be-green-lite); }
+#sb-quarters { display: flex; gap: 3px; }
+.qtr-btn { padding: 2px 6px; border-radius: 5px; border: 1.5px solid var(--border); background: transparent; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.1s; }
+.qtr-btn.active { background: var(--be-green); color: #fff; border-color: var(--be-green); }
+.qtr-btn:hover:not(.active) { border-color: var(--be-green-lite); color: var(--be-green-lite); }
+
+/* ─── Heatmap row 2 (quarters + tools) ──────── */
+#heatmap-row2 { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; padding: 6px 14px; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
+#heatmap-row2 > span { font-size: 11px; color: var(--text-muted); }
+.qtr-filter-btn { padding: 2px 8px; border-radius: 5px; border: 1.5px solid var(--border); background: transparent; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.1s; }
+.qtr-filter-btn.active { background: var(--be-green); color: #fff; border-color: var(--be-green); }
+.qtr-filter-btn:hover:not(.active) { border-color: var(--be-green-lite); color: var(--be-green-lite); }
+#btn-undo-shot { padding: 3px 9px; border-radius: 6px; border: 1.5px solid var(--border); background: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; margin-left: auto; }
+#btn-undo-shot:hover { border-color: #f87171; color: #f87171; }
+#btn-zones { padding: 3px 9px; border-radius: 6px; border: 1.5px solid var(--border); background: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; }
+#btn-zones.active { background: color-mix(in srgb,var(--be-gold) 18%,transparent); border-color: var(--be-gold); color: var(--be-gold-lite); }
+.fullscreen-btn { padding: 3px 7px; border-radius: 6px; border: 1.5px solid var(--border); background: none; color: var(--text-muted); font-size: 14px; cursor: pointer; }
+.fullscreen-btn:hover { border-color: var(--be-gold); color: var(--be-gold-lite); }
+
+/* ─── Player avatar & compare ───────────────── */
+#player-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); background: var(--surface2); flex-shrink: 0; font-size: 17px; font-weight: 900; color: var(--text-muted); display: flex; align-items: center; justify-content: center; }
+#player-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+#btn-compare-player { padding: 4px 10px; border-radius: 7px; border: 1.5px solid var(--border); background: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+#btn-compare-player:hover { border-color: var(--be-gold); color: var(--be-gold-lite); }
+
+/* ─── Player photo in profile tab ───────────── */
+#player-photo-area { display: flex; align-items: center; gap: 14px; padding: 14px 18px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+#player-photo-big { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; color: var(--text-muted); flex-shrink: 0; overflow: hidden; }
+#player-photo-big img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.photo-upload-btn { display: inline-block; padding: 6px 12px; border-radius: 7px; border: 1.5px dashed var(--border); background: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; }
+.photo-upload-btn:hover { border-color: var(--be-green-lite); color: var(--be-green-lite); }
+#photo-file-input { display: none; }
+#btn-remove-photo { padding: 4px 10px; border-radius: 6px; border: none; background: rgba(248,113,113,0.12); color: #f87171; font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 5px; display: none; }
+
+/* ─── Penalties tab ─────────────────────────── */
+#penalty-form { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px 14px; border-bottom: 1px solid var(--border); align-items: flex-end; flex-shrink: 0; }
+#penalty-form select, #penalty-form input { padding: 6px 8px; border-radius: 7px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); font-size: 12px; }
+#penalty-form select:focus, #penalty-form input:focus { outline: none; border-color: var(--be-green-lite); }
+#btn-log-penalty { padding: 7px 14px; border-radius: 7px; border: none; background: var(--be-green); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+#btn-log-penalty:hover { background: var(--be-green-lite); }
+#penalty-list { padding: 10px 14px; overflow-y: auto; flex: 1; }
+.penalty-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--surface2); border-radius: 8px; margin-bottom: 5px; }
+.pen-info { flex: 1; min-width: 0; }
+.pen-name { font-size: 12px; font-weight: 700; color: var(--text); }
+.pen-meta { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+.pen-del { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; padding: 0 2px; }
+.pen-del:hover { color: #f87171; }
+
+/* ─── Sub tracker badge on player cards ──────── */
+.sub-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; margin-left: 2px; }
+.sub-dot.on { background: var(--be-green-lite); box-shadow: 0 0 5px var(--be-green-lite); }
+
+/* ─── Season view ────────────────────────────── */
+#season-view { flex: 1; display: none; flex-direction: column; overflow-y: auto; padding: 20px 24px; gap: 20px; }
+#season-view.active { display: flex; }
+#season-view::-webkit-scrollbar { width: 5px; }
+#season-view::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.season-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.season-section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 12px; }
+.season-record-row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.season-record-big { font-size: 42px; font-weight: 900; color: var(--be-green-lite); line-height: 1; }
+.season-record-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; margin-top: 2px; }
+.season-game-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 7px; margin-bottom: 4px; cursor: pointer; }
+.season-game-row:hover { background: var(--surface2); }
+.season-game-result { font-size: 11px; font-weight: 900; width: 20px; text-align: center; border-radius: 4px; padding: 1px 3px; }
+.season-game-result.W { background: rgba(0,140,69,0.25); color: var(--be-green-lite); }
+.season-game-result.L { background: rgba(248,113,113,0.2); color: #f87171; }
+.season-game-result.T { background: rgba(122,170,135,0.2); color: var(--text-muted); }
+.season-game-name { flex: 1; font-size: 12px; font-weight: 600; color: var(--text); }
+.season-game-score { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+
+/* ─── Player comparison modal ────────────────── */
+#compare-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+#compare-overlay.hidden { display: none; }
+#compare-dialog { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: 520px; max-width: 96vw; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; }
+#compare-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+#compare-header h2 { margin: 0; font-size: 17px; }
+#btn-compare-close { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; padding: 0 4px; }
+#btn-compare-close:hover { color: var(--text); }
+#compare-body { flex: 1; overflow-y: auto; padding: 14px 18px; }
+.compare-selects { display: flex; gap: 10px; margin-bottom: 14px; }
+.compare-selects select { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); font-size: 13px; }
+.compare-selects select:focus { outline: none; border-color: var(--be-green-lite); }
+.compare-table { width: 100%; border-collapse: collapse; }
+.compare-table td { padding: 5px 8px; font-size: 13px; }
+.compare-table .ct-a { text-align: right; font-weight: 700; color: var(--be-gold-lite); }
+.compare-table .ct-lbl { text-align: center; font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 5px 12px; }
+.compare-table .ct-b { text-align: left; font-weight: 700; color: var(--be-green-lite); }
+.compare-table tr.winner-a .ct-a { background: rgba(0,140,69,0.25); border-radius: 6px; color: #fff; }
+.compare-table tr.winner-b .ct-b { background: rgba(0,140,69,0.25); border-radius: 6px; color: #fff; }
+.compare-table tr.sep td { padding: 2px; border-top: 1px solid var(--border); }
+.compare-names { display: flex; gap: 10px; margin-bottom: 8px; }
+.compare-names .cn { flex: 1; text-align: center; }
+.compare-names .cn-a { color: var(--be-gold-lite); font-weight: 800; font-size: 13px; }
+.compare-names .cn-b { color: var(--be-green-lite); font-weight: 800; font-size: 13px; }
+.compare-names .cn-mid { width: 80px; flex-shrink: 0; }
+
+/* ─── Print / Box Score ──────────────────────── */
+#print-box-score { display: none; }
+@media print {
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  #sidebar, #main-nav, #heatmap-controls, #heatmap-row2, #team-map-controls,
+  #match-bar, .tab-btn, #btn-save-profile, #btn-delete-player,
+  #match-mgr-overlay, #toast, #compare-overlay { display: none !important; }
+  body, #app { background: #fff !important; color: #000 !important; display: block !important; }
+  #main-panel { display: block !important; overflow: visible !important; }
+  #print-box-score { display: block !important; }
+  #player-view, #team-map-view, #charts-view, #season-view { display: none !important; }
+  .print-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .print-table th { background: #005a2b; color: #fff; padding: 6px 8px; text-align: left; }
+  .print-table td { padding: 5px 8px; border-bottom: 1px solid #ddd; }
+  .print-table tr:nth-child(even) td { background: #f9f9f9; }
+}
 </style>
 </head>
 <body>
@@ -655,7 +780,39 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
       <button id="btn-matches-open">&#9783; Matches</button>
     </div>
 
-    <div id="search-box">
+    <div id="scoreboard">
+    <div class="sb-row1">
+      <div class="sb-team">
+        <div class="sb-team-name">BE</div>
+        <div class="sb-digit be" id="score-be">0</div>
+      </div>
+      <div class="sb-colon">:</div>
+      <div id="sb-quarters">
+        <button class="qtr-btn active" data-q="1">Q1</button>
+        <button class="qtr-btn" data-q="2">Q2</button>
+        <button class="qtr-btn" data-q="3">Q3</button>
+        <button class="qtr-btn" data-q="4">Q4</button>
+      </div>
+      <div class="sb-colon">:</div>
+      <div class="sb-team">
+        <div class="sb-team-name" id="score-opp-name">OPP</div>
+        <div class="sb-digit" id="score-opp">0</div>
+      </div>
+    </div>
+    <div class="sb-row2">
+      <div class="sb-adj">
+        <button class="sb-btn" id="btn-be-minus">−</button>
+        <button class="sb-btn" id="btn-be-plus">+</button>
+      </div>
+      <span style="font-size:10px;color:var(--text-muted);font-weight:700;">SCORE</span>
+      <div class="sb-adj">
+        <button class="sb-btn" id="btn-opp-minus">−</button>
+        <button class="sb-btn" id="btn-opp-plus">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="search-box">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
         <circle cx="7" cy="7" r="5" stroke="#7aaa87" stroke-width="1.5"/>
         <path d="M11 11L14 14" stroke="#7aaa87" stroke-width="1.5" stroke-linecap="round"/>
@@ -689,6 +846,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
       <button class="main-nav-btn active" data-view="player">&#9654; Players</button>
       <button class="main-nav-btn" data-view="teammap">&#9633; Team Map</button>
       <button class="main-nav-btn" data-view="charts">&#9650; Charts</button>
+      <button class="main-nav-btn" data-view="season">&#9400; Season</button>
     </div>
 
     <!-- Player view -->
@@ -705,6 +863,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
     <div id="player-detail" class="hidden">
       <div id="player-header">
+        <div id="player-avatar"></div>
         <div id="player-number-badge"></div>
         <div id="player-info-block">
           <h1 id="player-name-display"></h1>
@@ -715,6 +874,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
           </div>
         </div>
         <div id="player-header-actions">
+          <button id="btn-compare-player" title="Compare with another player">⇄ Compare</button>
           <button id="btn-prev-player" title="Previous">&#8592;</button>
           <button id="btn-next-player" title="Next">&#8594;</button>
         </div>
@@ -723,6 +883,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
       <div id="tabs">
         <button class="tab-btn active" data-tab="stats">Stats</button>
         <button class="tab-btn" data-tab="heatmap">Shot Map</button>
+        <button class="tab-btn" data-tab="penalties">Penalties</button>
         <button class="tab-btn" data-tab="profile">Profile</button>
       </div>
 
@@ -753,6 +914,17 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
             <button id="btn-clear-shots" class="btn-danger-sm">Clear All</button>
           </div>
         </div>
+        <div id="heatmap-row2">
+          <span>Quarter:</span>
+          <button class="qtr-filter-btn active" data-q="all">All</button>
+          <button class="qtr-filter-btn" data-q="1">Q1</button>
+          <button class="qtr-filter-btn" data-q="2">Q2</button>
+          <button class="qtr-filter-btn" data-q="3">Q3</button>
+          <button class="qtr-filter-btn" data-q="4">Q4</button>
+          <button id="btn-undo-shot">↩ Undo</button>
+          <button id="btn-zones">Zones</button>
+          <button class="fullscreen-btn" id="btn-fullscreen-field" title="Fullscreen">⛶</button>
+        </div>
         <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
           <div id="field-container">
             <canvas id="field-canvas"></canvas>
@@ -771,8 +943,44 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
         </div>
       </div>
 
+      <!-- Penalties Tab -->
+      <div id="tab-penalties" class="tab-content hidden" style="display:none;flex-direction:column;overflow:hidden;">
+        <div id="penalty-form">
+          <select id="pen-player-select" style="max-width:140px;"><option value="">— Player —</option></select>
+          <select id="pen-type-select">
+            <option value="Slash">Slash</option>
+            <option value="Hold">Hold</option>
+            <option value="Push">Push</option>
+            <option value="Cross-Check">Cross-Check</option>
+            <option value="Unnecessary Roughness">Unnecc. Rough</option>
+            <option value="Interference">Interference</option>
+            <option value="Crease Violation">Crease Viol.</option>
+            <option value="Trip">Trip</option>
+            <option value="Unsportsmanlike">Unsportsmanlike</option>
+            <option value="Stalling">Stalling</option>
+          </select>
+          <select id="pen-quarter-select">
+            <option value="1">Q1</option><option value="2">Q2</option>
+            <option value="3">Q3</option><option value="4">Q4</option>
+          </select>
+          <button id="btn-log-penalty">Log Penalty</button>
+        </div>
+        <div id="penalty-list"></div>
+      </div>
+
       <!-- Profile Tab -->
       <div id="tab-profile" class="tab-content hidden">
+        <div id="player-photo-area">
+          <div id="player-photo-big"></div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Player Photo</div>
+            <label class="photo-upload-btn">
+              📷 Upload Photo
+              <input type="file" id="photo-file-input" accept="image/*" />
+            </label>
+            <button id="btn-remove-photo">Remove</button>
+          </div>
+        </div>
         <div id="profile-form">
           <div class="form-row"><label>Jersey #</label><input type="number" id="edit-number" min="0" max="99"/></div>
           <div class="form-row"><label>Full Name</label><input type="text" id="edit-name"/></div>
@@ -803,6 +1011,12 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
             </select>
           </div>
           <div class="form-row"><label>Notes</label><textarea id="edit-notes" rows="3" placeholder="e.g. lefty, captain…"></textarea></div>
+          <div class="form-row">
+            <label>On Field</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="edit-on-field" /> Currently on field
+            </label>
+          </div>
           <button id="btn-save-profile" class="btn-be">Save Profile</button>
           <button id="btn-delete-player" class="btn-danger">Delete Player</button>
         </div>
@@ -838,7 +1052,8 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
       <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
         <div id="team-field-container">
           <canvas id="team-field-canvas"></canvas>
-          <div style="position:absolute;bottom:22px;right:24px;background:rgba(10,26,15,0.92);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">
+          <button class="fullscreen-btn" id="btn-fullscreen-team" title="Fullscreen" style="position:absolute;top:10px;right:10px;">⛶</button>
+          <div style="position:absolute;bottom:22px;right:44px;background:rgba(10,26,15,0.92);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">
             <div class="legend-item"><span class="dot goal"></span>Goal</div>
             <div class="legend-item"><span class="dot sog"></span>Shot on Goal</div>
             <div class="legend-item"><span class="dot ast"></span>Assist</div>
@@ -875,6 +1090,33 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
         <div class="chart-title">Face-Off Wins (FOGO / Midfield)</div>
         <div id="chart-fo"></div>
       </div>
+    </div>
+
+    <!-- Season View -->
+    <div id="season-view">
+      <div class="season-section">
+        <div class="season-section-title">Season Record</div>
+        <div class="season-record-row">
+          <div><div class="season-record-big" id="season-wins">0</div><div class="season-record-label">Wins</div></div>
+          <div><div class="season-record-big" id="season-losses" style="color:var(--text-muted);">0</div><div class="season-record-label">Losses</div></div>
+          <div><div class="season-record-big" id="season-ties" style="color:var(--text-muted);font-size:28px;">0</div><div class="season-record-label">Ties</div></div>
+          <div><div class="season-record-big" id="season-gf" style="color:var(--be-gold-lite);">0</div><div class="season-record-label">Goals For</div></div>
+          <div><div class="season-record-big" id="season-ga" style="color:#f87171;">0</div><div class="season-record-label">Goals Against</div></div>
+        </div>
+      </div>
+      <div class="season-section">
+        <div class="season-section-title">Games</div>
+        <div id="season-games-list"></div>
+      </div>
+      <div class="season-section">
+        <div class="season-section-title">Season Leaders</div>
+        <div id="season-leaders"></div>
+      </div>
+    </div>
+
+    <!-- Print Box Score (hidden normally, shown when printing) -->
+    <div id="print-box-score">
+      <div id="print-content"></div>
     </div>
 
   </main>
@@ -933,6 +1175,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
       <div id="match-mgr-export-row">
         <button id="btn-mgr-export-html">&#9660; Save as HTML File</button>
         <button id="btn-mgr-export-csv">&#9660; Export CSV</button>
+        <button id="btn-mgr-print">&#9113; Print Box Score</button>
       </div>
       <button id="btn-new-match-open">+ New Match</button>
       <div id="new-match-form" class="hidden">
@@ -951,6 +1194,23 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
         <label>Saved Matches</label>
         <div id="match-list"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Player Comparison Modal -->
+<div id="compare-overlay" class="hidden">
+  <div id="compare-dialog">
+    <div id="compare-header">
+      <h2>Player Comparison</h2>
+      <button id="btn-compare-close">&#x2715;</button>
+    </div>
+    <div id="compare-body">
+      <div class="compare-selects">
+        <select id="compare-select-a"></select>
+        <select id="compare-select-b"></select>
+      </div>
+      <div id="compare-result"></div>
     </div>
   </div>
 </div>
@@ -994,12 +1254,13 @@ const DEFAULT_PLAYERS = [
   { id: 29, number:  0, name: "Charlie Godfrey",  grade: "Sophomore", pos: "",         team: "Manager", notes: "" },
 ];
 
-function emptyStats() { return { G:0, A:0, SOG:0, GB:0, TO:0, FTO:0, FOW:0, FOL:0, shots:[] }; }
+function emptyStats() { return { G:0, A:0, SOG:0, GB:0, TO:0, FTO:0, FOW:0, FOL:0, shots:[], onField:false }; }
+function emptyGame() { return { opponent:"", date:"", beScore:0, oppScore:0, currentQuarter:1, penalties:[], subs:[] }; }
 
 // ─── State ────────────────────────────────────────────────────────────────
 let state = {
   players: [], stats: {}, selectedId: null,
-  game: { opponent:"", date:"" },
+  game: emptyGame(),
   shotType: "goal", heatmapEnabled: false, nextId: 30
 };
 
@@ -1041,7 +1302,7 @@ function loadData() {
     const id = genMatchId();
     allMatches[id] = {
       id, name: "New Match", createdAt: Date.now(), updatedAt: Date.now(),
-      players: DEFAULT_PLAYERS, stats: {}, game: { opponent:"", date:"" }, nextId: 30
+      players: DEFAULT_PLAYERS, stats: {}, game: emptyGame(), nextId: 30
     };
     activeMatchId = id;
     persistAll();
@@ -1050,9 +1311,14 @@ function loadData() {
   const m = allMatches[activeMatchId];
   state.players = m.players || DEFAULT_PLAYERS;
   state.stats   = m.stats   || {};
-  state.game    = m.game    || { opponent:"", date:"" };
+  // Merge saved game with defaults so new fields are always present
+  state.game    = Object.assign(emptyGame(), m.game || {});
   state.nextId  = m.nextId  || 30;
-  state.players.forEach(p => { if (!state.stats[p.id]) state.stats[p.id] = emptyStats(); });
+  state.players.forEach(p => {
+    if (!state.stats[p.id]) state.stats[p.id] = emptyStats();
+    // Ensure new fields on existing stats
+    if (state.stats[p.id].onField === undefined) state.stats[p.id].onField = false;
+  });
 }
 
 function saveData(silent) {
@@ -1076,8 +1342,10 @@ let autoSaveTimer;
 function autoSave() {
   markUnsaved();
   clearTimeout(autoSaveTimer);
-  autoSaveTimer = setTimeout(() => saveData(true), 600);
+  autoSaveTimer = setTimeout(() => saveData(true), 80);
 }
+window.addEventListener("visibilitychange", () => { if (document.hidden) saveData(true); });
+window.addEventListener("beforeunload", () => saveData(true));
 
 function markUnsaved() {
   document.getElementById("match-unsaved-dot").classList.remove("hidden");
@@ -1134,8 +1402,11 @@ function renderPlayerList(filter="") {
       el.dataset.id = p.id;
       const numTxt = p.number > 0 ? `#${p.number}` : "—";
       const sub = [p.pos, p.notes].filter(Boolean).join(" · ") || p.team;
+      const avatarHtml = p.photo
+        ? `<img src="${p.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;" />`
+        : `<div class="player-jersey">${numTxt}</div>`;
       el.innerHTML = `
-        <div class="player-jersey">${numTxt}</div>
+        ${avatarHtml}
         <div class="player-item-info">
           <div class="player-item-name">${p.name}</div>
           <div class="player-item-sub">${sub}</div>
@@ -1143,7 +1414,8 @@ function renderPlayerList(filter="") {
         <div class="mini-stats">
           <div class="ms ${s.G>0?'lit':''}" title="Goals">G:${s.G}</div>
           <div class="ms ${s.A>0?'lit':''}" title="Assists">A:${s.A}</div>
-        </div>`;
+        </div>
+        <div class="sub-dot${s.onField?' on':''}" title="${s.onField?'On field':'Off field'}"></div>`;
       el.addEventListener("click", () => selectPlayer(p.id));
       list.appendChild(el);
     });
@@ -1167,6 +1439,10 @@ function selectPlayer(id) {
   document.getElementById("empty-state").classList.add("hidden");
   document.getElementById("player-detail").classList.remove("hidden");
 
+  // Avatar in header
+  const av = document.getElementById("player-avatar");
+  if (p.photo) { av.innerHTML = `<img src="${p.photo}" />`; }
+  else { av.textContent = (p.name||"?")[0].toUpperCase(); av.innerHTML = av.textContent; }
   document.getElementById("player-number-badge").textContent = p.number > 0 ? `#${p.number}` : "—";
   document.getElementById("player-name-display").textContent = p.name;
   document.getElementById("player-grade-display").textContent = p.grade;
@@ -1255,6 +1531,16 @@ function renderProfileTab(p) {
   document.getElementById("edit-position").value = p.pos;
   document.getElementById("edit-team").value     = p.team;
   document.getElementById("edit-notes").value    = p.notes || "";
+  document.getElementById("edit-on-field").checked = !!(state.stats[p.id]?.onField);
+  // Photo
+  const big = document.getElementById("player-photo-big");
+  if (p.photo) {
+    big.innerHTML = `<img src="${p.photo}" alt="${escHtml(p.name)}" />`;
+    document.getElementById("btn-remove-photo").style.display = "block";
+  } else {
+    big.textContent = (p.name||"?")[0].toUpperCase();
+    document.getElementById("btn-remove-photo").style.display = "none";
+  }
 }
 
 function saveProfile() {
@@ -1266,6 +1552,7 @@ function saveProfile() {
   p.pos    = document.getElementById("edit-position").value;
   p.team   = document.getElementById("edit-team").value;
   p.notes  = document.getElementById("edit-notes").value.trim();
+  if (state.stats[p.id]) state.stats[p.id].onField = document.getElementById("edit-on-field").checked;
   renderPlayerList(document.getElementById("player-search").value);
   selectPlayer(p.id);
   showToast("Profile updated!"); autoSave();
@@ -1334,12 +1621,18 @@ function drawField() {
   ctx.fillText("ATTACK",  80,     FH-17);
   ctx.fillText("DEFENSE", FW-80,  FH-17);
 
+  // Zone overlay
+  if (zonesEnabled) drawZoneOverlay(ctx, state.stats[state.selectedId]?.shots||[]);
+
   // Heat map
   const pid = state.selectedId;
-  if (pid && state.heatmapEnabled) drawHeatmap(ctx, state.stats[pid]?.shots||[]);
+  const visibleShots = (state.stats[pid]?.shots||[]).filter(sh =>
+    shotQuarterFilter==="all" || String(sh.quarter||1)===String(shotQuarterFilter)
+  );
+  if (pid && state.heatmapEnabled) drawHeatmap(ctx, visibleShots);
 
   // Dots
-  if (pid) (state.stats[pid]?.shots||[]).forEach(sh => {
+  if (pid) visibleShots.forEach(sh => {
     ctx.beginPath(); ctx.arc(sh.x,sh.y,6,0,Math.PI*2);
     ctx.fillStyle=(SHOT_COLORS[sh.type]||"#fff")+"cc"; ctx.fill();
     ctx.strokeStyle=SHOT_COLORS[sh.type]||"#fff"; ctx.lineWidth=1.5; ctx.stroke();
@@ -1385,10 +1678,24 @@ function canvasCoords(canvas, e) {
   return { x:(e.clientX-r.left)*(FW/r.width), y:(e.clientY-r.top)*(FH/r.height) };
 }
 
+const undoStack = [];
+let shotQuarterFilter = "all";
+let zonesEnabled = false;
+
+const ZONES = [
+  { id:"crease",  label:"Crease",   x1:10,  y1:95,  x2:85,  y2:235, color:"rgba(0,140,69,0.18)"  },
+  { id:"topwing", label:"Top Wing", x1:85,  y1:10,  x2:240, y2:130, color:"rgba(96,165,250,0.15)" },
+  { id:"slot",    label:"Slot",     x1:85,  y1:130, x2:200, y2:200, color:"rgba(212,175,68,0.18)" },
+  { id:"botwing", label:"Bot Wing", x1:85,  y1:200, x2:240, y2:320, color:"rgba(248,113,113,0.15)"},
+  { id:"mid",     label:"Midfield", x1:240, y1:10,  x2:400, y2:320, color:"rgba(251,191,36,0.12)" },
+  { id:"behind",  label:"Behind",   x1:10,  y1:10,  x2:85,  y2:95,  color:"rgba(167,139,250,0.15)"},
+];
+
 function addShot(x,y) {
   const pid=state.selectedId; if(!pid) return;
-  const sh={type:state.shotType,x,y,ts:Date.now()};
+  const sh={type:state.shotType,x,y,ts:Date.now(),quarter:state.game.currentQuarter||1};
   state.stats[pid].shots.push(sh);
+  undoStack.push({pid,ts:sh.ts});
   if (sh.type==="goal") { state.stats[pid].G++; state.stats[pid].SOG++; }
   else if (sh.type==="sog")  { state.stats[pid].SOG++; }
   else if (sh.type==="miss") { state.stats[pid].SOG++; }
@@ -1480,6 +1787,8 @@ function switchTab(tab) {
   });
   if(tab==="heatmap"){renderShotList();setTimeout(drawField,50);}
   if(tab==="stats"&&state.selectedId){const p=state.players.find(x=>x.id===state.selectedId);if(p)renderStatsTab(p);}
+  if(tab==="penalties"){populatePenPlayerSelect();renderPenaltyList();}
+  if(tab==="profile"&&state.selectedId){const p=state.players.find(x=>x.id===state.selectedId);if(p)renderProfileTab(p);}
 }
 
 function navigatePlayer(dir) {
@@ -1568,8 +1877,9 @@ function drawTeamMap() {
 function addTeamShot(x, y) {
   const pid = teamMapSelectedPid;
   if (!pid) { showToast("Select a player first", "error"); return; }
-  const sh = { type: teamMapShotType, x, y, ts: Date.now() };
+  const sh = { type: teamMapShotType, x, y, ts: Date.now(), quarter: state.game.currentQuarter||1 };
   state.stats[pid].shots.push(sh);
+  undoStack.push({pid,ts:sh.ts});
   if (sh.type==="goal") { state.stats[pid].G++; state.stats[pid].SOG++; }
   else if (sh.type==="sog")  { state.stats[pid].SOG++; }
   else if (sh.type==="miss") { state.stats[pid].SOG++; }
@@ -1679,7 +1989,7 @@ function loadMatchById(id) {
   state.selectedId = null;
   persistAll();
   // Refresh UI
-  updateMatchBar(); markSaved();
+  updateMatchBar(); markSaved(); updateScoreboard();
   document.getElementById("opponent-input").value = state.game.opponent || "";
   document.getElementById("game-date").value = state.game.date || "";
   renderPlayerList(document.getElementById("player-search").value);
@@ -1767,6 +2077,301 @@ function populateTmPlayerSelect() {
   const p = teamMapSelectedPid ? state.players.find(x => x.id === teamMapSelectedPid) : null;
   lbl.textContent = p ? `#${p.number} ${p.name}` : "Select a player from the sidebar";
   if (teamMapSelectedPid) renderTmShotList(teamMapSelectedPid);
+}
+
+// ─── Scoreboard ───────────────────────────────────────────────────────────
+function updateScoreboard() {
+  document.getElementById("score-be").textContent  = state.game.beScore  ?? 0;
+  document.getElementById("score-opp").textContent = state.game.oppScore ?? 0;
+  const oppName = (state.game.opponent||"OPP").slice(0,8).toUpperCase();
+  document.getElementById("score-opp-name").textContent = oppName;
+  const q = state.game.currentQuarter || 1;
+  document.querySelectorAll(".qtr-btn").forEach(b =>
+    b.classList.toggle("active", parseInt(b.dataset.q) === q));
+  // Sync pen-quarter-select default
+  const penQ = document.getElementById("pen-quarter-select");
+  if (penQ) penQ.value = String(q);
+}
+function adjustScore(team, delta) {
+  if (team==="be")  state.game.beScore  = Math.max(0,(state.game.beScore||0)+delta);
+  else              state.game.oppScore = Math.max(0,(state.game.oppScore||0)+delta);
+  document.getElementById("score-be").textContent  = state.game.beScore;
+  document.getElementById("score-opp").textContent = state.game.oppScore;
+  autoSave();
+}
+function setQuarter(q) {
+  state.game.currentQuarter = q;
+  document.querySelectorAll(".qtr-btn").forEach(b =>
+    b.classList.toggle("active", parseInt(b.dataset.q) === q));
+  const penQ = document.getElementById("pen-quarter-select");
+  if (penQ) penQ.value = String(q);
+  autoSave();
+}
+
+// ─── Undo ─────────────────────────────────────────────────────────────────
+function undoLastShot() {
+  if (!undoStack.length) { showToast("Nothing to undo","error"); return; }
+  const {pid, ts} = undoStack.pop();
+  const shots = state.stats[pid]?.shots;
+  if (!shots) return;
+  const idx = shots.findLastIndex(s => s.ts === ts);
+  if (idx === -1) return;
+  const s = shots[idx];
+  if (s.type==="goal")  { state.stats[pid].G=Math.max(0,state.stats[pid].G-1); state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
+  else if (s.type==="sog")  { state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
+  else if (s.type==="ast")  { state.stats[pid].A=Math.max(0,state.stats[pid].A-1); }
+  else if (s.type==="gb")   { state.stats[pid].GB=Math.max(0,state.stats[pid].GB-1); }
+  else if (s.type==="miss") { state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
+  shots.splice(idx,1);
+  renderShotList(); drawField();
+  if (document.getElementById("team-map-view").classList.contains("active")) drawTeamMap();
+  if (teamMapSelectedPid===pid) renderTmShotList(pid);
+  const p = state.players.find(x=>x.id===pid);
+  if (p) { renderStatsTab(p); renderPlayerList(document.getElementById("player-search").value); }
+  showToast("Undo!","success"); autoSave();
+}
+
+// ─── Zone Overlay ─────────────────────────────────────────────────────────
+function drawZoneOverlay(ctx, shots) {
+  ZONES.forEach(z => {
+    const count = shots.filter(sh =>
+      (shotQuarterFilter==="all"||String(sh.quarter||1)===String(shotQuarterFilter)) &&
+      sh.x>=z.x1 && sh.x<=z.x2 && sh.y>=z.y1 && sh.y<=z.y2
+    ).length;
+    ctx.fillStyle = z.color;
+    ctx.fillRect(z.x1,z.y1,z.x2-z.x1,z.y2-z.y1);
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(z.x1,z.y1,z.x2-z.x1,z.y2-z.y1);
+    ctx.fillStyle = "rgba(255,255,255,0.75)";
+    ctx.font = "bold 10px sans-serif"; ctx.textAlign = "center";
+    const cx = (z.x1+z.x2)/2, cy = (z.y1+z.y2)/2;
+    ctx.fillText(z.label, cx, cy-5);
+    ctx.font = "bold 14px sans-serif";
+    ctx.fillStyle = count>0 ? "#fff" : "rgba(255,255,255,0.3)";
+    ctx.fillText(count, cx, cy+10);
+  });
+}
+function toggleZones() {
+  zonesEnabled = !zonesEnabled;
+  document.getElementById("btn-zones").classList.toggle("active", zonesEnabled);
+  drawField();
+}
+
+// ─── Photo Upload ─────────────────────────────────────────────────────────
+function handlePhotoUpload(file) {
+  if (!file || !state.selectedId) return;
+  if (file.size > 5*1024*1024) { showToast("Image too large (max 5MB)","error"); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const p = state.players.find(x => x.id === state.selectedId);
+    if (!p) return;
+    p.photo = e.target.result;
+    renderProfileTab(p);
+    // Update header avatar
+    const av = document.getElementById("player-avatar");
+    av.innerHTML = `<img src="${p.photo}" />`;
+    renderPlayerList(document.getElementById("player-search").value);
+    showToast("Photo saved!","success");
+    autoSave();
+  };
+  reader.readAsDataURL(file);
+}
+function removePhoto() {
+  const p = state.players.find(x => x.id === state.selectedId);
+  if (!p) return;
+  p.photo = "";
+  renderProfileTab(p);
+  const av = document.getElementById("player-avatar");
+  av.innerHTML = (p.name||"?")[0].toUpperCase();
+  renderPlayerList(document.getElementById("player-search").value);
+  autoSave(); showToast("Photo removed");
+}
+
+// ─── Penalty Log ──────────────────────────────────────────────────────────
+function populatePenPlayerSelect() {
+  const sel = document.getElementById("pen-player-select");
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— Player —</option>';
+  state.players.filter(p=>p.team!=="Manager").forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.id; opt.textContent = `#${p.number} ${p.name}`;
+    if (String(p.id)===prev) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  // Default to selected player
+  if (!prev && state.selectedId) sel.value = state.selectedId;
+}
+function renderPenaltyList() {
+  const el = document.getElementById("penalty-list");
+  if (!el) return;
+  const penalties = state.game.penalties || [];
+  if (!penalties.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px;">No penalties logged.</div>'; return; }
+  el.innerHTML = "";
+  penalties.slice().reverse().forEach((pen,ri) => {
+    const idx = penalties.length-1-ri;
+    const p = state.players.find(x=>x.id===pen.pid);
+    const div = document.createElement("div");
+    div.className = "penalty-item";
+    div.innerHTML = `<div class="pen-info">
+      <div class="pen-name">${escHtml(p?.name||"Unknown")}</div>
+      <div class="pen-meta">${escHtml(pen.type)} · Q${pen.quarter}</div>
+    </div><button class="pen-del" data-idx="${idx}">×</button>`;
+    div.querySelector(".pen-del").addEventListener("click", e => {
+      state.game.penalties.splice(parseInt(e.currentTarget.dataset.idx),1);
+      renderPenaltyList(); autoSave();
+    });
+    el.appendChild(div);
+  });
+}
+function logPenalty() {
+  const pid = parseInt(document.getElementById("pen-player-select").value);
+  if (!pid) { showToast("Select a player","error"); return; }
+  const type = document.getElementById("pen-type-select").value;
+  const quarter = parseInt(document.getElementById("pen-quarter-select").value) || state.game.currentQuarter || 1;
+  if (!state.game.penalties) state.game.penalties = [];
+  state.game.penalties.push({pid, type, quarter, ts: Date.now()});
+  renderPenaltyList(); autoSave();
+  showToast("Penalty logged","success");
+}
+
+// ─── Fullscreen ────────────────────────────────────────────────────────────
+function enterFullscreen(el) {
+  if (el.requestFullscreen) el.requestFullscreen();
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+}
+
+// ─── Player Comparison ────────────────────────────────────────────────────
+function openCompare() {
+  const sel = document.getElementById("compare-select-a");
+  const selb = document.getElementById("compare-select-b");
+  [sel,selb].forEach(s => {
+    s.innerHTML = '<option value="">— Select —</option>';
+    state.players.filter(p=>p.team!=="Manager").forEach(p => {
+      const o = document.createElement("option");
+      o.value=p.id; o.textContent=`#${p.number} ${p.name}`;
+      s.appendChild(o);
+    });
+  });
+  if (state.selectedId) sel.value = state.selectedId;
+  renderComparison();
+  document.getElementById("compare-overlay").classList.remove("hidden");
+}
+function closeCompare() { document.getElementById("compare-overlay").classList.add("hidden"); }
+function renderComparison() {
+  const idA = parseInt(document.getElementById("compare-select-a").value);
+  const idB = parseInt(document.getElementById("compare-select-b").value);
+  const res = document.getElementById("compare-result");
+  if (!idA || !idB || idA===idB) { res.innerHTML="<p style='color:var(--text-muted);font-size:13px;text-align:center;padding:12px;'>Select two different players.</p>"; return; }
+  const pA = state.players.find(x=>x.id===idA);
+  const pB = state.players.find(x=>x.id===idB);
+  const sA = state.stats[idA] || emptyStats();
+  const sB = state.stats[idB] || emptyStats();
+  const defs = [
+    {key:"G",  label:"Goals"},
+    {key:"A",  label:"Assists"},
+    {key:"SOG",label:"SOG"},
+    {key:"GB", label:"Ground Balls"},
+    {key:"TO", label:"Turnovers"},
+    {key:"FOW",label:"FO Wins"},
+    {key:"FOL",label:"FO Losses"},
+    {key:"shots",label:"Shots Logged",fn:(s)=>s.shots.length},
+  ];
+  const namesHtml = `<div class="compare-names">
+    <div class="cn cn-a">#${pA.number} ${escHtml(pA.name)}</div>
+    <div class="cn cn-mid"></div>
+    <div class="cn cn-b">#${pB.number} ${escHtml(pB.name)}</div>
+  </div>`;
+  const rows = defs.map(d => {
+    const va = d.fn ? d.fn(sA) : (sA[d.key]||0);
+    const vb = d.fn ? d.fn(sB) : (sB[d.key]||0);
+    const cls = va>vb?"winner-a":vb>va?"winner-b":"";
+    return `<tr class="${cls}"><td class="ct-a">${va}</td><td class="ct-lbl">${d.label}</td><td class="ct-b">${vb}</td></tr>`;
+  }).join("");
+  res.innerHTML = namesHtml + `<table class="compare-table"><tbody>${rows}</tbody></table>`;
+}
+
+// ─── Season View ───────────────────────────────────────────────────────────
+function renderSeasonView() {
+  const games = Object.values(allMatches).sort((a,b)=>(a.game?.date||"").localeCompare(b.game?.date||""));
+  let W=0,L=0,T=0,GF=0,GA=0;
+  games.forEach(m => {
+    const be = m.game?.beScore||0, opp = m.game?.oppScore||0;
+    GF+=be; GA+=opp;
+    if(be>opp) W++; else if(opp>be) L++; else T++;
+  });
+  document.getElementById("season-wins").textContent   = W;
+  document.getElementById("season-losses").textContent = L;
+  document.getElementById("season-ties").textContent   = T;
+  document.getElementById("season-gf").textContent     = GF;
+  document.getElementById("season-ga").textContent     = GA;
+
+  const gl = document.getElementById("season-games-list");
+  if (!games.length) { gl.innerHTML="<p style='color:var(--text-muted);font-size:12px;'>No matches yet.</p>"; }
+  else {
+    gl.innerHTML = games.reverse().map(m => {
+      const be=m.game?.beScore||0, opp=m.game?.oppScore||0;
+      const res = be>opp?"W":opp>be?"L":"T";
+      const active = m.id===activeMatchId ? " (active)" : "";
+      return `<div class="season-game-row" onclick="loadMatchById('${m.id}')">
+        <span class="season-game-result ${res}">${res}</span>
+        <span class="season-game-name">${escHtml(m.name)}${active}</span>
+        <span class="season-game-score">${be}–${opp}</span>
+      </div>`;
+    }).join("");
+  }
+
+  // Season leaders
+  const leaderData = {};
+  games.forEach(m => {
+    (m.players||[]).forEach(p => {
+      if (!leaderData[p.id]) leaderData[p.id] = {name:p.name,number:p.number,G:0,A:0,SOG:0,GB:0};
+      const s = m.stats?.[p.id] || {};
+      leaderData[p.id].G   += s.G||0;
+      leaderData[p.id].A   += s.A||0;
+      leaderData[p.id].SOG += s.SOG||0;
+      leaderData[p.id].GB  += s.GB||0;
+    });
+  });
+  const leaders = Object.values(leaderData).filter(p=>p.G+p.A>0).sort((a,b)=>(b.G+b.A)-(a.G+a.A)).slice(0,10);
+  const sl = document.getElementById("season-leaders");
+  if (!leaders.length) { sl.innerHTML="<p style='color:var(--text-muted);font-size:12px;'>No stats yet.</p>"; }
+  else {
+    sl.innerHTML = leaders.map(p =>
+      `<div class="bar-row"><span class="bar-label">#${p.number} ${escHtml(p.name)}</span>
+       <span style="font-size:12px;color:var(--be-gold-lite);font-weight:700;min-width:30px;">${p.G}G</span>
+       <span style="font-size:12px;color:var(--text-muted);font-weight:700;min-width:30px;">${p.A}A</span>
+       <span style="font-size:11px;color:var(--text-muted);">${p.SOG} SOG · ${p.GB} GB</span></div>`
+    ).join("");
+  }
+}
+
+// ─── Print Box Score ───────────────────────────────────────────────────────
+function printBoxScore() {
+  const dt = state.game.date || new Date().toLocaleDateString();
+  const opp = state.game.opponent || "Opponent";
+  const rows = state.players.filter(p=>p.team!=="Manager").map(p => {
+    const s = state.stats[p.id]||emptyStats();
+    return `<tr><td>#${p.number}</td><td>${escHtml(p.name)}</td><td>${p.pos}</td>
+      <td>${s.G}</td><td>${s.A}</td><td>${s.SOG}</td><td>${s.GB}</td>
+      <td>${s.TO}</td><td>${s.FOW}</td><td>${s.FOL}</td></tr>`;
+  }).join("");
+  const totals = state.players.filter(p=>p.team!=="Manager").reduce((t,p) => {
+    const s=state.stats[p.id]||emptyStats();
+    Object.keys(t).forEach(k=>{t[k]+=(s[k]||0);}); return t;
+  },{G:0,A:0,SOG:0,GB:0,TO:0,FOW:0,FOL:0});
+  document.getElementById("print-content").innerHTML = `
+    <h2 style="margin:0 0 4px;font-family:serif;">Bishop England Lacrosse</h2>
+    <h3 style="margin:0 0 16px;font-weight:400;color:#555;">${dt} — BE ${state.game.beScore||0} vs ${opp} ${state.game.oppScore||0}</h3>
+    <table class="print-table">
+      <thead><tr><th>#</th><th>Name</th><th>Pos</th><th>G</th><th>A</th><th>SOG</th><th>GB</th><th>TO</th><th>FOW</th><th>FOL</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="font-weight:bold;"><td colspan="3">TOTALS</td><td>${totals.G}</td><td>${totals.A}</td><td>${totals.SOG}</td><td>${totals.GB}</td><td>${totals.TO}</td><td>${totals.FOW}</td><td>${totals.FOL}</td></tr></tfoot>
+    </table>
+    <p style="margin-top:20px;font-size:11px;color:#888;">Generated ${new Date().toLocaleString()}</p>`;
+  saveData(true);
+  window.print();
 }
 
 // ─── Charts ───────────────────────────────────────────────────────────────
@@ -1866,8 +2471,10 @@ function showView(name) {
   document.getElementById("player-view").style.display    = name==="player"  ? "flex" : "none";
   document.getElementById("team-map-view").classList.toggle("active", name==="teammap");
   document.getElementById("charts-view").classList.toggle("active",   name==="charts");
+  document.getElementById("season-view").classList.toggle("active",   name==="season");
   if (name==="teammap") { populateTmPlayerSelect(); setTimeout(drawTeamMap, 50); }
   if (name==="charts")  renderCharts();
+  if (name==="season")  renderSeasonView();
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────
@@ -1877,12 +2484,23 @@ function init() {
   if(state.game.opponent) document.getElementById("opponent-input").value=state.game.opponent;
   if(state.game.date)     document.getElementById("game-date").value=state.game.date;
 
-  updateMatchBar(); markSaved();
+  updateMatchBar(); markSaved(); updateScoreboard();
   document.getElementById("player-search").addEventListener("input",e=>renderPlayerList(e.target.value));
-  document.getElementById("opponent-input").addEventListener("input",e=>{state.game.opponent=e.target.value;autoSave();});
+  document.getElementById("opponent-input").addEventListener("input",e=>{
+    state.game.opponent=e.target.value;
+    document.getElementById("score-opp-name").textContent=(e.target.value||"OPP").slice(0,8).toUpperCase();
+    autoSave();
+  });
   document.getElementById("game-date").addEventListener("change",e=>{state.game.date=e.target.value;autoSave();});
   document.getElementById("btn-save").addEventListener("click",()=>saveData(false));
   document.getElementById("btn-export").addEventListener("click",exportCSV);
+
+  // Scoreboard
+  document.getElementById("btn-be-plus").addEventListener("click",()=>adjustScore("be",1));
+  document.getElementById("btn-be-minus").addEventListener("click",()=>adjustScore("be",-1));
+  document.getElementById("btn-opp-plus").addEventListener("click",()=>adjustScore("opp",1));
+  document.getElementById("btn-opp-minus").addEventListener("click",()=>adjustScore("opp",-1));
+  document.querySelectorAll(".qtr-btn").forEach(b=>b.addEventListener("click",()=>setQuarter(parseInt(b.dataset.q))));
 
   // Match bar + manager
   document.getElementById("match-name-display").addEventListener("click", openMatchManager);
@@ -1899,6 +2517,7 @@ function init() {
   document.getElementById("new-match-name-input").addEventListener("keydown", e => { if (e.key==="Enter") createNewMatch(); });
   document.getElementById("btn-mgr-export-html").addEventListener("click", exportCurrentMatchHTML);
   document.getElementById("btn-mgr-export-csv").addEventListener("click", exportCSV);
+  document.getElementById("btn-mgr-print").addEventListener("click",()=>{closeMatchManager();printBoxScore();});
 
   // Main nav
   document.querySelectorAll(".main-nav-btn").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
@@ -1927,6 +2546,33 @@ function init() {
   document.getElementById("btn-delete-player").addEventListener("click",deletePlayer);
   document.getElementById("btn-prev-player").addEventListener("click",()=>navigatePlayer(-1));
   document.getElementById("btn-next-player").addEventListener("click",()=>navigatePlayer(1));
+  document.getElementById("btn-compare-player").addEventListener("click",openCompare);
+
+  // Penalties
+  document.getElementById("btn-log-penalty").addEventListener("click",logPenalty);
+
+  // Photo upload
+  document.getElementById("photo-file-input").addEventListener("change",e=>{
+    if(e.target.files[0]) handlePhotoUpload(e.target.files[0]);
+    e.target.value=""; // allow re-uploading same file
+  });
+  document.getElementById("btn-remove-photo").addEventListener("click",removePhoto);
+
+  // Quarter filter + undo + zones + fullscreen
+  document.querySelectorAll(".qtr-filter-btn").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".qtr-filter-btn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); shotQuarterFilter=b.dataset.q; drawField();
+  }));
+  document.getElementById("btn-undo-shot").addEventListener("click",undoLastShot);
+  document.getElementById("btn-zones").addEventListener("click",toggleZones);
+  document.getElementById("btn-fullscreen-field").addEventListener("click",()=>enterFullscreen(document.getElementById("field-container")));
+  document.getElementById("btn-fullscreen-team").addEventListener("click",()=>enterFullscreen(document.getElementById("team-field-container")));
+
+  // Comparison modal
+  document.getElementById("btn-compare-close").addEventListener("click",closeCompare);
+  document.getElementById("compare-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("compare-overlay"))closeCompare();});
+  document.getElementById("compare-select-a").addEventListener("change",renderComparison);
+  document.getElementById("compare-select-b").addEventListener("change",renderComparison);
 
   document.getElementById("btn-modal-cancel").addEventListener("click",closeModal);
   document.getElementById("btn-modal-add").addEventListener("click",addPlayer);
@@ -1950,6 +2596,8 @@ function init() {
   });
 
   document.addEventListener("keydown",e=>{
+    // Ctrl+Z / Cmd+Z → undo last shot (works anywhere)
+    if ((e.ctrlKey||e.metaKey) && e.key==="z") { e.preventDefault(); undoLastShot(); return; }
     if(["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) return;
     if(!state.selectedId) return;
     const pid=state.selectedId;
