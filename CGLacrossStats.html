@@ -219,6 +219,10 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   transition: border-color 0.15s;
 }
 .stat-card:focus-within { border-color: var(--be-green-lite); }
+.stat-card.derived { border-color: rgba(212,175,68,0.25); background: rgba(212,175,68,0.04); }
+.stat-card.derived .stat-value { font-size:30px; }
+.derived-tag { font-size:9px; font-weight:800; letter-spacing:1px; color:var(--be-gold); background:rgba(212,175,68,0.15); border-radius:4px; padding:1px 5px; margin-left:auto; text-transform:uppercase; }
+#derived-divider { grid-column:1/-1; border:none; border-top:1px solid var(--border); margin:0; }
 
 .stat-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
 .stat-desc  { font-size: 10px; color: var(--text-muted); opacity: 0.6; margin-top: -3px; }
@@ -1645,6 +1649,67 @@ function renderStatsTab(p) {
     grid.appendChild(card);
   });
 
+  // ── Derived / efficiency stats ────────────────────────────────────────────
+  const divider = document.createElement("hr");
+  divider.id = "derived-divider";
+  grid.appendChild(divider);
+
+  const G   = s.G   || 0;
+  const A   = s.A   || 0;
+  const SOG = s.SOG || 0;
+  const FOW = s.FOW || 0;
+  const FOL = s.FOL || 0;
+  const GB  = s.GB  || 0;
+  const TO  = s.TO  || 0;
+
+  const derived = [
+    {
+      key:"PTS", label:"Points", desc:"Goals + Assists",
+      val: G + A,
+      display: String(G + A),
+      color:"#d4af44",
+      active: (G+A) > 0,
+    },
+    {
+      key:"SH%", label:"Shot %", desc:"Goals ÷ Shots on Goal",
+      val: SOG > 0 ? G/SOG : null,
+      display: SOG > 0 ? ((G/SOG)*100).toFixed(1)+"%" : "—",
+      color:"#60a5fa",
+      active: SOG > 0,
+      sub: SOG > 0 ? `${G}G / ${SOG} SOG` : "No shots yet",
+    },
+    {
+      key:"FO%", label:"Face-Off %", desc:"Face-Off Wins ÷ Total",
+      val: (FOW+FOL) > 0 ? FOW/(FOW+FOL) : null,
+      display: (FOW+FOL) > 0 ? ((FOW/(FOW+FOL))*100).toFixed(1)+"%" : "—",
+      color:"#6ee89b",
+      active: (FOW+FOL) > 0,
+      sub: (FOW+FOL) > 0 ? `${FOW}W / ${FOW+FOL} FOs` : "No face-offs yet",
+    },
+    {
+      key:"GB:TO", label:"GB Ratio", desc:"Ground Balls ÷ Turnovers",
+      val: TO > 0 ? GB/TO : null,
+      display: TO > 0 ? (GB/TO).toFixed(2) : GB > 0 ? "∞" : "—",
+      color:"#fbbf24",
+      active: GB > 0 || TO > 0,
+      sub: TO > 0 ? `${GB} GB / ${TO} TO` : GB > 0 ? `${GB} GB, 0 TO` : "No data yet",
+    },
+  ];
+
+  derived.forEach(d => {
+    const card = document.createElement("div");
+    card.className = "stat-card derived" + (d.active ? " has-value" : "");
+    card.innerHTML = `
+      <div class="stat-label" style="display:flex;align-items:center;gap:6px;">
+        ${d.key}<span class="derived-tag">calc</span>
+      </div>
+      <div class="stat-desc">${d.sub || d.desc}</div>
+      <div class="stat-value-row">
+        <div class="stat-value" style="color:${d.active?d.color:''}">${d.display}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+
   // Goalie save% panel
   const svPanel = document.getElementById("goalie-savepct");
   const isGoalie = (p.pos||"").toLowerCase().includes("g");
@@ -1939,10 +2004,14 @@ function addPlayer() {
 
 // ─── CSV Export ───────────────────────────────────────────────────────────
 function exportCSV() {
-  const h=["#","Name","Grade","Pos","Team","G","A","SOG","GB","TO","FTO","FOW","FOL","SV"];
+  const h=["#","Name","Grade","Pos","Team","G","A","SOG","GB","TO","FTO","FOW","FOL","SV","PTS","SH%","FO%","GB:TO"];
   const rows=state.players.map(p=>{
     const s=state.stats[p.id]||emptyStats();
-    return[p.number,`"${p.name}"`,p.grade,p.pos,p.team,s.G,s.A,s.SOG,s.GB,s.TO,s.FTO,s.FOW,s.FOL,s.SV||0];
+    const g=s.G||0,a=s.A||0,sog=s.SOG||0,fow=s.FOW||0,fol=s.FOL||0,gb=s.GB||0,to=s.TO||0;
+    const shPct = sog>0 ? ((g/sog)*100).toFixed(1)+"%" : "";
+    const foPct = (fow+fol)>0 ? ((fow/(fow+fol))*100).toFixed(1)+"%" : "";
+    const gbRatio = to>0 ? (gb/to).toFixed(2) : (gb>0?"∞":"");
+    return[p.number,`"${p.name}"`,p.grade,p.pos,p.team,g,a,sog,gb,to,s.FTO||0,fow,fol,s.SV||0,g+a,shPct,foPct,gbRatio];
   });
   const csv=[h,...rows].map(r=>r.join(",")).join("\n");
   const a=document.createElement("a");
