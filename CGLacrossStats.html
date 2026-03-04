@@ -53,7 +53,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   margin-bottom: 12px;
 }
 #logo-shield {
-  width: 40px; height: 46px; flex-shrink: 0;
+  width: 54px; height: 54px; flex-shrink: 0; object-fit: contain;
 }
 #logo-text { line-height: 1.15; }
 #logo-text .school { font-size: 11px; font-weight: 700; color: var(--be-gold-lite); letter-spacing: 1.5px; text-transform: uppercase; }
@@ -633,12 +633,11 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   <aside id="sidebar">
     <div id="sidebar-header">
       <div id="app-logo">
-        <!-- Bishop England Shield SVG -->
-        <svg id="logo-shield" viewBox="0 0 40 46" fill="none">
-          <path d="M20 2 L38 10 L38 28 Q38 40 20 44 Q2 40 2 28 L2 10 Z" fill="#003d1e" stroke="#b5973a" stroke-width="2"/>
-          <path d="M20 7 L33 13 L33 27 Q33 37 20 41 Q7 37 7 27 L7 13 Z" fill="#005a2b"/>
-          <text x="20" y="30" text-anchor="middle" font-size="13" font-weight="900" fill="#b5973a" font-family="serif">BE</text>
-        </svg>
+        <img id="logo-shield"
+          src="https://carolinapreps.com/teams/assets/teams/frontend/logo/Bishop-England-Battling-Bishops.png"
+          alt="Bishop England Battling Bishops"
+          onerror="this.onerror=null;this.outerHTML='<svg id=&quot;logo-shield&quot; viewBox=&quot;0 0 40 46&quot; fill=&quot;none&quot;><path d=&quot;M20 2 L38 10 L38 28 Q38 40 20 44 Q2 40 2 28 L2 10 Z&quot; fill=&quot;#003d1e&quot; stroke=&quot;#b5973a&quot; stroke-width=&quot;2&quot;/><path d=&quot;M20 7 L33 13 L33 27 Q33 37 20 41 Q7 37 7 27 L7 13 Z&quot; fill=&quot;#005a2b&quot;/><text x=&quot;20&quot; y=&quot;30&quot; text-anchor=&quot;middle&quot; font-size=&quot;13&quot; font-weight=&quot;900&quot; fill=&quot;#b5973a&quot; font-family=&quot;serif&quot;>BE</text></svg>'"
+        />
         <div id="logo-text">
           <div class="school">Bishop England</div>
           <div class="sport">Lacrosse Stats</div>
@@ -695,10 +694,11 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
     <!-- Player view -->
     <div id="player-view" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
     <div id="empty-state">
-      <svg class="be-crest" width="120" height="140" viewBox="0 0 40 46" fill="none">
-        <path d="M20 2 L38 10 L38 28 Q38 40 20 44 Q2 40 2 28 L2 10 Z" fill="#005a2b" stroke="#b5973a" stroke-width="2"/>
-        <text x="20" y="30" text-anchor="middle" font-size="13" font-weight="900" fill="#b5973a" font-family="serif">BE</text>
-      </svg>
+      <img class="be-crest" width="120" height="120" style="object-fit:contain;"
+        src="https://carolinapreps.com/teams/assets/teams/frontend/logo/Bishop-England-Battling-Bishops.png"
+        alt="Bishop England Battling Bishops"
+        onerror="this.onerror=null;this.outerHTML='<svg class=&quot;be-crest&quot; width=&quot;120&quot; height=&quot;140&quot; viewBox=&quot;0 0 40 46&quot; fill=&quot;none&quot;><path d=&quot;M20 2 L38 10 L38 28 Q38 40 20 44 Q2 40 2 28 L2 10 Z&quot; fill=&quot;#005a2b&quot; stroke=&quot;#b5973a&quot; stroke-width=&quot;2&quot;/><text x=&quot;20&quot; y=&quot;30&quot; text-anchor=&quot;middle&quot; font-size=&quot;13&quot; font-weight=&quot;900&quot; fill=&quot;#b5973a&quot; font-family=&quot;serif&quot;>BE</text></svg>'"
+      />
       <h2>Select a Player</h2>
       <p>Choose a player from the roster to track their stats</p>
     </div>
