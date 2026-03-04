@@ -389,6 +389,79 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
 /* ─── Utility ─────────────────────────────────── */
 .hidden { display: none !important; }
+
+/* ─── Main Nav (top-level view switcher) ───────── */
+#main-nav {
+  display: flex; gap: 0;
+  background: var(--surface); border-bottom: 2px solid var(--be-gold);
+  flex-shrink: 0;
+}
+.main-nav-btn {
+  flex: 1; background: none; border: none;
+  padding: 13px 10px; color: var(--text-muted);
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  border-bottom: 3px solid transparent; transition: all 0.15s;
+  text-transform: uppercase; letter-spacing: 0.6px;
+}
+.main-nav-btn:hover { color: var(--text); background: var(--surface2); }
+.main-nav-btn.active { color: var(--be-gold-lite); border-bottom-color: var(--be-gold); background: var(--surface2); }
+
+/* ─── Team Map View ────────────────────────────── */
+#team-map-view { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+#team-map-view.active { display: flex; }
+
+#team-map-controls {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 18px; border-bottom: 1px solid var(--border);
+  background: var(--surface); flex-shrink: 0;
+}
+#team-map-controls span { font-size: 12px; color: var(--text-muted); }
+.tm-filter-btn {
+  padding: 4px 11px; border-radius: 6px; border: 1.5px solid var(--c,#888);
+  background: transparent; color: var(--c,#888);
+  font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.1s;
+}
+.tm-filter-btn.active { background: color-mix(in srgb, var(--c) 20%, transparent); }
+#team-heatmap-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; margin-left: auto; }
+
+#team-field-container {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  padding: 14px; overflow: hidden; position: relative;
+}
+#team-field-canvas { border-radius: 10px; max-width: 100%; max-height: 100%; }
+
+/* ─── Charts View ──────────────────────────────── */
+#charts-view { flex: 1; display: none; flex-direction: column; overflow-y: auto; padding: 20px 24px; gap: 24px; }
+#charts-view.active { display: flex; }
+#charts-view::-webkit-scrollbar { width: 5px; }
+#charts-view::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.chart-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.chart-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 14px; }
+
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.bar-label { font-size: 11px; font-weight: 600; color: var(--text-muted); width: 110px; min-width: 110px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { flex: 1; background: var(--surface2); border-radius: 4px; height: 14px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s cubic-bezier(.4,0,.2,1); min-width: 2px; }
+.bar-val { font-size: 11px; font-weight: 700; color: var(--text); min-width: 24px; }
+
+.stat-summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px,1fr)); gap: 10px; margin-bottom: 0; }
+.summary-card { background: var(--surface2); border-radius: 8px; padding: 10px 12px; text-align: center; }
+.summary-card .sc-val { font-size: 28px; font-weight: 900; }
+.summary-card .sc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-top: 2px; }
+
+/* ─── Assist dot ────────────────────────────────── */
+.dot.ast { background: #d4af44; }
+
+/* ─── Save Game button ─────────────────────────── */
+#btn-save-game {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; background: none; border: none;
+  color: var(--be-gold-lite); font-size: 12px; font-weight: 700; cursor: pointer; width: 100%;
+  border-bottom: 1px solid var(--border); transition: background 0.1s;
+}
+#btn-save-game:hover { background: var(--surface2); }
+#btn-save-game svg { flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -413,6 +486,13 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
         <input type="date"  id="game-date" />
       </div>
     </div>
+
+    <button id="btn-save-game">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+        <path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Save Game as File
+    </button>
 
     <div id="search-box">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
@@ -443,6 +523,15 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
   <!-- Main -->
   <main id="main-panel">
+    <!-- Top-level view navigation -->
+    <div id="main-nav">
+      <button class="main-nav-btn active" data-view="player">&#9654; Players</button>
+      <button class="main-nav-btn" data-view="teammap">&#9633; Team Map</button>
+      <button class="main-nav-btn" data-view="charts">&#9650; Charts</button>
+    </div>
+
+    <!-- Player view -->
+    <div id="player-view" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
     <div id="empty-state">
       <svg class="be-crest" width="120" height="140" viewBox="0 0 40 46" fill="none">
         <path d="M20 2 L38 10 L38 28 Q38 40 20 44 Q2 40 2 28 L2 10 Z" fill="#005a2b" stroke="#b5973a" stroke-width="2"/>
@@ -491,6 +580,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
             <span>Mark as:</span>
             <button class="shot-type-btn active" data-type="goal" style="--c:#008c45">Goal</button>
             <button class="shot-type-btn" data-type="sog"  style="--c:#60a5fa">Shot on Goal</button>
+            <button class="shot-type-btn" data-type="ast"  style="--c:#d4af44">Assist</button>
             <button class="shot-type-btn" data-type="miss" style="--c:#f87171">Miss</button>
             <button class="shot-type-btn" data-type="gb"   style="--c:#fbbf24">Ground Ball</button>
           </div>
@@ -503,9 +593,10 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
         </div>
         <div id="field-container">
           <canvas id="field-canvas"></canvas>
-          <div id="shot-count-legend">
+          <div id="shot-count-legend" style="position:absolute;bottom:22px;right:214px;background:rgba(10,26,15,0.92);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">
             <div class="legend-item"><span class="dot goal"></span>Goal</div>
             <div class="legend-item"><span class="dot sog"></span>Shot on Goal</div>
+            <div class="legend-item"><span class="dot ast"></span>Assist</div>
             <div class="legend-item"><span class="dot miss"></span>Miss</div>
             <div class="legend-item"><span class="dot gb"></span>Ground Ball</div>
           </div>
@@ -553,6 +644,58 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
         </div>
       </div>
     </div>
+    </div><!-- end #player-view -->
+
+    <!-- Team Map view -->
+    <div id="team-map-view">
+      <div id="team-map-controls">
+        <span>Filter:</span>
+        <button class="tm-filter-btn active" data-type="all" style="--c:#7aaa87">All</button>
+        <button class="tm-filter-btn" data-type="goal" style="--c:#008c45">Goals</button>
+        <button class="tm-filter-btn" data-type="sog"  style="--c:#60a5fa">SOG</button>
+        <button class="tm-filter-btn" data-type="ast"  style="--c:#d4af44">Assists</button>
+        <button class="tm-filter-btn" data-type="miss" style="--c:#f87171">Miss</button>
+        <button class="tm-filter-btn" data-type="gb"   style="--c:#fbbf24">GB</button>
+        <label id="team-heatmap-label">
+          <input type="checkbox" id="team-heatmap-toggle" /> Heat Map
+        </label>
+      </div>
+      <div id="team-field-container">
+        <canvas id="team-field-canvas"></canvas>
+        <div id="shot-count-legend" style="position:absolute;bottom:22px;right:24px;background:rgba(10,26,15,0.92);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">
+          <div class="legend-item"><span class="dot goal"></span>Goal</div>
+          <div class="legend-item"><span class="dot sog"></span>Shot on Goal</div>
+          <div class="legend-item"><span class="dot ast"></span>Assist</div>
+          <div class="legend-item"><span class="dot miss"></span>Miss</div>
+          <div class="legend-item"><span class="dot gb"></span>Ground Ball</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts view -->
+    <div id="charts-view">
+      <div id="chart-summary" class="chart-section">
+        <div class="chart-title">Team Totals</div>
+        <div id="summary-cards" class="stat-summary-grid"></div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-title">Scoring Leaders (Goals + Assists)</div>
+        <div id="chart-scoring"></div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-title">Shot Efficiency (Goals / Shots on Goal)</div>
+        <div id="chart-shots"></div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-title">Ground Balls &amp; Turnovers</div>
+        <div id="chart-gb-to"></div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-title">Face-Off Wins (FOGO / Midfield)</div>
+        <div id="chart-fo"></div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -630,7 +773,7 @@ const DEFAULT_PLAYERS = [
   { id: 29, number:  0, name: "Charlie Godfrey",  grade: "Sophomore", pos: "",         team: "Manager", notes: "" },
 ];
 
-function emptyStats() { return { G:0, A:0, SOG:0, GB:0, TO:0, FOU:0, FOL:0, shots:[] }; }
+function emptyStats() { return { G:0, A:0, SOG:0, GB:0, TO:0, FTO:0, FOW:0, FOL:0, shots:[] }; }
 
 // ─── State ────────────────────────────────────────────────────────────────
 let state = {
@@ -753,13 +896,14 @@ function selectPlayer(id) {
 
 // ─── Stats Tab ────────────────────────────────────────────────────────────
 const STAT_DEFS = [
-  { key:"G",   label:"Goals",          desc:"Total goals scored",      color:"#008c45" },
-  { key:"A",   label:"Assists",         desc:"Passes leading to goals", color:"#d4af44" },
-  { key:"SOG", label:"Shots on Goal",   desc:"Shots on cage",           color:"#60a5fa" },
-  { key:"GB",  label:"Ground Balls",    desc:"Loose ball pickups",      color:"#fbbf24" },
-  { key:"TO",  label:"Turnovers",       desc:"Possessions lost",        color:"#f87171" },
-  { key:"FOU", label:"Face-Off Wins",   desc:"Face-offs won",           color:"#6ee89b" },
-  { key:"FOL", label:"Face-Off Losses", desc:"Face-offs lost",          color:"#fca5a5" },
+  { key:"G",   label:"Goals",            desc:"Total goals scored",       color:"#008c45" },
+  { key:"A",   label:"Assists",           desc:"Passes leading to goals",  color:"#d4af44" },
+  { key:"SOG", label:"Shots on Goal",     desc:"Shots on cage",            color:"#60a5fa" },
+  { key:"GB",  label:"Ground Balls",      desc:"Loose ball pickups",       color:"#fbbf24" },
+  { key:"TO",  label:"Turnovers",         desc:"Possessions lost",         color:"#f87171" },
+  { key:"FTO", label:"Forced Turnovers",  desc:"Turnovers caused by you",  color:"#fb923c" },
+  { key:"FOW", label:"Face-Off Wins",     desc:"Face-offs won",            color:"#6ee89b" },
+  { key:"FOL", label:"Face-Off Losses",   desc:"Face-offs lost",           color:"#fca5a5" },
 ];
 
 function renderStatsTab(p) {
@@ -787,13 +931,14 @@ function renderStatsTab(p) {
   const qb = document.getElementById("quick-buttons");
   qb.innerHTML = "";
   [
-    { stat:"G",   label:"+ Goal",        cls:"qg"  },
-    { stat:"A",   label:"+ Assist",      cls:"qa"  },
-    { stat:"SOG", label:"+ Shot on Goal",cls:"qs"  },
-    { stat:"GB",  label:"+ Ground Ball", cls:"qb"  },
-    { stat:"TO",  label:"+ Turnover",    cls:"qt"  },
-    { stat:"FOU", label:"+ FO Win",      cls:"qfw" },
-    { stat:"FOL", label:"+ FO Loss",     cls:"qfl" },
+    { stat:"G",   label:"+ Goal",          cls:"qg"  },
+    { stat:"A",   label:"+ Assist",        cls:"qa"  },
+    { stat:"SOG", label:"+ Shot on Goal",  cls:"qs"  },
+    { stat:"GB",  label:"+ Ground Ball",   cls:"qb"  },
+    { stat:"TO",  label:"+ Turnover",      cls:"qt"  },
+    { stat:"FTO", label:"+ Forced TO",     cls:"qt"  },
+    { stat:"FOW", label:"+ FO Win",        cls:"qfw" },
+    { stat:"FOL", label:"+ FO Loss",       cls:"qfl" },
   ].forEach(qd => {
     const btn = document.createElement("button");
     btn.className = `quick-btn ${qd.cls}`;
@@ -855,7 +1000,7 @@ function deletePlayer() {
 
 // ─── Field Canvas ─────────────────────────────────────────────────────────
 const FW = 560, FH = 330;
-const SHOT_COLORS = { goal:"#008c45", sog:"#60a5fa", miss:"#f87171", gb:"#fbbf24" };
+const SHOT_COLORS = { goal:"#008c45", sog:"#60a5fa", ast:"#d4af44", miss:"#f87171", gb:"#fbbf24" };
 
 function drawField() {
   const canvas = document.getElementById("field-canvas");
@@ -964,6 +1109,7 @@ function addShot(x,y) {
   else if (sh.type==="sog")  { state.stats[pid].SOG++; }
   else if (sh.type==="miss") { state.stats[pid].SOG++; }
   else if (sh.type==="gb")   { state.stats[pid].GB++;  }
+  else if (sh.type==="ast")  { state.stats[pid].A++;   }
   renderShotList(); drawField();
   const p=state.players.find(x=>x.id===pid);
   if (p) renderStatsTab(p);
@@ -977,7 +1123,7 @@ function renderShotList() {
   document.getElementById("shot-count-badge").textContent=shots.length;
   const listEl=document.getElementById("shot-list");
   listEl.innerHTML="";
-  const labels={goal:"Goal",sog:"Shot on Goal",miss:"Miss",gb:"Ground Ball"};
+  const labels={goal:"Goal",sog:"Shot on Goal",ast:"Assist",miss:"Miss",gb:"Ground Ball"};
   shots.slice().reverse().forEach((sh,ri) => {
     const i=shots.length-1-ri;
     const el=document.createElement("div");
@@ -989,6 +1135,7 @@ function renderShotList() {
       const s=state.stats[pid].shots[idx];
       if(s.type==="goal"){state.stats[pid].G=Math.max(0,state.stats[pid].G-1);state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1);}
       else if(s.type==="sog"){state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1);}
+      else if(s.type==="ast"){state.stats[pid].A=Math.max(0,state.stats[pid].A-1);}
       else if(s.type==="gb"){state.stats[pid].GB=Math.max(0,state.stats[pid].GB-1);}
       state.stats[pid].shots.splice(idx,1);
       renderShotList(); drawField();
@@ -1024,10 +1171,10 @@ function addPlayer() {
 
 // ─── CSV Export ───────────────────────────────────────────────────────────
 function exportCSV() {
-  const h=["#","Name","Grade","Pos","Team","G","A","SOG","GB","TO","FOU","FOL"];
+  const h=["#","Name","Grade","Pos","Team","G","A","SOG","GB","TO","FTO","FOW","FOL"];
   const rows=state.players.map(p=>{
     const s=state.stats[p.id]||emptyStats();
-    return[p.number,`"${p.name}"`,p.grade,p.pos,p.team,s.G,s.A,s.SOG,s.GB,s.TO,s.FOU,s.FOL];
+    return[p.number,`"${p.name}"`,p.grade,p.pos,p.team,s.G,s.A,s.SOG,s.GB,s.TO,s.FTO,s.FOW,s.FOL];
   });
   const csv=[h,...rows].map(r=>r.join(",")).join("\n");
   const a=document.createElement("a");
@@ -1054,6 +1201,203 @@ function navigatePlayer(dir) {
   if(nxt>=0&&nxt<state.players.length) selectPlayer(state.players[nxt].id);
 }
 
+// ─── Team Map ─────────────────────────────────────────────────────────────
+let teamMapFilter = "all";
+let teamHeatmap   = false;
+
+function drawTeamMap() {
+  const canvas = document.getElementById("team-field-canvas");
+  const ctx    = canvas.getContext("2d");
+  const dpr    = window.devicePixelRatio || 1;
+  const cont   = document.getElementById("team-field-container");
+  const scale  = Math.min((cont.clientWidth-28)/FW, (cont.clientHeight-28)/FH, 1);
+  const cW = Math.floor(FW*scale), cH = Math.floor(FH*scale);
+  canvas.style.width = cW+"px"; canvas.style.height = cH+"px";
+  canvas.width = cW*dpr; canvas.height = cH*dpr;
+  ctx.scale(dpr*scale, dpr*scale);
+
+  // Draw the field (same as individual)
+  const g = ctx.createLinearGradient(0,0,0,FH);
+  g.addColorStop(0,"#0f3d18"); g.addColorStop(0.5,"#135220"); g.addColorStop(1,"#0f3d18");
+  ctx.fillStyle=g; ctx.fillRect(0,0,FW,FH);
+  ctx.fillStyle="rgba(0,0,0,0.07)";
+  for(let i=0;i<FW;i+=40) ctx.fillRect(i,0,20,FH);
+  ctx.strokeStyle="#fff"; ctx.lineWidth=2;
+  ctx.strokeRect(10,10,FW-20,FH-20);
+  ctx.beginPath(); ctx.moveTo(FW/2,10); ctx.lineTo(FW/2,FH-10); ctx.stroke();
+  ctx.beginPath(); ctx.arc(FW/2,FH/2,28,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(FW/2,FH/2,3,0,Math.PI*2); ctx.fill();
+  drawGoal(ctx,10,FH/2); drawGoal(ctx,FW-10,FH/2);
+  ctx.strokeStyle="rgba(255,255,255,0.8)"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(10,FH/2,55,-Math.PI/2,Math.PI/2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(FW-10,FH/2,55,Math.PI/2,-Math.PI/2); ctx.stroke();
+  ctx.strokeStyle="rgba(255,255,255,0.45)"; ctx.lineWidth=1; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(120,10); ctx.lineTo(120,FH-10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(FW-120,10); ctx.lineTo(FW-120,FH-10); ctx.stroke();
+  ctx.setLineDash([]);
+  drawX(ctx,FW/2-70,FH/2); drawX(ctx,FW/2+70,FH/2);
+  ctx.fillStyle="rgba(255,255,255,0.2)"; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("ATTACK",80,FH-17); ctx.fillText("DEFENSE",FW-80,FH-17);
+
+  // Collect all shots
+  const allShots = [];
+  state.players.forEach(p => {
+    const shots = state.stats[p.id]?.shots || [];
+    shots.forEach(sh => allShots.push({ sh, p }));
+  });
+
+  // Heat map overlay
+  if (teamHeatmap) {
+    const visible = teamMapFilter==="all" ? allShots.map(x=>x.sh) : allShots.filter(x=>x.sh.type===teamMapFilter).map(x=>x.sh);
+    drawHeatmap(ctx, visible);
+  }
+
+  // Draw dots + player name labels
+  const firstName = p => p.name.split(" ")[0];
+  allShots.forEach(({sh, p}) => {
+    if (teamMapFilter !== "all" && sh.type !== teamMapFilter) return;
+    const col = SHOT_COLORS[sh.type] || "#fff";
+    ctx.beginPath(); ctx.arc(sh.x,sh.y,6,0,Math.PI*2);
+    ctx.fillStyle = col+"cc"; ctx.fill();
+    ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke();
+
+    // Name label
+    const fname = firstName(p);
+    ctx.font = "bold 9px sans-serif";
+    const tw = ctx.measureText(fname).width;
+    // Position label to avoid going off right edge
+    const lx = sh.x + 9 + tw > FW - 4 ? sh.x - 9 - tw : sh.x + 9;
+    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.fillRect(lx - 2, sh.y - 8, tw + 4, 11);
+    ctx.fillStyle = col;
+    ctx.textAlign = "left";
+    ctx.fillText(fname, lx, sh.y + 1);
+  });
+}
+
+// ─── Charts ───────────────────────────────────────────────────────────────
+function renderCharts() {
+  const players = state.players.filter(p => p.team !== "Manager");
+
+  // Team summary cards
+  const totals = { G:0, A:0, SOG:0, GB:0, TO:0, FTO:0, FOW:0, FOL:0 };
+  players.forEach(p => {
+    const s = state.stats[p.id] || emptyStats();
+    Object.keys(totals).forEach(k => { totals[k] += (s[k]||0); });
+  });
+  const cards = document.getElementById("summary-cards");
+  cards.innerHTML = [
+    {k:"G",  label:"Goals",    color:"#008c45"},
+    {k:"A",  label:"Assists",  color:"#d4af44"},
+    {k:"SOG",label:"SOG",      color:"#60a5fa"},
+    {k:"GB", label:"GBs",      color:"#fbbf24"},
+    {k:"TO", label:"TOs",      color:"#f87171"},
+    {k:"FTO",label:"FTOs",     color:"#fb923c"},
+    {k:"FOW",label:"FO Wins",  color:"#6ee89b"},
+  ].map(d => `
+    <div class="summary-card">
+      <div class="sc-val" style="color:${d.color}">${totals[d.k]}</div>
+      <div class="sc-label">${d.label}</div>
+    </div>`).join("");
+
+  renderBarChart("chart-scoring",
+    players.map(p => {
+      const s = state.stats[p.id]||emptyStats();
+      return { label: p.name.split(" ")[0]+" #"+p.number, val: s.G+s.A, sub: `${s.G}G + ${s.A}A` };
+    }).filter(d=>d.val>0).sort((a,b)=>b.val-a.val),
+    "#d4af44", 1);
+
+  renderStackedShotChart("chart-shots", players);
+
+  renderBarChart("chart-gb-to",
+    players.map(p => {
+      const s = state.stats[p.id]||emptyStats();
+      return { label: p.name.split(" ")[0]+" #"+p.number, val: s.GB, val2: s.TO, sub: `${s.GB} GB / ${s.TO} TO` };
+    }).filter(d=>d.val+d.val2>0).sort((a,b)=>(b.val+b.val2)-(a.val+a.val2)),
+    "#fbbf24", 2);
+
+  renderBarChart("chart-fo",
+    players.map(p => {
+      const s = state.stats[p.id]||emptyStats();
+      return { label: p.name.split(" ")[0]+" #"+p.number, val: s.FOW, fol: s.FOL, sub: `${s.FOW}W / ${s.FOL}L` };
+    }).filter(d=>d.val+d.fol>0).sort((a,b)=>b.val-a.val),
+    "#6ee89b", 1);
+}
+
+function renderBarChart(containerId, data, color, mode) {
+  const el = document.getElementById(containerId);
+  if (!data.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:6px 0">No data yet</div>'; return; }
+  const max = Math.max(...data.map(d=>d.val + (mode===2?d.val2||0:0)), 1);
+  el.innerHTML = data.map(d => {
+    const pct = Math.round((d.val/max)*100);
+    const pct2 = mode===2 ? Math.round(((d.val2||0)/max)*100) : 0;
+    return `<div class="bar-row">
+      <div class="bar-label" title="${d.label}">${d.label}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%;background:${color};${mode===2?'border-radius:4px 0 0 4px':''}"></div>
+        ${mode===2?`<div class="bar-fill" style="position:absolute;left:${pct}%;top:0;width:${pct2}%;background:#f87171;border-radius:0 4px 4px 0"></div>`:''}
+      </div>
+      <div class="bar-val">${d.sub||d.val}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderStackedShotChart(containerId, players) {
+  const el = document.getElementById(containerId);
+  const data = players.map(p => {
+    const s = state.stats[p.id]||emptyStats();
+    return { label: p.name.split(" ")[0]+" #"+p.number, g: s.G, sog: Math.max(0,s.SOG-s.G), miss: s.shots.filter(sh=>sh.type==="miss").length };
+  }).filter(d=>d.g+d.sog+d.miss>0).sort((a,b)=>(b.g+b.sog+b.miss)-(a.g+a.sog+a.miss));
+  if (!data.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:6px 0">No shots recorded yet</div>'; return; }
+  const max = Math.max(...data.map(d=>d.g+d.sog+d.miss), 1);
+  el.innerHTML = data.map(d => {
+    const tot = d.g+d.sog+d.miss;
+    const pg = Math.round((d.g/max)*100), ps = Math.round((d.sog/max)*100), pm = Math.round((d.miss/max)*100);
+    const eff = tot ? Math.round((d.g/tot)*100) : 0;
+    return `<div class="bar-row">
+      <div class="bar-label" title="${d.label}">${d.label}</div>
+      <div class="bar-track" style="position:relative;">
+        <div class="bar-fill" style="position:absolute;left:0;top:0;width:${pg}%;background:#008c45;z-index:3"></div>
+        <div class="bar-fill" style="position:absolute;left:${pg}%;top:0;width:${ps}%;background:#60a5fa;z-index:2"></div>
+        <div class="bar-fill" style="position:absolute;left:${pg+ps}%;top:0;width:${pm}%;background:#f87171;z-index:1"></div>
+      </div>
+      <div class="bar-val">${eff}%</div>
+    </div>`;
+  }).join("");
+}
+
+// ─── Main Nav (view switching) ─────────────────────────────────────────────
+function showView(name) {
+  document.querySelectorAll(".main-nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.view===name));
+  document.getElementById("player-view").style.display    = name==="player"  ? "flex" : "none";
+  document.getElementById("team-map-view").classList.toggle("active", name==="teammap");
+  document.getElementById("charts-view").classList.toggle("active",   name==="charts");
+  if (name==="teammap") setTimeout(drawTeamMap, 50);
+  if (name==="charts")  renderCharts();
+}
+
+// ─── Export Game as Standalone HTML ───────────────────────────────────────
+function exportGameHTML() {
+  const snapshot = JSON.stringify({ players: state.players, stats: state.stats, game: state.game, nextId: state.nextId });
+  const src = document.documentElement.outerHTML;
+  // Inject snapshot as the first data loaded
+  const injected = src.replace(
+    /\/\/ ─── Player Data ──/,
+    `const GAME_SNAPSHOT = ${snapshot};\n// ─── Player Data ──`
+  ).replace(
+    /function loadData\(\) \{[\s\S]*?try \{[\s\S]*?const raw = localStorage\.getItem/,
+    `function loadData() {\n  try {\n    const raw = JSON.stringify(GAME_SNAPSHOT) || localStorage.getItem`
+  );
+  const blob = new Blob([injected], {type:"text/html"});
+  const a = document.createElement("a");
+  const opp = state.game.opponent ? `-vs-${state.game.opponent.replace(/\s+/g,"-")}` : "";
+  const dt  = state.game.date || new Date().toISOString().slice(0,10);
+  a.href = URL.createObjectURL(blob);
+  a.download = `BE-Lacrosse-${dt}${opp}.html`;
+  a.click();
+  showToast("Game saved as HTML file!", "success");
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────
 function init() {
   loadData();
@@ -1066,6 +1410,17 @@ function init() {
   document.getElementById("game-date").addEventListener("change",e=>{state.game.date=e.target.value;autoSave();});
   document.getElementById("btn-save").addEventListener("click",saveData);
   document.getElementById("btn-export").addEventListener("click",exportCSV);
+  document.getElementById("btn-save-game").addEventListener("click",exportGameHTML);
+
+  // Main nav
+  document.querySelectorAll(".main-nav-btn").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+
+  // Team map filter buttons
+  document.querySelectorAll(".tm-filter-btn").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".tm-filter-btn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); teamMapFilter=b.dataset.type; drawTeamMap();
+  }));
+  document.getElementById("team-heatmap-toggle").addEventListener("change",e=>{teamHeatmap=e.target.checked;drawTeamMap();});
 
   document.querySelectorAll(".tab-btn").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
   document.getElementById("btn-save-profile").addEventListener("click",saveProfile);
@@ -1100,7 +1455,7 @@ function init() {
     const pid=state.selectedId;
     const k={g:()=>adjustStat(pid,"G",1),a:()=>adjustStat(pid,"A",1),s:()=>adjustStat(pid,"SOG",1),
              b:()=>adjustStat(pid,"GB",1),t:()=>adjustStat(pid,"TO",1),
-             w:()=>adjustStat(pid,"FOU",1),l:()=>adjustStat(pid,"FOL",1),
+             w:()=>adjustStat(pid,"FOW",1),l:()=>adjustStat(pid,"FOL",1),
              ArrowLeft:()=>navigatePlayer(-1),ArrowRight:()=>navigatePlayer(1)};
     if(k[e.key]) k[e.key]();
   });
@@ -1108,7 +1463,10 @@ function init() {
   let rt;
   window.addEventListener("resize",()=>{
     clearTimeout(rt);
-    rt=setTimeout(()=>{if(document.getElementById("tab-heatmap").classList.contains("active"))drawField();},100);
+    rt=setTimeout(()=>{
+      if(document.getElementById("tab-heatmap").classList.contains("active")) drawField();
+      if(document.getElementById("team-map-view").classList.contains("active")) drawTeamMap();
+    },100);
   });
 }
 
