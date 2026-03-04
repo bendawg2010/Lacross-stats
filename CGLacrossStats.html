@@ -411,10 +411,15 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 #team-map-view.active { display: flex; }
 
 #team-map-controls {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  padding: 10px 18px; border-bottom: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 0;
+  border-bottom: 1px solid var(--border);
   background: var(--surface); flex-shrink: 0;
 }
+.tm-controls-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 8px 18px;
+}
+.tm-controls-row + .tm-controls-row { border-top: 1px solid var(--border); }
 #team-map-controls span { font-size: 12px; color: var(--text-muted); }
 .tm-filter-btn {
   padding: 4px 11px; border-radius: 6px; border: 1.5px solid var(--c,#888);
@@ -424,11 +429,56 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 .tm-filter-btn.active { background: color-mix(in srgb, var(--c) 20%, transparent); }
 #team-heatmap-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; margin-left: auto; }
 
+.tm-shot-btn {
+  padding: 4px 10px; border-radius: 6px; border: 1.5px solid var(--c,#888);
+  background: transparent; color: var(--c,#888);
+  font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.1s;
+}
+.tm-shot-btn.active { background: color-mix(in srgb, var(--c) 20%, transparent); }
+
+#tm-player-select {
+  padding: 4px 8px; border-radius: 6px; border: 1.5px solid var(--border);
+  background: var(--surface2); color: var(--text); font-size: 11px; font-weight: 600;
+  cursor: pointer; max-width: 160px;
+}
+#tm-shot-list-panel {
+  width: 190px; min-width: 190px; border-left: 1px solid var(--border);
+  background: var(--surface); padding: 12px; overflow-y: auto;
+}
+#tm-shot-list-panel h4 { font-size: 12px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.7px; color: var(--text-muted); margin: 0 0 8px; display: flex; align-items: center; gap: 6px; }
+
 #team-field-container {
   flex: 1; display: flex; align-items: center; justify-content: center;
   padding: 14px; overflow: hidden; position: relative;
 }
-#team-field-canvas { border-radius: 10px; max-width: 100%; max-height: 100%; }
+#team-field-canvas { border-radius: 10px; max-width: 100%; max-height: 100%; cursor: crosshair; }
+
+/* ─── Finish Match button ─────────────────────── */
+#btn-finish-match {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; background: none; border: none;
+  color: #60a5fa; font-size: 12px; font-weight: 700; cursor: pointer; width: 100%;
+  border-bottom: 1px solid var(--border); transition: background 0.1s;
+}
+#btn-finish-match:hover { background: var(--surface2); }
+#btn-finish-match svg { flex-shrink: 0; }
+#finish-match-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; }
+#finish-match-overlay.hidden { display: none; }
+#finish-match-dialog { background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 32px; min-width: 320px; max-width: 400px; }
+#finish-match-dialog h2 { margin: 0 0 6px; font-size: 18px; }
+#finish-match-dialog p { margin: 0 0 14px; font-size: 13px; color: var(--text-muted); }
+#finish-match-name { width: 100%; box-sizing: border-box; padding: 9px 12px;
+  border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg);
+  color: var(--text); font-size: 14px; margin-bottom: 16px; }
+#finish-match-name:focus { outline: none; border-color: var(--be-green-lite); }
+#finish-match-actions { display: flex; gap: 10px; justify-content: flex-end; }
+#finish-match-actions button { padding: 8px 18px; border-radius: 8px; border: none;
+  font-size: 13px; font-weight: 700; cursor: pointer; }
+#btn-finish-cancel { background: var(--surface2); color: var(--text-muted); }
+#btn-finish-save { background: #1d4ed8; color: #fff; }
 
 /* ─── Charts View ──────────────────────────────── */
 #charts-view { flex: 1; display: none; flex-direction: column; overflow-y: auto; padding: 20px 24px; gap: 24px; }
@@ -492,6 +542,13 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
         <path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
       </svg>
       Save Game as File
+    </button>
+    <button id="btn-finish-match">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+        <rect x="2" y="2" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M5 7l2 2 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Finish Match &amp; Save
     </button>
 
     <div id="search-box">
@@ -651,25 +708,42 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
     <!-- Team Map view -->
     <div id="team-map-view">
       <div id="team-map-controls">
-        <span>Filter:</span>
-        <button class="tm-filter-btn active" data-type="all" style="--c:#7aaa87">All</button>
-        <button class="tm-filter-btn" data-type="goal" style="--c:#008c45">Goals</button>
-        <button class="tm-filter-btn" data-type="sog"  style="--c:#60a5fa">SOG</button>
-        <button class="tm-filter-btn" data-type="ast"  style="--c:#d4af44">Assists</button>
-        <button class="tm-filter-btn" data-type="miss" style="--c:#f87171">Miss</button>
-        <button class="tm-filter-btn" data-type="gb"   style="--c:#fbbf24">GB</button>
-        <label id="team-heatmap-label">
-          <input type="checkbox" id="team-heatmap-toggle" /> Heat Map
-        </label>
+        <div class="tm-controls-row">
+          <span>Filter:</span>
+          <button class="tm-filter-btn active" data-type="all" style="--c:#7aaa87">All</button>
+          <button class="tm-filter-btn" data-type="goal" style="--c:#008c45">Goals</button>
+          <button class="tm-filter-btn" data-type="sog"  style="--c:#60a5fa">SOG</button>
+          <button class="tm-filter-btn" data-type="ast"  style="--c:#d4af44">Assists</button>
+          <button class="tm-filter-btn" data-type="miss" style="--c:#f87171">Miss</button>
+          <button class="tm-filter-btn" data-type="gb"   style="--c:#fbbf24">GB</button>
+          <label id="team-heatmap-label">
+            <input type="checkbox" id="team-heatmap-toggle" /> Heat Map
+          </label>
+        </div>
+        <div class="tm-controls-row">
+          <span>Add Shot:</span>
+          <select id="tm-player-select"><option value="">— select player —</option></select>
+          <button class="tm-shot-btn active" data-type="goal" style="--c:#008c45">Goal</button>
+          <button class="tm-shot-btn" data-type="sog"  style="--c:#60a5fa">SOG</button>
+          <button class="tm-shot-btn" data-type="ast"  style="--c:#d4af44">Assist</button>
+          <button class="tm-shot-btn" data-type="miss" style="--c:#f87171">Miss</button>
+          <button class="tm-shot-btn" data-type="gb"   style="--c:#fbbf24">GB</button>
+        </div>
       </div>
-      <div id="team-field-container">
-        <canvas id="team-field-canvas"></canvas>
-        <div id="shot-count-legend" style="position:absolute;bottom:22px;right:24px;background:rgba(10,26,15,0.92);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">
-          <div class="legend-item"><span class="dot goal"></span>Goal</div>
-          <div class="legend-item"><span class="dot sog"></span>Shot on Goal</div>
-          <div class="legend-item"><span class="dot ast"></span>Assist</div>
-          <div class="legend-item"><span class="dot miss"></span>Miss</div>
-          <div class="legend-item"><span class="dot gb"></span>Ground Ball</div>
+      <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
+        <div id="team-field-container">
+          <canvas id="team-field-canvas"></canvas>
+          <div style="position:absolute;bottom:22px;right:24px;background:rgba(10,26,15,0.92);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">
+            <div class="legend-item"><span class="dot goal"></span>Goal</div>
+            <div class="legend-item"><span class="dot sog"></span>Shot on Goal</div>
+            <div class="legend-item"><span class="dot ast"></span>Assist</div>
+            <div class="legend-item"><span class="dot miss"></span>Miss</div>
+            <div class="legend-item"><span class="dot gb"></span>Ground Ball</div>
+          </div>
+        </div>
+        <div id="tm-shot-list-panel">
+          <h4>Shot Log <span id="tm-shot-count-badge"></span></h4>
+          <div id="tm-shot-list"></div>
         </div>
       </div>
     </div>
@@ -735,6 +809,19 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 </div>
 
 <div id="toast"></div>
+
+<!-- Finish Match Modal -->
+<div id="finish-match-overlay" class="hidden">
+  <div id="finish-match-dialog">
+    <h2>Finish Match &amp; Save</h2>
+    <p>Enter a name for the saved file (e.g. "vs-Wando" or "Playoffs-R1"):</p>
+    <input type="text" id="finish-match-name" placeholder="vs-Opponent" />
+    <div id="finish-match-actions">
+      <button id="btn-finish-cancel">Cancel</button>
+      <button id="btn-finish-save">Save File</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ─── Player Data ──────────────────────────────────────────────────────────
@@ -1113,6 +1200,8 @@ function addShot(x,y) {
   else if (sh.type==="gb")   { state.stats[pid].GB++;  }
   else if (sh.type==="ast")  { state.stats[pid].A++;   }
   renderShotList(); drawField();
+  if (document.getElementById("team-map-view").classList.contains("active")) drawTeamMap();
+  if (teamMapSelectedPid === pid) renderTmShotList(pid);
   const p=state.players.find(x=>x.id===pid);
   if (p) renderStatsTab(p);
   renderPlayerList(document.getElementById("player-search").value);
@@ -1141,6 +1230,8 @@ function renderShotList() {
       else if(s.type==="gb"){state.stats[pid].GB=Math.max(0,state.stats[pid].GB-1);}
       state.stats[pid].shots.splice(idx,1);
       renderShotList(); drawField();
+      if (document.getElementById("team-map-view").classList.contains("active")) drawTeamMap();
+      if (teamMapSelectedPid === pid) renderTmShotList(pid);
       const p=state.players.find(x=>x.id===pid);
       if(p&&document.getElementById("tab-stats").classList.contains("active")) renderStatsTab(p);
       renderPlayerList(document.getElementById("player-search").value);
@@ -1204,8 +1295,10 @@ function navigatePlayer(dir) {
 }
 
 // ─── Team Map ─────────────────────────────────────────────────────────────
-let teamMapFilter = "all";
-let teamHeatmap   = false;
+let teamMapFilter      = "all";
+let teamHeatmap        = false;
+let teamMapShotType    = "goal";
+let teamMapSelectedPid = null;
 
 function drawTeamMap() {
   const canvas = document.getElementById("team-field-canvas");
@@ -1275,6 +1368,104 @@ function drawTeamMap() {
     ctx.textAlign = "left";
     ctx.fillText(fname, lx, sh.y + 1);
   });
+}
+
+function addTeamShot(x, y) {
+  const pid = teamMapSelectedPid;
+  if (!pid) { showToast("Select a player first", "error"); return; }
+  const sh = { type: teamMapShotType, x, y, ts: Date.now() };
+  state.stats[pid].shots.push(sh);
+  if (sh.type==="goal") { state.stats[pid].G++; state.stats[pid].SOG++; }
+  else if (sh.type==="sog")  { state.stats[pid].SOG++; }
+  else if (sh.type==="miss") { state.stats[pid].SOG++; }
+  else if (sh.type==="gb")   { state.stats[pid].GB++;  }
+  else if (sh.type==="ast")  { state.stats[pid].A++;   }
+  drawTeamMap(); renderTmShotList(pid);
+  renderPlayerList(document.getElementById("player-search").value);
+  // If individual map is open on this player, redraw it too
+  if (state.selectedId === pid) {
+    renderShotList(); drawField();
+    const p = state.players.find(x => x.id === pid);
+    if (p && document.getElementById("tab-stats").classList.contains("active")) renderStatsTab(p);
+  }
+  autoSave();
+}
+
+function renderTmShotList(pid) {
+  const shots = state.stats[pid]?.shots || [];
+  document.getElementById("tm-shot-count-badge").textContent = shots.length;
+  const listEl = document.getElementById("tm-shot-list");
+  listEl.innerHTML = "";
+  if (!pid) return;
+  const labels = {goal:"Goal",sog:"Shot on Goal",ast:"Assist",miss:"Miss",gb:"Ground Ball"};
+  shots.slice().reverse().forEach((sh, ri) => {
+    const i = shots.length - 1 - ri;
+    const el = document.createElement("div");
+    el.className = "shot-entry";
+    el.innerHTML = `<div class="shot-entry-label"><span class="dot ${sh.type}"></span><span>${labels[sh.type]||sh.type}</span></div>
+      <button class="shot-entry-del" data-idx="${i}">×</button>`;
+    el.querySelector(".shot-entry-del").addEventListener("click", e => {
+      const idx = parseInt(e.currentTarget.dataset.idx);
+      const s = state.stats[pid].shots[idx];
+      if (s.type==="goal")  { state.stats[pid].G=Math.max(0,state.stats[pid].G-1); state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
+      else if (s.type==="sog")  { state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
+      else if (s.type==="ast")  { state.stats[pid].A=Math.max(0,state.stats[pid].A-1); }
+      else if (s.type==="gb")   { state.stats[pid].GB=Math.max(0,state.stats[pid].GB-1); }
+      else if (s.type==="miss") { state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
+      state.stats[pid].shots.splice(idx, 1);
+      renderTmShotList(pid); drawTeamMap();
+      if (state.selectedId === pid) { renderShotList(); drawField(); }
+      renderPlayerList(document.getElementById("player-search").value);
+      autoSave();
+    });
+    listEl.appendChild(el);
+  });
+}
+
+function populateTmPlayerSelect() {
+  const sel = document.getElementById("tm-player-select");
+  const prev = teamMapSelectedPid;
+  sel.innerHTML = '<option value="">— select player —</option>';
+  state.players.filter(p => p.team !== "Manager").forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.id;
+    opt.textContent = `#${p.number} ${p.name}`;
+    if (p.id === prev) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function openFinishMatch() {
+  const opp = state.game.opponent ? state.game.opponent.replace(/\s+/g,"-") : "";
+  const dt  = state.game.date || new Date().toISOString().slice(0,10);
+  document.getElementById("finish-match-name").value = `${dt}${opp ? "-vs-"+opp : ""}`;
+  document.getElementById("finish-match-overlay").classList.remove("hidden");
+  document.getElementById("finish-match-name").focus();
+  document.getElementById("finish-match-name").select();
+}
+function closeFinishMatch() { document.getElementById("finish-match-overlay").classList.add("hidden"); }
+
+function saveFinishMatch() {
+  let name = document.getElementById("finish-match-name").value.trim();
+  if (!name) name = `BE-Lacrosse-${new Date().toISOString().slice(0,10)}`;
+  // Sanitize
+  name = name.replace(/[^a-zA-Z0-9._\-]/g, "-");
+  const snapshot = JSON.stringify({ players: state.players, stats: state.stats, game: state.game, nextId: state.nextId });
+  const src = document.documentElement.outerHTML;
+  const injected = src.replace(
+    /\/\/ ─── Player Data ──/,
+    `const GAME_SNAPSHOT = ${snapshot};\n// ─── Player Data ──`
+  ).replace(
+    /function loadData\(\) \{[\s\S]*?try \{[\s\S]*?const raw = localStorage\.getItem/,
+    `function loadData() {\n  try {\n    const raw = JSON.stringify(GAME_SNAPSHOT) || localStorage.getItem`
+  );
+  const blob = new Blob([injected], {type:"text/html"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `BE-Lacrosse-${name}.html`;
+  a.click();
+  closeFinishMatch();
+  showToast("Match saved!", "success");
 }
 
 // ─── Charts ───────────────────────────────────────────────────────────────
@@ -1374,7 +1565,7 @@ function showView(name) {
   document.getElementById("player-view").style.display    = name==="player"  ? "flex" : "none";
   document.getElementById("team-map-view").classList.toggle("active", name==="teammap");
   document.getElementById("charts-view").classList.toggle("active",   name==="charts");
-  if (name==="teammap") setTimeout(drawTeamMap, 50);
+  if (name==="teammap") { populateTmPlayerSelect(); setTimeout(drawTeamMap, 50); }
   if (name==="charts")  renderCharts();
 }
 
@@ -1423,6 +1614,37 @@ function init() {
     b.classList.add("active"); teamMapFilter=b.dataset.type; drawTeamMap();
   }));
   document.getElementById("team-heatmap-toggle").addEventListener("change",e=>{teamHeatmap=e.target.checked;drawTeamMap();});
+
+  // Team map shot type buttons
+  document.querySelectorAll(".tm-shot-btn").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".tm-shot-btn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); teamMapShotType=b.dataset.type;
+  }));
+
+  // Team map player select
+  document.getElementById("tm-player-select").addEventListener("change", e => {
+    teamMapSelectedPid = e.target.value ? parseInt(e.target.value) : null;
+    if (teamMapSelectedPid) renderTmShotList(teamMapSelectedPid);
+    else { document.getElementById("tm-shot-list").innerHTML=""; document.getElementById("tm-shot-count-badge").textContent=""; }
+  });
+
+  // Team map canvas click → add shot for selected player
+  document.getElementById("team-field-canvas").addEventListener("click", e => {
+    const {x,y} = canvasCoords(document.getElementById("team-field-canvas"), e);
+    addTeamShot(x, y);
+  });
+
+  // Finish Match button & modal
+  document.getElementById("btn-finish-match").addEventListener("click", openFinishMatch);
+  document.getElementById("btn-finish-cancel").addEventListener("click", closeFinishMatch);
+  document.getElementById("btn-finish-save").addEventListener("click", saveFinishMatch);
+  document.getElementById("finish-match-overlay").addEventListener("click", e => {
+    if (e.target === document.getElementById("finish-match-overlay")) closeFinishMatch();
+  });
+  document.getElementById("finish-match-name").addEventListener("keydown", e => {
+    if (e.key === "Enter") saveFinishMatch();
+    if (e.key === "Escape") closeFinishMatch();
+  });
 
   document.querySelectorAll(".tab-btn").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
   document.getElementById("btn-save-profile").addEventListener("click",saveProfile);
