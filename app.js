@@ -473,24 +473,19 @@ function addShot(x, y) {
   const shot = { type: state.shotType, x, y, ts: Date.now() };
   state.stats[pid].shots.push(shot);
 
-  // Also increment corresponding stat
-  const statMap = { goal: "G", sog: "SOG", miss: "SOG" };  // miss still counts as SOG attempt logged
-  if (statMap[shot.type]) {
-    // Only auto-increment if it's a goal or explicit sog
-    if (shot.type === "goal") { state.stats[pid].G++; state.stats[pid].SOG++; }
-    else if (shot.type === "sog") { state.stats[pid].SOG++; }
-    else if (shot.type === "gb") { state.stats[pid].GB++; }
-  }
+  // Increment corresponding stat
+  if (shot.type === "goal") { state.stats[pid].G++; state.stats[pid].SOG++; }
+  else if (shot.type === "sog")  { state.stats[pid].SOG++; }
+  else if (shot.type === "miss") { state.stats[pid].SOG++; }
+  else if (shot.type === "gb")   { state.stats[pid].GB++;  }
 
   renderShotList();
   drawField();
   autoSave();
 
-  // Refresh stats tab if visible
-  if (document.getElementById("tab-stats").classList.contains("active")) {
-    const p = state.players.find(x => x.id === pid);
-    if (p) renderStatsTab(p);
-  }
+  // Always refresh stats tab so numbers stay in sync
+  const p = state.players.find(x => x.id === pid);
+  if (p) renderStatsTab(p);
   renderPlayerList(document.getElementById("player-search").value);
 }
 
@@ -605,6 +600,10 @@ function switchTab(tab) {
   if (tab === "heatmap") {
     renderShotList();
     setTimeout(drawField, 50);
+  }
+  if (tab === "stats" && state.selectedId) {
+    const p = state.players.find(x => x.id === state.selectedId);
+    if (p) renderStatsTab(p);
   }
 }
 

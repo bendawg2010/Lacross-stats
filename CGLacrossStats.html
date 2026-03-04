@@ -961,11 +961,12 @@ function addShot(x,y) {
   const sh={type:state.shotType,x,y,ts:Date.now()};
   state.stats[pid].shots.push(sh);
   if (sh.type==="goal") { state.stats[pid].G++; state.stats[pid].SOG++; }
-  else if (sh.type==="sog") { state.stats[pid].SOG++; }
-  else if (sh.type==="gb")  { state.stats[pid].GB++;  }
+  else if (sh.type==="sog")  { state.stats[pid].SOG++; }
+  else if (sh.type==="miss") { state.stats[pid].SOG++; }
+  else if (sh.type==="gb")   { state.stats[pid].GB++;  }
   renderShotList(); drawField();
   const p=state.players.find(x=>x.id===pid);
-  if (p && document.getElementById("tab-stats").classList.contains("active")) renderStatsTab(p);
+  if (p) renderStatsTab(p);
   renderPlayerList(document.getElementById("player-search").value);
   autoSave();
 }
@@ -1043,6 +1044,7 @@ function switchTab(tab) {
     c.classList.toggle("hidden",c.id!==`tab-${tab}`);
   });
   if(tab==="heatmap"){renderShotList();setTimeout(drawField,50);}
+  if(tab==="stats"&&state.selectedId){const p=state.players.find(x=>x.id===state.selectedId);if(p)renderStatsTab(p);}
 }
 
 function navigatePlayer(dir) {
