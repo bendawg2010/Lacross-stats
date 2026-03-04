@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="LaxStats"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="assets/icon-192.png"/>
 <title>CGLacrossStats</title>
 <style>
 /* ─── Bishop England Colors ────────────────────── */
@@ -845,6 +851,61 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   .print-table td { padding: 5px 8px; border-bottom: 1px solid #ddd; }
   .print-table tr:nth-child(even) td { background: #f9f9f9; }
 }
+
+/* ── Install Guide Modal ───────────────────────────────────────────────────── */
+#install-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+#install-overlay.open { opacity: 1; pointer-events: all; }
+#install-modal {
+  background: var(--surface2); border: 1px solid var(--be-gold);
+  border-radius: 14px; padding: 28px 32px; max-width: 640px; width: 92%;
+  max-height: 88vh; overflow-y: auto;
+}
+#install-modal h2 { color: var(--be-gold-lite); margin: 0 0 6px; font-size: 20px; }
+#install-modal .subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 22px; }
+.install-section { margin-bottom: 22px; }
+.install-section h3 {
+  font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--be-green-lite); margin: 0 0 10px; display: flex; align-items: center; gap: 8px;
+}
+.install-section h3 .platform-tag {
+  background: var(--surface3); border-radius: 6px; padding: 2px 8px;
+  font-size: 11px; color: var(--be-gold);
+}
+.install-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.install-steps li {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: var(--surface3); border-radius: 8px; padding: 10px 12px; font-size: 13px;
+}
+.install-steps li .step-num {
+  background: var(--be-green); color: #fff; border-radius: 50%;
+  width: 22px; height: 22px; min-width: 22px; font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.install-steps .note { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
+kbd {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 6px; font-family: monospace; font-size: 12px; color: var(--text);
+}
+.install-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+#btn-close-install {
+  margin-top: 18px; width: 100%; padding: 10px;
+  background: var(--be-green); color: #fff; border: none; border-radius: 8px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+}
+#btn-close-install:hover { background: var(--be-green-mid); }
+#btn-install-guide {
+  position: fixed; bottom: 18px; right: 18px;
+  background: var(--be-green-mid); color: #fff; border: 1px solid var(--be-gold);
+  border-radius: 50%; width: 42px; height: 42px; font-size: 20px; font-weight: 900;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 900;
+  transition: background 0.15s;
+}
+#btn-install-guide:hover { background: var(--be-green-lite); }
 </style>
 </head>
 <body>
@@ -1755,7 +1816,28 @@ function renderStatsTab(p) {
 }
 
 function adjustStat(pid, stat, delta) {
-  state.stats[pid][stat] = Math.max(0, (state.stats[pid][stat] || 0) + delta);
+  const prev = state.stats[pid][stat] || 0;
+  state.stats[pid][stat] = Math.max(0, prev + delta);
+
+  // Keep shots[] in sync when decrementing shot-derived stats
+  if (delta < 0 && prev > 0) {
+    const shots = state.stats[pid].shots || [];
+    if (stat === "G") {
+      // Remove the most recent goal shot
+      const idx = shots.map(s => s.type).lastIndexOf("goal");
+      if (idx !== -1) shots.splice(idx, 1);
+    } else if (stat === "SOG") {
+      // Remove the most recent shot of any type that counts as SOG
+      let idx = -1;
+      for (let i = shots.length - 1; i >= 0; i--) {
+        if (shots[i].type === "goal" || shots[i].type === "sog" || shots[i].type === "miss") {
+          idx = i; break;
+        }
+      }
+      if (idx !== -1) shots.splice(idx, 1);
+    }
+  }
+
   const p = state.players.find(x => x.id === pid);
   if (p) { renderStatsTab(p); renderPlayerList(document.getElementById("player-search").value); }
   autoSave();
@@ -2915,6 +2997,60 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+// ── Service Worker Registration ────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
 </script>
+
+<!-- Install Guide FAB -->
+<button id="btn-install-guide" title="Install Guide / Tutorial" onclick="document.getElementById('install-overlay').classList.add('open')">?</button>
+
+<!-- Install Guide Modal -->
+<div id="install-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div id="install-modal">
+    <h2>Install &amp; Setup Guide</h2>
+    <p class="subtitle">How to install CGLacross Stats on your device so it works like a real app — offline included.</p>
+
+    <!-- MAC -->
+    <div class="install-section">
+      <h3>Mac <span class="platform-tag">macOS · Chrome / Safari</span></h3>
+      <ol class="install-steps">
+        <li><span class="step-num">1</span><div>Download the full project folder from GitHub (green <strong>Code → Download ZIP</strong> button) and unzip it anywhere — your Desktop works fine.</div></li>
+        <li><span class="step-num">2</span><div>Open <strong>Google Chrome</strong> (recommended) and drag <kbd>CGLacrossStats.html</kbd> into the Chrome window, or press <kbd>⌘O</kbd> and select the file.</div></li>
+        <li><span class="step-num">3</span><div>In Chrome, click the <strong>address bar menu</strong> (⋮ or the screen icon on the right side of the address bar) → <strong>"Save and share" → "Create shortcut…"</strong> → check <em>Open as window</em> → <strong>Create</strong>.
+          <span class="note">This adds a standalone LaxStats icon to your Applications folder and Dock — it opens without browser chrome.</span>
+        </div></li>
+        <li><span class="step-num">4</span><div>All data is saved automatically in your browser's storage. To back up, use <strong>Export CSV</strong> in the app sidebar.</div></li>
+      </ol>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">
+        <strong>Want a full native .app?</strong> With Node.js installed, open Terminal in the project folder and run <kbd>npm install</kbd> then <kbd>npm run build:mac</kbd>. A <kbd>.dmg</kbd> installer appears in <kbd>dist/</kbd>.
+      </p>
+    </div>
+
+    <hr class="install-divider"/>
+
+    <!-- CHROMEBOOK -->
+    <div class="install-section" style="margin-top:18px;">
+      <h3>HP Chromebook <span class="platform-tag">Chrome OS · Chrome</span></h3>
+      <ol class="install-steps">
+        <li><span class="step-num">1</span><div>Download the project ZIP from GitHub. In the <strong>Files</strong> app (bottom shelf), find it in <em>Downloads</em> and extract it (tap once → <strong>Extract all</strong>).</div></li>
+        <li><span class="step-num">2</span><div>Open the extracted folder in <strong>Files</strong>, then double-click <kbd>CGLacrossStats.html</kbd>. Chrome opens the app automatically.</div></li>
+        <li><span class="step-num">3</span><div>To add it to your <strong>Launcher</strong> (like an installed app): in Chrome, click the <strong>⋮ menu → More tools → Create shortcut…</strong> → check <em>Open as window</em> → <strong>Create</strong>.
+          <span class="note">You'll see "LaxStats" in your Chromebook Launcher just like any Android app. Tap it to open full-screen.</span>
+        </div></li>
+        <li><span class="step-num">4</span><div>The app works <strong>completely offline</strong> after first use — no internet needed at the game.</div></li>
+        <li><span class="step-num">5</span><div>To share stats: tap <strong>Export CSV</strong> in the sidebar. The file saves to <em>Downloads</em> — open it in <strong>Google Sheets</strong> directly from Files.</div></li>
+      </ol>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">
+        <strong>Tip:</strong> Keep the HTML file in <em>Google Drive → My Drive</em> so you can access it from any Chromebook or phone without re-downloading.
+      </p>
+    </div>
+
+    <button id="btn-close-install" onclick="document.getElementById('install-overlay').classList.remove('open')">Got it — Close Guide</button>
+  </div>
+</div>
+
 </body>
 </html>
