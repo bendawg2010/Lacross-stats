@@ -737,6 +737,94 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 .compare-names .cn-b { color: var(--be-green-lite); font-weight: 800; font-size: 13px; }
 .compare-names .cn-mid { width: 80px; flex-shrink: 0; }
 
+/* ─── Goal Animation ────────────────────────── */
+@keyframes goalBgFlash {
+  0%   { opacity:0; }
+  8%   { opacity:1; }
+  75%  { opacity:1; }
+  100% { opacity:0; }
+}
+@keyframes goalLogoAnim {
+  0%   { transform:scale(0.15) rotate(-15deg); opacity:0; filter:drop-shadow(0 0 0px #d4af44); }
+  18%  { transform:scale(1.25) rotate(4deg);  opacity:1; filter:drop-shadow(0 0 40px #d4af44); }
+  32%  { transform:scale(0.95) rotate(-2deg); opacity:1; filter:drop-shadow(0 0 20px #d4af44); }
+  40%  { transform:scale(1.05) rotate(1deg);  opacity:1; filter:drop-shadow(0 0 30px #d4af44); }
+  75%  { transform:scale(1.0)  rotate(0deg);  opacity:1; filter:drop-shadow(0 0 20px #d4af44); }
+  100% { transform:scale(1.4)  rotate(3deg);  opacity:0; filter:drop-shadow(0 0 0px #d4af44); }
+}
+@keyframes goalTextAnim {
+  0%   { transform:translateY(40px) scale(0.7); opacity:0; letter-spacing:2px; }
+  22%  { transform:translateY(-8px) scale(1.12); opacity:1; letter-spacing:14px; }
+  38%  { transform:translateY(0) scale(1.0);    opacity:1; letter-spacing:10px; }
+  75%  { transform:translateY(0) scale(1.0);    opacity:1; letter-spacing:10px; }
+  100% { transform:translateY(-30px) scale(1.1);opacity:0; letter-spacing:18px; }
+}
+@keyframes goalSubAnim {
+  0%,20% { opacity:0; transform:translateY(12px); }
+  35%    { opacity:1; transform:translateY(0); }
+  75%    { opacity:1; transform:translateY(0); }
+  100%   { opacity:0; }
+}
+@keyframes particleBurst {
+  0%   { transform:translate(0,0) scale(1.2); opacity:1; }
+  100% { transform:translate(var(--tx),var(--ty)) scale(0); opacity:0; }
+}
+#goal-anim {
+  position:fixed; inset:0; z-index:9999; pointer-events:none;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:radial-gradient(ellipse at center, rgba(0,90,43,0.92) 0%, rgba(0,0,0,0.82) 70%);
+  opacity:0;
+}
+#goal-anim.playing { animation: goalBgFlash 2.6s ease forwards; }
+#goal-anim-logo {
+  width:160px; height:160px; object-fit:contain;
+  opacity:0; margin-bottom:18px;
+}
+#goal-anim.playing #goal-anim-logo { animation: goalLogoAnim 2.6s ease forwards; }
+#goal-anim-text {
+  font-size:72px; font-weight:900; color:#d4af44;
+  font-family:-apple-system,sans-serif; letter-spacing:10px;
+  text-shadow: 0 0 40px #d4af44, 0 4px 20px rgba(0,0,0,0.8);
+  opacity:0;
+}
+#goal-anim.playing #goal-anim-text { animation: goalTextAnim 2.6s ease forwards; }
+#goal-anim-sub {
+  font-size:18px; font-weight:800; color:rgba(255,255,255,0.85);
+  letter-spacing:5px; text-transform:uppercase; margin-top:10px;
+  opacity:0;
+}
+#goal-anim.playing #goal-anim-sub { animation: goalSubAnim 2.6s ease forwards; }
+.goal-particle {
+  position:absolute; width:10px; height:10px; border-radius:50%;
+  opacity:0;
+}
+#goal-anim.playing .goal-particle { animation: particleBurst 1.1s ease-out 0.15s forwards; }
+
+/* ─── Shortcuts Modal ────────────────────────── */
+#shortcuts-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); display:flex; align-items:center; justify-content:center; z-index:1000; }
+#shortcuts-overlay.hidden { display:none; }
+#shortcuts-dialog { background:var(--surface); border:1px solid var(--border); border-radius:14px; width:480px; max-width:96vw; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; }
+#shortcuts-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 12px; border-bottom:1px solid var(--border); flex-shrink:0; }
+#shortcuts-header h2 { margin:0; font-size:17px; }
+#btn-shortcuts-close { background:none; border:none; color:var(--text-muted); font-size:22px; cursor:pointer; padding:0 4px; }
+#btn-shortcuts-close:hover { color:var(--text); }
+#shortcuts-body { overflow-y:auto; padding:14px 18px 18px; }
+.sc-group { margin-bottom:16px; }
+.sc-group-title { font-size:10px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--be-gold); margin-bottom:8px; }
+.sc-row { display:flex; align-items:center; gap:10px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.sc-row:last-child { border-bottom:none; }
+.sc-key { display:inline-flex; align-items:center; justify-content:center; min-width:32px; height:26px; padding:0 8px; background:var(--surface3); border:1px solid var(--border); border-radius:6px; font-size:12px; font-weight:700; color:var(--text); font-family:monospace; white-space:nowrap; flex-shrink:0; }
+.sc-desc { font-size:12px; color:var(--text-muted); }
+#btn-shortcuts-open { background:none; border:1px solid var(--border); color:var(--text-muted); border-radius:7px; padding:4px 10px; font-size:12px; font-weight:700; cursor:pointer; }
+#btn-shortcuts-open:hover { border-color:var(--be-gold); color:var(--be-gold-lite); }
+
+/* ─── Goalie save% badge ─────────────────────── */
+#goalie-savepct { display:none; margin:0 24px 12px; padding:10px 16px; background:var(--surface2); border-radius:10px; border-left:3px solid #a78bfa; flex-shrink:0; }
+#goalie-savepct.visible { display:block; }
+.sv-row { display:flex; align-items:center; justify-content:space-between; }
+.sv-label { font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+.sv-val { font-size:22px; font-weight:900; color:#a78bfa; }
+
 /* ─── Print / Box Score ──────────────────────── */
 #print-box-score { display: none; }
 @media print {
@@ -850,6 +938,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
       <button class="main-nav-btn" data-view="teammap">&#9633; Team Map</button>
       <button class="main-nav-btn" data-view="charts">&#9650; Charts</button>
       <button class="main-nav-btn" data-view="season">&#9400; Season</button>
+      <button id="btn-shortcuts-open" style="margin-left:auto;">⌨ Shortcuts</button>
     </div>
 
     <!-- Player view -->
@@ -893,6 +982,15 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
       <!-- Stats Tab -->
       <div id="tab-stats" class="tab-content active">
         <div id="stats-grid"></div>
+        <div id="goalie-savepct">
+          <div class="sv-row">
+            <div>
+              <div class="sv-label">Save Percentage</div>
+              <div id="sv-formula" style="font-size:10px;color:var(--text-muted);margin-top:2px;"></div>
+            </div>
+            <div class="sv-val" id="sv-pct-display">—</div>
+          </div>
+        </div>
         <div id="quick-add-bar">
           <h3>Quick Add</h3>
           <div id="quick-buttons"></div>
@@ -1135,6 +1233,51 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   </main>
 </div>
 
+<!-- Goal Animation Overlay -->
+<div id="goal-anim">
+  <img id="goal-anim-logo"
+    src="https://carolinapreps.com/teams/assets/teams/frontend/logo/Bishop-England-Battling-Bishops.png"
+    alt=""
+    onerror="this.onerror=null;this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 46%22><path d=%22M20 2 L38 10 L38 28 Q38 40 20 44 Q2 40 2 28 L2 10 Z%22 fill=%22%23005a2b%22 stroke=%22%23b5973a%22 stroke-width=%222%22/><text x=%2220%22 y=%2230%22 text-anchor=%22middle%22 font-size=%2213%22 font-weight=%22900%22 fill=%22%23b5973a%22 font-family=%22serif%22>BE</text></svg>';"
+  />
+  <div id="goal-anim-text">GOAL!</div>
+  <div id="goal-anim-sub">Bishop England</div>
+</div>
+
+<!-- Shortcuts Modal -->
+<div id="shortcuts-overlay" class="hidden">
+  <div id="shortcuts-dialog">
+    <div id="shortcuts-header">
+      <h2>⌨ Keyboard Shortcuts</h2>
+      <button id="btn-shortcuts-close">&#x2715;</button>
+    </div>
+    <div id="shortcuts-body">
+      <div class="sc-group">
+        <div class="sc-group-title">Stats (with a player selected)</div>
+        <div class="sc-row"><span class="sc-key">G</span><span class="sc-desc">+ Goal</span></div>
+        <div class="sc-row"><span class="sc-key">A</span><span class="sc-desc">+ Assist</span></div>
+        <div class="sc-row"><span class="sc-key">S</span><span class="sc-desc">+ Shot on Goal</span></div>
+        <div class="sc-row"><span class="sc-key">B</span><span class="sc-desc">+ Ground Ball</span></div>
+        <div class="sc-row"><span class="sc-key">T</span><span class="sc-desc">+ Turnover</span></div>
+        <div class="sc-row"><span class="sc-key">W</span><span class="sc-desc">+ Face-Off Win</span></div>
+        <div class="sc-row"><span class="sc-key">L</span><span class="sc-desc">+ Face-Off Loss</span></div>
+        <div class="sc-row"><span class="sc-key">V</span><span class="sc-desc">+ Save (goalies)</span></div>
+      </div>
+      <div class="sc-group">
+        <div class="sc-group-title">Navigation</div>
+        <div class="sc-row"><span class="sc-key">← →</span><span class="sc-desc">Previous / Next player</span></div>
+        <div class="sc-row"><span class="sc-key">Ctrl Z</span><span class="sc-desc">Undo last shot</span></div>
+        <div class="sc-row"><span class="sc-key">?</span><span class="sc-desc">Show this shortcuts panel</span></div>
+      </div>
+      <div class="sc-group">
+        <div class="sc-group-title">Scoreboard</div>
+        <div class="sc-row"><span class="sc-key">+</span><span class="sc-desc">BE score +1 (when not in a text field)</span></div>
+        <div class="sc-row"><span class="sc-key">−</span><span class="sc-desc">BE score −1</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Add Player Modal -->
 <div id="modal-overlay" class="hidden">
   <div id="modal">
@@ -1267,7 +1410,7 @@ const DEFAULT_PLAYERS = [
   { id: 29, number:  0, name: "Charlie Godfrey",  grade: "Sophomore", pos: "",         team: "Manager", notes: "" },
 ];
 
-function emptyStats() { return { G:0, A:0, SOG:0, GB:0, TO:0, FTO:0, FOW:0, FOL:0, shots:[], onField:false }; }
+function emptyStats() { return { G:0, A:0, SOG:0, GB:0, TO:0, FTO:0, FOW:0, FOL:0, SV:0, shots:[], onField:false }; }
 function emptyGame() { return { opponent:"", date:"", beScore:0, oppScore:0, currentQuarter:1, penalties:[], subs:[] }; }
 
 // ─── State ────────────────────────────────────────────────────────────────
@@ -1477,6 +1620,7 @@ const STAT_DEFS = [
   { key:"FTO", label:"Forced Turnovers",  desc:"Turnovers caused by you",  color:"#fb923c" },
   { key:"FOW", label:"Face-Off Wins",     desc:"Face-offs won",            color:"#6ee89b" },
   { key:"FOL", label:"Face-Off Losses",   desc:"Face-offs lost",           color:"#fca5a5" },
+  { key:"SV",  label:"Saves",             desc:"Shots saved (goalies)",    color:"#a78bfa" },
 ];
 
 function renderStatsTab(p) {
@@ -1501,6 +1645,21 @@ function renderStatsTab(p) {
     grid.appendChild(card);
   });
 
+  // Goalie save% panel
+  const svPanel = document.getElementById("goalie-savepct");
+  const isGoalie = (p.pos||"").toLowerCase().includes("g");
+  if (isGoalie) {
+    const sv = s.SV || 0;
+    const ga = state.game.oppScore || 0;
+    const total = sv + ga;
+    const pct = total > 0 ? ((sv / total) * 100).toFixed(1) + "%" : "—";
+    document.getElementById("sv-pct-display").textContent = pct;
+    document.getElementById("sv-formula").textContent = total > 0 ? `${sv} saves / ${total} shots faced` : "No shots recorded yet";
+    svPanel.classList.add("visible");
+  } else {
+    svPanel.classList.remove("visible");
+  }
+
   const qb = document.getElementById("quick-buttons");
   qb.innerHTML = "";
   [
@@ -1512,6 +1671,7 @@ function renderStatsTab(p) {
     { stat:"FTO", label:"+ Forced TO",     cls:"qt"  },
     { stat:"FOW", label:"+ FO Win",        cls:"qfw" },
     { stat:"FOL", label:"+ FO Loss",       cls:"qfl" },
+    { stat:"SV",  label:"+ Save",          cls:"qs"  },
   ].forEach(qd => {
     const btn = document.createElement("button");
     btn.className = `quick-btn ${qd.cls}`;
@@ -1779,10 +1939,10 @@ function addPlayer() {
 
 // ─── CSV Export ───────────────────────────────────────────────────────────
 function exportCSV() {
-  const h=["#","Name","Grade","Pos","Team","G","A","SOG","GB","TO","FTO","FOW","FOL"];
+  const h=["#","Name","Grade","Pos","Team","G","A","SOG","GB","TO","FTO","FOW","FOL","SV"];
   const rows=state.players.map(p=>{
     const s=state.stats[p.id]||emptyStats();
-    return[p.number,`"${p.name}"`,p.grade,p.pos,p.team,s.G,s.A,s.SOG,s.GB,s.TO,s.FTO,s.FOW,s.FOL];
+    return[p.number,`"${p.name}"`,p.grade,p.pos,p.team,s.G,s.A,s.SOG,s.GB,s.TO,s.FTO,s.FOW,s.FOL,s.SV||0];
   });
   const csv=[h,...rows].map(r=>r.join(",")).join("\n");
   const a=document.createElement("a");
@@ -2118,8 +2278,41 @@ function adjustScore(team, delta) {
   else              state.game.oppScore = Math.max(0,(state.game.oppScore||0)+delta);
   document.getElementById("score-be").textContent  = state.game.beScore;
   document.getElementById("score-opp").textContent = state.game.oppScore;
+  if (team==="be" && delta > 0) triggerGoalAnim();
   autoSave();
 }
+
+// ─── Goal Animation ────────────────────────────────────────────────────────
+let goalAnimTimer;
+function triggerGoalAnim() {
+  const el = document.getElementById("goal-anim");
+  // Spawn particles
+  el.querySelectorAll(".goal-particle").forEach(p => p.remove());
+  const colors = ["#d4af44","#fbbf24","#ffffff","#6ee89b","#008c45","#a78bfa"];
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement("div");
+    p.className = "goal-particle";
+    const angle = (i / 18) * Math.PI * 2;
+    const dist  = 140 + Math.random() * 120;
+    p.style.cssText = `
+      left:50%; top:42%;
+      background:${colors[i % colors.length]};
+      --tx:${(Math.cos(angle)*dist).toFixed(0)}px;
+      --ty:${(Math.sin(angle)*dist).toFixed(0)}px;
+      width:${8+Math.random()*8}px; height:${8+Math.random()*8}px;
+    `;
+    el.appendChild(p);
+  }
+  el.classList.remove("playing");
+  void el.offsetWidth; // reflow to restart animation
+  el.classList.add("playing");
+  clearTimeout(goalAnimTimer);
+  goalAnimTimer = setTimeout(() => el.classList.remove("playing"), 2700);
+}
+
+// ─── Shortcuts Modal ───────────────────────────────────────────────────────
+function openShortcuts() { document.getElementById("shortcuts-overlay").classList.remove("hidden"); }
+function closeShortcuts() { document.getElementById("shortcuts-overlay").classList.add("hidden"); }
 function setQuarter(q) {
   state.game.currentQuarter = q;
   document.querySelectorAll(".qtr-btn").forEach(b =>
@@ -2594,6 +2787,11 @@ function init() {
   document.getElementById("btn-fullscreen-field").addEventListener("click",()=>enterFullscreen(document.getElementById("field-container")));
   document.getElementById("btn-fullscreen-team").addEventListener("click",()=>enterFullscreen(document.getElementById("team-field-container")));
 
+  // Shortcuts modal
+  document.getElementById("btn-shortcuts-open").addEventListener("click",openShortcuts);
+  document.getElementById("btn-shortcuts-close").addEventListener("click",closeShortcuts);
+  document.getElementById("shortcuts-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("shortcuts-overlay"))closeShortcuts();});
+
   // Comparison modal
   document.getElementById("btn-compare-close").addEventListener("click",closeCompare);
   document.getElementById("compare-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("compare-overlay"))closeCompare();});
@@ -2625,11 +2823,14 @@ function init() {
     // Ctrl+Z / Cmd+Z → undo last shot (works anywhere)
     if ((e.ctrlKey||e.metaKey) && e.key==="z") { e.preventDefault(); undoLastShot(); return; }
     if(["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) return;
+    if(e.key==="?") { openShortcuts(); return; }
     if(!state.selectedId) return;
     const pid=state.selectedId;
     const k={g:()=>adjustStat(pid,"G",1),a:()=>adjustStat(pid,"A",1),s:()=>adjustStat(pid,"SOG",1),
              b:()=>adjustStat(pid,"GB",1),t:()=>adjustStat(pid,"TO",1),
+             v:()=>adjustStat(pid,"SV",1),
              w:()=>adjustStat(pid,"FOW",1),l:()=>adjustStat(pid,"FOL",1),
+             "?":()=>openShortcuts(),
              ArrowLeft:()=>navigatePlayer(-1),ArrowRight:()=>navigatePlayer(1)};
     if(k[e.key]) k[e.key]();
   });
