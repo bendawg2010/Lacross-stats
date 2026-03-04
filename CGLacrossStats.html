@@ -264,7 +264,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 .qfl { background: rgba(248,113,113,0.08);border-color: #fca5a5; color: #fca5a5; }
 
 /* ─── Heat Map ───────────────────────────────── */
-#tab-heatmap { padding: 0; overflow: hidden; }
+#tab-heatmap { padding: 0; overflow: hidden; min-height: 0; }
 
 #heatmap-controls {
   display: flex; align-items: center; justify-content: space-between;
@@ -591,19 +591,21 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
             <button id="btn-clear-shots" class="btn-danger-sm">Clear All</button>
           </div>
         </div>
-        <div id="field-container">
-          <canvas id="field-canvas"></canvas>
-          <div id="shot-count-legend" style="position:absolute;bottom:22px;right:214px;background:rgba(10,26,15,0.92);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">
-            <div class="legend-item"><span class="dot goal"></span>Goal</div>
-            <div class="legend-item"><span class="dot sog"></span>Shot on Goal</div>
-            <div class="legend-item"><span class="dot ast"></span>Assist</div>
-            <div class="legend-item"><span class="dot miss"></span>Miss</div>
-            <div class="legend-item"><span class="dot gb"></span>Ground Ball</div>
+        <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
+          <div id="field-container">
+            <canvas id="field-canvas"></canvas>
+            <div id="shot-count-legend" style="position:absolute;bottom:22px;right:24px;background:rgba(10,26,15,0.92);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">
+              <div class="legend-item"><span class="dot goal"></span>Goal</div>
+              <div class="legend-item"><span class="dot sog"></span>Shot on Goal</div>
+              <div class="legend-item"><span class="dot ast"></span>Assist</div>
+              <div class="legend-item"><span class="dot miss"></span>Miss</div>
+              <div class="legend-item"><span class="dot gb"></span>Ground Ball</div>
+            </div>
           </div>
-        </div>
-        <div id="shot-list-panel">
-          <h4>Shot Log <span id="shot-count-badge"></span></h4>
-          <div id="shot-list"></div>
+          <div id="shot-list-panel">
+            <h4>Shot Log <span id="shot-count-badge"></span></h4>
+            <div id="shot-list"></div>
+          </div>
         </div>
       </div>
 
