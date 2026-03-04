@@ -435,6 +435,9 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.1s;
 }
 .tm-shot-btn.active { background: color-mix(in srgb, var(--c) 20%, transparent); }
+.tm-qtr-btn { padding: 4px 10px; border-radius: 6px; border: 1.5px solid var(--border); background: transparent; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.1s; }
+.tm-qtr-btn.active { background: rgba(0,140,69,0.2); border-color: var(--be-green-lite); color: var(--be-green-lite); }
+.tm-qtr-btn:hover { border-color: var(--be-gold); color: var(--be-gold-lite); }
 
 #tm-player-select {
   padding: 4px 8px; border-radius: 6px; border: 1.5px solid var(--border);
@@ -659,7 +662,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 /* ─── Player avatar & compare ───────────────── */
 #player-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); background: var(--surface2); flex-shrink: 0; font-size: 17px; font-weight: 900; color: var(--text-muted); display: flex; align-items: center; justify-content: center; }
 #player-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-#btn-compare-player { padding: 4px 10px; border-radius: 7px; border: 1.5px solid var(--border); background: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+#btn-compare-player { width: auto !important; height: auto !important; padding: 6px 12px !important; border-radius: 7px; border: 1.5px solid var(--border); background: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 #btn-compare-player:hover { border-color: var(--be-gold); color: var(--be-gold-lite); }
 
 /* ─── Player photo in profile tab ───────────── */
@@ -944,7 +947,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
       </div>
 
       <!-- Penalties Tab -->
-      <div id="tab-penalties" class="tab-content hidden" style="display:none;flex-direction:column;overflow:hidden;">
+      <div id="tab-penalties" class="tab-content hidden">
         <div id="penalty-form">
           <select id="pen-player-select" style="max-width:140px;"><option value="">— Player —</option></select>
           <select id="pen-type-select">
@@ -1038,6 +1041,16 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
           <label id="team-heatmap-label">
             <input type="checkbox" id="team-heatmap-toggle" /> Heat Map
           </label>
+        </div>
+        <div class="tm-controls-row">
+          <span>Quarter:</span>
+          <button class="tm-qtr-btn active" data-q="all">All</button>
+          <button class="tm-qtr-btn" data-q="h1">H1</button>
+          <button class="tm-qtr-btn" data-q="h2">H2</button>
+          <button class="tm-qtr-btn" data-q="1">Q1</button>
+          <button class="tm-qtr-btn" data-q="2">Q2</button>
+          <button class="tm-qtr-btn" data-q="3">Q3</button>
+          <button class="tm-qtr-btn" data-q="4">Q4</button>
         </div>
         <div class="tm-controls-row">
           <span>Add Shot:</span>
@@ -1800,6 +1813,7 @@ function navigatePlayer(dir) {
 
 // ─── Team Map ─────────────────────────────────────────────────────────────
 let teamMapFilter      = "all";
+let teamMapQtrFilter   = "all";
 let teamHeatmap        = false;
 let teamMapShotType    = "goal";
 let teamMapSelectedPid = null;
@@ -1838,11 +1852,18 @@ function drawTeamMap() {
   ctx.fillStyle="rgba(255,255,255,0.2)"; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
   ctx.fillText("ATTACK",80,FH-17); ctx.fillText("DEFENSE",FW-80,FH-17);
 
-  // Collect all shots
+  // Collect all shots (apply quarter/half filter)
+  const qtrMatch = sh => {
+    if (teamMapQtrFilter === "all") return true;
+    const q = sh.quarter || 1;
+    if (teamMapQtrFilter === "h1") return q <= 2;
+    if (teamMapQtrFilter === "h2") return q >= 3;
+    return String(q) === String(teamMapQtrFilter);
+  };
   const allShots = [];
   state.players.forEach(p => {
     const shots = state.stats[p.id]?.shots || [];
-    shots.forEach(sh => allShots.push({ sh, p }));
+    shots.filter(qtrMatch).forEach(sh => allShots.push({ sh, p }));
   });
 
   // Heat map overlay
@@ -2526,6 +2547,11 @@ function init() {
   document.querySelectorAll(".tm-filter-btn").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll(".tm-filter-btn").forEach(x=>x.classList.remove("active"));
     b.classList.add("active"); teamMapFilter=b.dataset.type; drawTeamMap();
+  }));
+  // Team map quarter/half filter buttons
+  document.querySelectorAll(".tm-qtr-btn").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".tm-qtr-btn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); teamMapQtrFilter=b.dataset.q; drawTeamMap();
   }));
   document.getElementById("team-heatmap-toggle").addEventListener("change",e=>{teamHeatmap=e.target.checked;drawTeamMap();});
 
