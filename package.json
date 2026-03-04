@@ -20,12 +20,20 @@
       "icon": "assets/icon.icns"
     },
     "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
       "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "assets/icon.ico",
+      "shortcutName": "Lacrosse Stats"
     },
     "files": [
       "**/*",
       "!dist/**",
-      "!node_modules/.cache/**"
+      "!node_modules/.cache/**",
+      "!.github/**"
     ]
   },
   "devDependencies": {
