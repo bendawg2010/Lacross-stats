@@ -288,9 +288,11 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   border-bottom: 2px solid var(--be-gold); flex-shrink: 0;
 }
 #tab-heatmap:fullscreen #fs-player-bar,
-#tab-heatmap:-webkit-full-screen #fs-player-bar { display: flex; }
+#tab-heatmap:-webkit-full-screen #fs-player-bar,
+#tab-heatmap.is-fullscreen #fs-player-bar { display: flex; }
 #tab-heatmap:fullscreen #heatmap-controls,
-#tab-heatmap:-webkit-full-screen #heatmap-controls { display: none; }
+#tab-heatmap:-webkit-full-screen #heatmap-controls,
+#tab-heatmap.is-fullscreen #heatmap-controls { display: none; }
 #fs-top-row { display: flex; align-items: center; gap: 8px; }
 #fs-player-list { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
 .fs-player-chip {
@@ -2766,10 +2768,14 @@ function updateFsPlayerBar() {
   });
   setShotType(state.shotType || "goal");
 }
-document.addEventListener("fullscreenchange", () => {
+function onFullscreenChange() {
+  const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  document.getElementById("tab-heatmap").classList.toggle("is-fullscreen", isFS);
   updateFsPlayerBar();
   setTimeout(() => { drawField(); if (typeof drawTeamMap === "function") drawTeamMap(); }, 100);
-});
+}
+document.addEventListener("fullscreenchange", onFullscreenChange);
+document.addEventListener("webkitfullscreenchange", onFullscreenChange);
 
 // ─── Player Comparison ────────────────────────────────────────────────────
 function openCompare() {
