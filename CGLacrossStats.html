@@ -1577,10 +1577,10 @@ function loadData() {
   }
 
   const m = allMatches[activeMatchId];
-  state.players = m.players || DEFAULT_PLAYERS;
-  state.stats   = m.stats   || {};
-  // Merge saved game with defaults so new fields are always present
-  state.game    = Object.assign(emptyGame(), m.game || {});
+  // Deep clone everything so state never shares references with allMatches
+  state.players = JSON.parse(JSON.stringify(m.players || DEFAULT_PLAYERS));
+  state.stats   = JSON.parse(JSON.stringify(m.stats   || {}));
+  state.game    = Object.assign(emptyGame(), JSON.parse(JSON.stringify(m.game || {})));
   state.nextId  = m.nextId  || 30;
   state.players.forEach(p => {
     if (!state.stats[p.id]) state.stats[p.id] = emptyStats();
@@ -1591,14 +1591,17 @@ function loadData() {
 
 function saveData(silent) {
   if (!activeMatchId) return;
+  // Deep clone state into allMatches so no references are shared
   allMatches[activeMatchId] = {
     ...(allMatches[activeMatchId] || {}),
     id: activeMatchId,
     name: allMatches[activeMatchId]?.name || "New Match",
     createdAt: allMatches[activeMatchId]?.createdAt || Date.now(),
     updatedAt: Date.now(),
-    players: state.players, stats: state.stats,
-    game: state.game, nextId: state.nextId
+    players: JSON.parse(JSON.stringify(state.players)),
+    stats:   JSON.parse(JSON.stringify(state.stats)),
+    game:    JSON.parse(JSON.stringify(state.game)),
+    nextId:  state.nextId
   };
   persistAll();
   updateMatchBar();
