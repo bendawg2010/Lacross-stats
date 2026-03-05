@@ -2418,16 +2418,22 @@ function loadMatchById(id) {
   const m = allMatches[id];
   state.players = JSON.parse(JSON.stringify(m.players || DEFAULT_PLAYERS));
   state.stats   = JSON.parse(JSON.stringify(m.stats   || {}));
-  state.game    = JSON.parse(JSON.stringify(m.game    || { opponent:"", date:"" }));
+  state.game    = Object.assign(emptyGame(), JSON.parse(JSON.stringify(m.game || {})));
   state.nextId  = m.nextId || 30;
-  state.players.forEach(p => { if (!state.stats[p.id]) state.stats[p.id] = emptyStats(); });
+  state.players.forEach(p => {
+    if (!state.stats[p.id]) state.stats[p.id] = emptyStats();
+    if (state.stats[p.id].onField === undefined) state.stats[p.id].onField = false;
+  });
   state.selectedId = null;
   persistAll();
-  // Refresh UI
+  // Refresh UI — fully reset everything for the loaded match
   updateMatchBar(); markSaved(); updateScoreboard();
   document.getElementById("opponent-input").value = state.game.opponent || "";
   document.getElementById("game-date").value = state.game.date || "";
+  document.getElementById("empty-state").classList.remove("hidden");
+  document.getElementById("player-detail").classList.add("hidden");
   renderPlayerList(document.getElementById("player-search").value);
+  renderPenaltyList();
   showView("player");
   document.querySelectorAll(".main-nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view==="player"));
   closeMatchManager();
@@ -2480,7 +2486,7 @@ function createNewMatch() {
     id, name, createdAt: Date.now(), updatedAt: Date.now(),
     players: JSON.parse(JSON.stringify(state.players)),
     stats: freshStats,
-    game: { opponent: opp, date: dt },
+    game: Object.assign(emptyGame(), { opponent: opp, date: dt }),
     nextId: state.nextId
   };
   persistAll();
