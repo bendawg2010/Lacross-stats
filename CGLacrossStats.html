@@ -126,10 +126,10 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   border-top: 1px solid var(--border);
 }
 .footer-btn {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
   background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 7px; color: var(--text-muted); font-size: 12px;
-  padding: 8px 6px; cursor: pointer; transition: all 0.15s;
+  border-radius: 8px; color: var(--text-muted); font-size: 14px;
+  padding: 12px 10px; cursor: pointer; transition: all 0.15s;
 }
 .footer-btn:hover { background: var(--surface3); color: var(--text); }
 .footer-btn.gold  { background: var(--be-gold); border-color: var(--be-gold); color: #000; font-weight: 700; }
@@ -137,8 +137,8 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
 #btn-add-player {
   display: flex; align-items: center; gap: 8px;
-  padding: 8px 14px; background: none; border: none;
-  color: var(--be-green-lite); font-size: 13px; cursor: pointer; width: 100%;
+  padding: 12px 14px; background: none; border: none;
+  color: var(--be-green-lite); font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
   border-bottom: 1px solid var(--border);
 }
 #btn-add-player:hover { background: var(--surface2); }
@@ -186,9 +186,9 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
 #player-header-actions { display: flex; gap: 8px; }
 #player-header-actions button {
-  width: 36px; height: 36px;
+  width: 44px; height: 44px;
   background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px; color: #fff; font-size: 18px; cursor: pointer; transition: all 0.15s;
+  border-radius: 10px; color: #fff; font-size: 22px; cursor: pointer; transition: all 0.15s;
 }
 #player-header-actions button:hover { background: rgba(255,255,255,0.2); }
 
@@ -200,8 +200,8 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 }
 .tab-btn {
   background: none; border: none;
-  padding: 12px 18px; color: var(--text-muted);
-  font-size: 13px; font-weight: 600; cursor: pointer;
+  padding: 14px 24px; color: var(--text-muted);
+  font-size: 15px; font-weight: 600; cursor: pointer;
   border-bottom: 2px solid transparent; transition: all 0.15s;
 }
 .tab-btn:hover { color: var(--text); }
@@ -242,10 +242,10 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
 .stat-btn-group { display: flex; flex-direction: column; gap: 4px; }
 .stat-btn {
-  width: 30px; height: 28px;
+  width: 36px; height: 36px;
   background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 6px; color: var(--text);
-  font-size: 16px; font-weight: 700; cursor: pointer;
+  border-radius: 8px; color: var(--text);
+  font-size: 20px; font-weight: 700; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: all 0.1s; line-height: 1;
 }
@@ -259,8 +259,8 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 #quick-buttons { display: flex; gap: 7px; flex-wrap: wrap; }
 
 .quick-btn {
-  padding: 7px 14px; border-radius: 8px; border: 1px solid;
-  font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.1s;
+  padding: 12px 20px; border-radius: 10px; border: 1.5px solid;
+  font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.1s;
 }
 .quick-btn:active { transform: scale(0.95); }
 .qg  { background: rgba(0,140,69,0.15);   border-color: var(--be-green-lite);  color: var(--be-green-lite); }
@@ -278,6 +278,25 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
 /* ─── Heat Map ───────────────────────────────── */
 #tab-heatmap { padding: 0; overflow: hidden; min-height: 0; }
+#tab-heatmap:fullscreen { background: var(--bg); display: flex; flex-direction: column; }
+#tab-heatmap:-webkit-full-screen { background: var(--bg); display: flex; flex-direction: column; }
+
+/* Fullscreen player bar — hidden normally, shown in fullscreen */
+#fs-player-bar {
+  display: none; align-items: center; gap: 12px;
+  padding: 10px 18px; background: var(--surface);
+  border-bottom: 2px solid var(--be-gold); flex-shrink: 0;
+}
+#tab-heatmap:fullscreen #fs-player-bar,
+#tab-heatmap:-webkit-full-screen #fs-player-bar { display: flex; }
+#fs-player-info { flex: 1; font-size: 16px; font-weight: 700; color: var(--text); }
+#fs-player-bar button {
+  width: 40px; height: 40px; background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+  color: #fff; font-size: 18px; cursor: pointer; transition: all 0.15s;
+}
+#fs-player-bar button:hover { background: rgba(255,255,255,0.2); }
+#fs-exit-fullscreen { background: rgba(248,113,113,0.15) !important; border-color: #f87171 !important; color: #f87171 !important; }
 
 #heatmap-controls {
   display: flex; align-items: center; justify-content: space-between;
@@ -288,10 +307,10 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 #shot-type-selector span { font-size: 12px; color: var(--text-muted); }
 
 .shot-type-btn {
-  padding: 5px 12px; border-radius: 6px;
+  padding: 10px 18px; border-radius: 8px;
   border: 1.5px solid var(--c, #888);
   background: transparent; color: var(--c, #888);
-  font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.1s;
+  font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.1s;
 }
 .shot-type-btn:hover, .shot-type-btn.active {
   background: color-mix(in srgb, var(--c) 20%, transparent);
@@ -302,8 +321,8 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 #heatmap-toggle { accent-color: var(--be-green-lite); }
 .btn-danger-sm {
   background: rgba(248,113,113,0.1); border: 1px solid #f87171;
-  color: #f87171; border-radius: 6px; padding: 5px 12px;
-  font-size: 12px; cursor: pointer;
+  color: #f87171; border-radius: 8px; padding: 10px 16px;
+  font-size: 14px; cursor: pointer;
 }
 
 #field-container {
@@ -357,15 +376,15 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
 .btn-be {
   background: linear-gradient(135deg, var(--be-green) 0%, var(--be-green-lite) 100%);
-  color: #fff; font-weight: 700; border: none; border-radius: 8px;
-  padding: 10px 20px; font-size: 14px; cursor: pointer; transition: opacity 0.15s;
+  color: #fff; font-weight: 700; border: none; border-radius: 10px;
+  padding: 14px 24px; font-size: 16px; cursor: pointer; transition: opacity 0.15s;
 }
 .btn-be:hover { opacity: 0.88; }
 
 .btn-danger {
   background: rgba(248,113,113,0.1); border: 1px solid #f87171;
-  color: #f87171; font-weight: 700; border-radius: 8px;
-  padding: 10px 20px; font-size: 14px; cursor: pointer; margin-top: 6px;
+  color: #f87171; font-weight: 700; border-radius: 10px;
+  padding: 14px 24px; font-size: 16px; cursor: pointer; margin-top: 6px;
 }
 .btn-danger:hover { background: rgba(248,113,113,0.2); }
 
@@ -383,7 +402,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 }
 #modal h2 { font-size: 18px; }
 #modal-actions { display: flex; gap: 10px; margin-top: 4px; }
-#modal-actions button { flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; }
+#modal-actions button { flex: 1; padding: 14px; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: 600; }
 #btn-modal-cancel { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
 #btn-modal-cancel:hover { background: var(--surface3); }
 
@@ -1086,6 +1105,12 @@ kbd {
 
       <!-- Heat Map Tab -->
       <div id="tab-heatmap" class="tab-content hidden">
+        <div id="fs-player-bar">
+          <div id="fs-player-info"></div>
+          <button id="fs-prev-player" title="Previous player">&#8592;</button>
+          <button id="fs-next-player" title="Next player">&#8594;</button>
+          <button id="fs-exit-fullscreen" title="Exit fullscreen">✕</button>
+        </div>
         <div id="heatmap-controls">
           <div id="shot-type-selector">
             <span>Mark as:</span>
@@ -1698,6 +1723,7 @@ function selectPlayer(id) {
 
   renderStatsTab(p);
   renderProfileTab(p);
+  updateFsPlayerBar();
   if (document.querySelector(".tab-btn.active")?.dataset.tab === "heatmap") setTimeout(drawField, 50);
 }
 
@@ -1930,7 +1956,7 @@ function deletePlayer() {
 }
 
 // ─── Field Canvas ─────────────────────────────────────────────────────────
-const FW = 560, FH = 330;
+const FW = 700, FH = 420;
 const SHOT_COLORS = { goal:"#008c45", sog:"#60a5fa", ast:"#d4af44", miss:"#f87171", gb:"#fbbf24" };
 
 function drawField() {
@@ -1938,11 +1964,20 @@ function drawField() {
   const ctx    = canvas.getContext("2d");
   const dpr    = window.devicePixelRatio || 1;
   const cont   = document.getElementById("field-container");
-  const scale  = Math.min((cont.clientWidth-28)/FW, (cont.clientHeight-28)/FH, 1);
+  const scale  = Math.min((cont.clientWidth-28)/FW, (cont.clientHeight-28)/FH, 1.5);
   const cW = Math.floor(FW*scale), cH = Math.floor(FH*scale);
   canvas.style.width = cW+"px"; canvas.style.height = cH+"px";
   canvas.width = cW*dpr; canvas.height = cH*dpr;
   ctx.scale(dpr*scale, dpr*scale);
+
+  // Room behind goals (like real lacrosse)
+  const BEHIND = 60;
+  const LEFT_END  = BEHIND;
+  const RIGHT_END = FW - BEHIND;
+  const TOP_SIDE  = 20;
+  const BOT_SIDE  = FH - 20;
+  const MID_X     = FW / 2;
+  const MID_Y     = FH / 2;
 
   // Grass
   const g = ctx.createLinearGradient(0,0,0,FH);
@@ -1953,33 +1988,47 @@ function drawField() {
   ctx.fillStyle = "rgba(0,0,0,0.07)";
   for (let i=0; i<FW; i+=40) ctx.fillRect(i,0,20,FH);
 
-  // Lines
+  // Field boundary (with room behind goals)
   ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2;
-  ctx.strokeRect(10,10,FW-20,FH-20);
-  ctx.beginPath(); ctx.moveTo(FW/2,10); ctx.lineTo(FW/2,FH-10); ctx.stroke();
-  ctx.beginPath(); ctx.arc(FW/2,FH/2,28,0,Math.PI*2); ctx.stroke();
-  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(FW/2,FH/2,3,0,Math.PI*2); ctx.fill();
+  ctx.strokeRect(LEFT_END, TOP_SIDE, RIGHT_END - LEFT_END, BOT_SIDE - TOP_SIDE);
 
-  // Goals & crease
-  drawGoal(ctx, 10,      FH/2);
-  drawGoal(ctx, FW-10,   FH/2);
+  // Behind-goal areas
+  ctx.fillStyle = "rgba(255,255,255,0.03)";
+  ctx.fillRect(0, TOP_SIDE, LEFT_END, BOT_SIDE - TOP_SIDE);
+  ctx.fillRect(RIGHT_END, TOP_SIDE, BEHIND, BOT_SIDE - TOP_SIDE);
+
+  // Behind-goal boundary lines
+  ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(LEFT_END, TOP_SIDE); ctx.lineTo(10, TOP_SIDE); ctx.lineTo(10, BOT_SIDE); ctx.lineTo(LEFT_END, BOT_SIDE); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(RIGHT_END, TOP_SIDE); ctx.lineTo(FW-10, TOP_SIDE); ctx.lineTo(FW-10, BOT_SIDE); ctx.lineTo(RIGHT_END, BOT_SIDE); ctx.stroke();
+
+  // Center line
+  ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(MID_X, TOP_SIDE); ctx.lineTo(MID_X, BOT_SIDE); ctx.stroke();
+  ctx.beginPath(); ctx.arc(MID_X, MID_Y, 32, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(MID_X, MID_Y, 3, 0, Math.PI*2); ctx.fill();
+
+  // Goals & crease (on the endlines)
+  drawGoal(ctx, LEFT_END,  MID_Y);
+  drawGoal(ctx, RIGHT_END, MID_Y);
   ctx.strokeStyle="rgba(255,255,255,0.8)"; ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.arc(10,      FH/2,55,-Math.PI/2,Math.PI/2); ctx.stroke();
-  ctx.beginPath(); ctx.arc(FW-10,   FH/2,55,Math.PI/2,-Math.PI/2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(LEFT_END,  MID_Y, 60, -Math.PI/2, Math.PI/2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(RIGHT_END, MID_Y, 60, Math.PI/2, -Math.PI/2); ctx.stroke();
 
   // Restraining lines
   ctx.strokeStyle="rgba(255,255,255,0.45)"; ctx.lineWidth=1; ctx.setLineDash([6,4]);
-  ctx.beginPath(); ctx.moveTo(120,10); ctx.lineTo(120,FH-10); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(FW-120,10); ctx.lineTo(FW-120,FH-10); ctx.stroke();
+  const restOff = 140;
+  ctx.beginPath(); ctx.moveTo(LEFT_END+restOff, TOP_SIDE); ctx.lineTo(LEFT_END+restOff, BOT_SIDE); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(RIGHT_END-restOff, TOP_SIDE); ctx.lineTo(RIGHT_END-restOff, BOT_SIDE); ctx.stroke();
   ctx.setLineDash([]);
 
   // FO marks
-  drawX(ctx, FW/2-70, FH/2); drawX(ctx, FW/2+70, FH/2);
+  drawX(ctx, MID_X-80, MID_Y); drawX(ctx, MID_X+80, MID_Y);
 
   // Labels
-  ctx.fillStyle="rgba(255,255,255,0.2)"; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
-  ctx.fillText("ATTACK",  80,     FH-17);
-  ctx.fillText("DEFENSE", FW-80,  FH-17);
+  ctx.fillStyle="rgba(255,255,255,0.2)"; ctx.font="bold 12px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("ATTACK",  LEFT_END+90,  BOT_SIDE-8);
+  ctx.fillText("DEFENSE", RIGHT_END-90, BOT_SIDE-8);
 
   // Zone overlay
   if (zonesEnabled) drawZoneOverlay(ctx, state.stats[state.selectedId]?.shots||[]);
@@ -2000,15 +2049,16 @@ function drawField() {
 }
 
 function drawGoal(ctx, x, y) {
-  const gH=30, bDepth = x<FW/2 ? 18 : -18;
+  const gH=36, bDepth = x<FW/2 ? -24 : 24;
   ctx.fillStyle="#fff";
-  ctx.fillRect(x-3,y-gH/2,6,3); ctx.fillRect(x-3,y+gH/2-3,6,3);
-  ctx.fillRect(x+bDepth-3,y-gH/2,3,gH);
+  ctx.fillRect(x-2,y-gH/2,4,3); ctx.fillRect(x-2,y+gH/2-3,4,3);
+  ctx.fillRect(x+bDepth-1.5,y-gH/2,3,gH);
   ctx.strokeStyle="rgba(255,255,255,0.45)"; ctx.lineWidth=1;
   ctx.beginPath();
   ctx.moveTo(x,y-gH/2); ctx.lineTo(x+bDepth,y-gH/2);
   ctx.lineTo(x+bDepth,y+gH/2); ctx.lineTo(x,y+gH/2);
   ctx.stroke();
+  ctx.fillStyle="rgba(255,255,255,0.05)"; ctx.fill();
 }
 
 function drawX(ctx, x, y) {
@@ -2174,34 +2224,47 @@ function drawTeamMap() {
   const ctx    = canvas.getContext("2d");
   const dpr    = window.devicePixelRatio || 1;
   const cont   = document.getElementById("team-field-container");
-  const scale  = Math.min((cont.clientWidth-28)/FW, (cont.clientHeight-28)/FH, 1);
+  const scale  = Math.min((cont.clientWidth-28)/FW, (cont.clientHeight-28)/FH, 1.5);
   const cW = Math.floor(FW*scale), cH = Math.floor(FH*scale);
   canvas.style.width = cW+"px"; canvas.style.height = cH+"px";
   canvas.width = cW*dpr; canvas.height = cH*dpr;
   ctx.scale(dpr*scale, dpr*scale);
 
-  // Draw the field (same as individual)
+  // Draw the field (same as individual, with behind-goal area)
+  const BEHIND = 60;
+  const LEFT_END = BEHIND, RIGHT_END = FW - BEHIND;
+  const TOP_SIDE = 20, BOT_SIDE = FH - 20;
+  const MID_X = FW/2, MID_Y = FH/2;
+
   const g = ctx.createLinearGradient(0,0,0,FH);
   g.addColorStop(0,"#0f3d18"); g.addColorStop(0.5,"#135220"); g.addColorStop(1,"#0f3d18");
   ctx.fillStyle=g; ctx.fillRect(0,0,FW,FH);
   ctx.fillStyle="rgba(0,0,0,0.07)";
   for(let i=0;i<FW;i+=40) ctx.fillRect(i,0,20,FH);
   ctx.strokeStyle="#fff"; ctx.lineWidth=2;
-  ctx.strokeRect(10,10,FW-20,FH-20);
-  ctx.beginPath(); ctx.moveTo(FW/2,10); ctx.lineTo(FW/2,FH-10); ctx.stroke();
-  ctx.beginPath(); ctx.arc(FW/2,FH/2,28,0,Math.PI*2); ctx.stroke();
-  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(FW/2,FH/2,3,0,Math.PI*2); ctx.fill();
-  drawGoal(ctx,10,FH/2); drawGoal(ctx,FW-10,FH/2);
+  ctx.strokeRect(LEFT_END, TOP_SIDE, RIGHT_END-LEFT_END, BOT_SIDE-TOP_SIDE);
+  ctx.fillStyle="rgba(255,255,255,0.03)";
+  ctx.fillRect(0, TOP_SIDE, LEFT_END, BOT_SIDE-TOP_SIDE);
+  ctx.fillRect(RIGHT_END, TOP_SIDE, BEHIND, BOT_SIDE-TOP_SIDE);
+  ctx.strokeStyle="rgba(255,255,255,0.4)"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(LEFT_END,TOP_SIDE); ctx.lineTo(10,TOP_SIDE); ctx.lineTo(10,BOT_SIDE); ctx.lineTo(LEFT_END,BOT_SIDE); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(RIGHT_END,TOP_SIDE); ctx.lineTo(FW-10,TOP_SIDE); ctx.lineTo(FW-10,BOT_SIDE); ctx.lineTo(RIGHT_END,BOT_SIDE); ctx.stroke();
+  ctx.strokeStyle="#fff"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(MID_X,TOP_SIDE); ctx.lineTo(MID_X,BOT_SIDE); ctx.stroke();
+  ctx.beginPath(); ctx.arc(MID_X,MID_Y,32,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(MID_X,MID_Y,3,0,Math.PI*2); ctx.fill();
+  drawGoal(ctx,LEFT_END,MID_Y); drawGoal(ctx,RIGHT_END,MID_Y);
   ctx.strokeStyle="rgba(255,255,255,0.8)"; ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.arc(10,FH/2,55,-Math.PI/2,Math.PI/2); ctx.stroke();
-  ctx.beginPath(); ctx.arc(FW-10,FH/2,55,Math.PI/2,-Math.PI/2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(LEFT_END,MID_Y,60,-Math.PI/2,Math.PI/2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(RIGHT_END,MID_Y,60,Math.PI/2,-Math.PI/2); ctx.stroke();
   ctx.strokeStyle="rgba(255,255,255,0.45)"; ctx.lineWidth=1; ctx.setLineDash([6,4]);
-  ctx.beginPath(); ctx.moveTo(120,10); ctx.lineTo(120,FH-10); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(FW-120,10); ctx.lineTo(FW-120,FH-10); ctx.stroke();
+  const restOff=140;
+  ctx.beginPath(); ctx.moveTo(LEFT_END+restOff,TOP_SIDE); ctx.lineTo(LEFT_END+restOff,BOT_SIDE); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(RIGHT_END-restOff,TOP_SIDE); ctx.lineTo(RIGHT_END-restOff,BOT_SIDE); ctx.stroke();
   ctx.setLineDash([]);
-  drawX(ctx,FW/2-70,FH/2); drawX(ctx,FW/2+70,FH/2);
-  ctx.fillStyle="rgba(255,255,255,0.2)"; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
-  ctx.fillText("ATTACK",80,FH-17); ctx.fillText("DEFENSE",FW-80,FH-17);
+  drawX(ctx,MID_X-80,MID_Y); drawX(ctx,MID_X+80,MID_Y);
+  ctx.fillStyle="rgba(255,255,255,0.2)"; ctx.font="bold 12px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("ATTACK",LEFT_END+90,BOT_SIDE-8); ctx.fillText("DEFENSE",RIGHT_END-90,BOT_SIDE-8);
 
   // Collect all shots (apply quarter/half filter)
   const qtrMatch = sh => {
@@ -2646,6 +2709,16 @@ function enterFullscreen(el) {
   if (el.requestFullscreen) el.requestFullscreen();
   else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
 }
+function updateFsPlayerBar() {
+  const p = state.players.find(x => x.id === state.selectedId);
+  const el = document.getElementById("fs-player-info");
+  if (p) el.textContent = `#${p.number} ${p.name}  ·  ${p.pos || ""}`;
+  else el.textContent = "";
+}
+document.addEventListener("fullscreenchange", () => {
+  updateFsPlayerBar();
+  setTimeout(() => { drawField(); if (typeof drawTeamMap === "function") drawTeamMap(); }, 100);
+});
 
 // ─── Player Comparison ────────────────────────────────────────────────────
 function openCompare() {
@@ -2975,8 +3048,11 @@ function init() {
   }));
   document.getElementById("btn-undo-shot").addEventListener("click",undoLastShot);
   document.getElementById("btn-zones").addEventListener("click",toggleZones);
-  document.getElementById("btn-fullscreen-field").addEventListener("click",()=>enterFullscreen(document.getElementById("field-container")));
+  document.getElementById("btn-fullscreen-field").addEventListener("click",()=>{updateFsPlayerBar();enterFullscreen(document.getElementById("tab-heatmap"));});
   document.getElementById("btn-fullscreen-team").addEventListener("click",()=>enterFullscreen(document.getElementById("team-field-container")));
+  document.getElementById("fs-prev-player").addEventListener("click",()=>{navigatePlayer(-1);updateFsPlayerBar();});
+  document.getElementById("fs-next-player").addEventListener("click",()=>{navigatePlayer(1);updateFsPlayerBar();});
+  document.getElementById("fs-exit-fullscreen").addEventListener("click",()=>{if(document.exitFullscreen)document.exitFullscreen();});
 
   // Shortcuts modal
   document.getElementById("btn-shortcuts-open").addEventListener("click",openShortcuts);
