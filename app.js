@@ -292,7 +292,7 @@ function deletePlayer() {
 
 // ─── Heat Map / Field Canvas ───────────────────────────────────────────────
 let fieldImg = null;
-const FIELD_W = 560, FIELD_H = 330;
+const FIELD_W = 700, FIELD_H = 420;
 
 function drawField() {
   const canvas = document.getElementById("field-canvas");
@@ -303,7 +303,7 @@ function drawField() {
   const container = document.getElementById("field-container");
   const maxW = container.clientWidth  - 32;
   const maxH = container.clientHeight - 32;
-  const scale = Math.min(maxW / FIELD_W, maxH / FIELD_H, 1);
+  const scale = Math.min(maxW / FIELD_W, maxH / FIELD_H, 1.5);
   const cW = Math.floor(FIELD_W * scale);
   const cH = Math.floor(FIELD_H * scale);
 
@@ -314,6 +314,15 @@ function drawField() {
   ctx.scale(dpr * scale, dpr * scale);
 
   // ── Draw grass field ──
+  // Room behind goals (like real lacrosse)
+  const BEHIND = 60;  // space behind each endline
+  const LEFT_END  = BEHIND;       // left endline x
+  const RIGHT_END = FIELD_W - BEHIND; // right endline x
+  const TOP_SIDE  = 20;
+  const BOT_SIDE  = FIELD_H - 20;
+  const MID_X     = FIELD_W / 2;
+  const MID_Y     = FIELD_H / 2;
+
   // Grass gradient
   const grad = ctx.createLinearGradient(0, 0, 0, FIELD_H);
   grad.addColorStop(0,   "#1a4a1a");
@@ -328,56 +337,73 @@ function drawField() {
     ctx.fillRect(i, 0, 20, FIELD_H);
   }
 
-  // Field boundary
+  // Field boundary (with room behind goals)
   ctx.strokeStyle = "#ffffff";
   ctx.lineWidth = 2;
-  ctx.strokeRect(10, 10, FIELD_W - 20, FIELD_H - 20);
+  ctx.strokeRect(LEFT_END, TOP_SIDE, RIGHT_END - LEFT_END, BOT_SIDE - TOP_SIDE);
+
+  // Behind-goal areas (lighter tint to show the area)
+  ctx.fillStyle = "rgba(255,255,255,0.03)";
+  ctx.fillRect(0, TOP_SIDE, LEFT_END, BOT_SIDE - TOP_SIDE);
+  ctx.fillRect(RIGHT_END, TOP_SIDE, BEHIND, BOT_SIDE - TOP_SIDE);
+
+  // End lines are already part of boundary rect
+  // Side boundary extensions behind goals
+  ctx.strokeStyle = "rgba(255,255,255,0.4)";
+  ctx.lineWidth = 1;
+  // Left behind-goal boundary
+  ctx.beginPath(); ctx.moveTo(LEFT_END, TOP_SIDE); ctx.lineTo(10, TOP_SIDE); ctx.lineTo(10, BOT_SIDE); ctx.lineTo(LEFT_END, BOT_SIDE); ctx.stroke();
+  // Right behind-goal boundary
+  ctx.beginPath(); ctx.moveTo(RIGHT_END, TOP_SIDE); ctx.lineTo(FIELD_W-10, TOP_SIDE); ctx.lineTo(FIELD_W-10, BOT_SIDE); ctx.lineTo(RIGHT_END, BOT_SIDE); ctx.stroke();
 
   // Center line
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(FIELD_W / 2, 10);
-  ctx.lineTo(FIELD_W / 2, FIELD_H - 10);
+  ctx.moveTo(MID_X, TOP_SIDE);
+  ctx.lineTo(MID_X, BOT_SIDE);
   ctx.stroke();
 
   // Center circle
   ctx.beginPath();
-  ctx.arc(FIELD_W / 2, FIELD_H / 2, 28, 0, Math.PI * 2);
+  ctx.arc(MID_X, MID_Y, 32, 0, Math.PI * 2);
   ctx.stroke();
 
   // Center faceoff dot
   ctx.fillStyle = "#ffffff";
   ctx.beginPath();
-  ctx.arc(FIELD_W / 2, FIELD_H / 2, 3, 0, Math.PI * 2);
+  ctx.arc(MID_X, MID_Y, 3, 0, Math.PI * 2);
   ctx.fill();
 
-  // ── Goals ──
-  drawGoal(ctx, 10,          FIELD_H / 2);  // left goal
-  drawGoal(ctx, FIELD_W - 10, FIELD_H / 2);  // right goal
+  // ── Goals (positioned on the endlines) ──
+  drawGoal(ctx, LEFT_END,  MID_Y);   // left goal
+  drawGoal(ctx, RIGHT_END, MID_Y);   // right goal
 
   // ── Crease circles ──
   ctx.strokeStyle = "rgba(255,255,255,0.8)";
   ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.arc(10,           FIELD_H/2, 55, -Math.PI/2, Math.PI/2); ctx.stroke();
-  ctx.beginPath(); ctx.arc(FIELD_W - 10, FIELD_H/2, 55, Math.PI/2, -Math.PI/2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(LEFT_END,  MID_Y, 60, -Math.PI/2, Math.PI/2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(RIGHT_END, MID_Y, 60, Math.PI/2, -Math.PI/2); ctx.stroke();
 
   // ── Restraining lines ──
   ctx.strokeStyle = "rgba(255,255,255,0.5)";
   ctx.lineWidth = 1;
   ctx.setLineDash([6, 4]);
-  ctx.beginPath(); ctx.moveTo(120, 10); ctx.lineTo(120, FIELD_H-10); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(FIELD_W-120, 10); ctx.lineTo(FIELD_W-120, FIELD_H-10); ctx.stroke();
+  const restOff = 140;
+  ctx.beginPath(); ctx.moveTo(LEFT_END + restOff, TOP_SIDE); ctx.lineTo(LEFT_END + restOff, BOT_SIDE); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(RIGHT_END - restOff, TOP_SIDE); ctx.lineTo(RIGHT_END - restOff, BOT_SIDE); ctx.stroke();
   ctx.setLineDash([]);
 
   // ── Faceoff boxes ──
-  drawFaceoffX(ctx, FIELD_W/2 - 70, FIELD_H/2);
-  drawFaceoffX(ctx, FIELD_W/2 + 70, FIELD_H/2);
+  drawFaceoffX(ctx, MID_X - 80, MID_Y);
+  drawFaceoffX(ctx, MID_X + 80, MID_Y);
 
   // ── Labels ──
   ctx.fillStyle = "rgba(255,255,255,0.25)";
-  ctx.font = "bold 11px -apple-system, sans-serif";
+  ctx.font = "bold 12px -apple-system, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("ATTACK", 80, FIELD_H - 18);
-  ctx.fillText("DEFENSE", FIELD_W - 80, FIELD_H - 18);
+  ctx.fillText("ATTACK", LEFT_END + 90, BOT_SIDE - 8);
+  ctx.fillText("DEFENSE", RIGHT_END - 90, BOT_SIDE - 8);
 
   // ── Heat map overlay ──
   const pid = state.selectedId;
@@ -393,14 +419,14 @@ function drawField() {
 }
 
 function drawGoal(ctx, x, y) {
-  const gW = 6, gH = 30;
+  const gH = 36;
   ctx.fillStyle = "#ffffff";
-  // Posts
-  ctx.fillRect(x - 3, y - gH/2, gW, 3);
-  ctx.fillRect(x - 3, y + gH/2 - 3, gW, 3);
-  // Back (pipe)
-  const bDepth = x < FIELD_W/2 ? 18 : -18;
-  ctx.fillRect(x + bDepth - 3, y - gH/2, 3, gH);
+  // Posts (on the endline)
+  ctx.fillRect(x - 2, y - gH/2, 4, 3);
+  ctx.fillRect(x - 2, y + gH/2 - 3, 4, 3);
+  // Back pipe (extends behind the goal into the behind-goal area)
+  const bDepth = x < FIELD_W/2 ? -24 : 24;
+  ctx.fillRect(x + bDepth - 1.5, y - gH/2, 3, gH);
   // Net outline
   ctx.strokeStyle = "rgba(255,255,255,0.5)";
   ctx.lineWidth = 1;
@@ -410,6 +436,9 @@ function drawGoal(ctx, x, y) {
   ctx.lineTo(x + bDepth, y + gH/2);
   ctx.lineTo(x, y + gH/2);
   ctx.stroke();
+  // Net fill
+  ctx.fillStyle = "rgba(255,255,255,0.05)";
+  ctx.fill();
 }
 
 function drawFaceoffX(ctx, x, y) {
