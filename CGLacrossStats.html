@@ -283,20 +283,37 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
 /* Fullscreen player bar — hidden normally, shown in fullscreen */
 #fs-player-bar {
-  display: none; align-items: center; gap: 12px;
-  padding: 10px 18px; background: var(--surface);
+  display: none; flex-direction: column; gap: 8px;
+  padding: 8px 12px; background: var(--surface);
   border-bottom: 2px solid var(--be-gold); flex-shrink: 0;
 }
 #tab-heatmap:fullscreen #fs-player-bar,
 #tab-heatmap:-webkit-full-screen #fs-player-bar { display: flex; }
-#fs-player-info { flex: 1; font-size: 16px; font-weight: 700; color: var(--text); }
-#fs-player-bar button {
-  width: 40px; height: 40px; background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
-  color: #fff; font-size: 18px; cursor: pointer; transition: all 0.15s;
+#tab-heatmap:fullscreen #heatmap-controls,
+#tab-heatmap:-webkit-full-screen #heatmap-controls { display: none; }
+#fs-top-row { display: flex; align-items: center; gap: 8px; }
+#fs-player-list { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+.fs-player-chip {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: var(--text); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
 }
-#fs-player-bar button:hover { background: rgba(255,255,255,0.2); }
-#fs-exit-fullscreen { background: rgba(248,113,113,0.15) !important; border-color: #f87171 !important; color: #f87171 !important; }
+.fs-player-chip.active {
+  background: color-mix(in srgb, var(--be-gold) 25%, transparent);
+  border-color: var(--be-gold); color: var(--be-gold);
+}
+.fs-player-chip:hover { background: rgba(255,255,255,0.15); }
+#fs-exit-fullscreen {
+  width: 36px; height: 36px; background: rgba(248,113,113,0.15);
+  border: 1px solid #f87171; border-radius: 8px;
+  color: #f87171; font-size: 16px; cursor: pointer;
+  flex-shrink: 0; transition: all 0.15s;
+}
+#fs-exit-fullscreen:hover { background: rgba(248,113,113,0.3); }
+#fs-shot-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+#fs-shot-row span { font-size: 12px; color: var(--text-muted); }
 
 #heatmap-controls {
   display: flex; align-items: center; justify-content: space-between;
@@ -1106,10 +1123,18 @@ kbd {
       <!-- Heat Map Tab -->
       <div id="tab-heatmap" class="tab-content hidden">
         <div id="fs-player-bar">
-          <div id="fs-player-info"></div>
-          <button id="fs-prev-player" title="Previous player">&#8592;</button>
-          <button id="fs-next-player" title="Next player">&#8594;</button>
-          <button id="fs-exit-fullscreen" title="Exit fullscreen">✕</button>
+          <div id="fs-top-row">
+            <div id="fs-player-list"></div>
+            <button id="fs-exit-fullscreen" title="Exit fullscreen">✕</button>
+          </div>
+          <div id="fs-shot-row">
+            <span>Mark as:</span>
+            <button class="shot-type-btn active" data-type="goal" style="--c:#008c45">Goal</button>
+            <button class="shot-type-btn" data-type="sog"  style="--c:#60a5fa">Shot on Goal</button>
+            <button class="shot-type-btn" data-type="ast"  style="--c:#d4af44">Assist</button>
+            <button class="shot-type-btn" data-type="miss" style="--c:#f87171">Miss</button>
+            <button class="shot-type-btn" data-type="gb"   style="--c:#fbbf24">Ground Ball</button>
+          </div>
         </div>
         <div id="heatmap-controls">
           <div id="shot-type-selector">
@@ -2713,16 +2738,33 @@ function logPenalty() {
   showToast("Penalty logged","success");
 }
 
+// ─── Shot Type ─────────────────────────────────────────────────────────────
+function setShotType(type) {
+  state.shotType = type;
+  document.querySelectorAll(".shot-type-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.type === type);
+  });
+}
+
 // ─── Fullscreen ────────────────────────────────────────────────────────────
 function enterFullscreen(el) {
   if (el.requestFullscreen) el.requestFullscreen();
   else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
 }
 function updateFsPlayerBar() {
-  const p = state.players.find(x => x.id === state.selectedId);
-  const el = document.getElementById("fs-player-info");
-  if (p) el.textContent = `#${p.number} ${p.name}  ·  ${p.pos || ""}`;
-  else el.textContent = "";
+  const list = document.getElementById("fs-player-list");
+  list.innerHTML = "";
+  state.players.filter(p => p.team !== "Manager").forEach(p => {
+    const btn = document.createElement("button");
+    btn.className = "fs-player-chip" + (p.id === state.selectedId ? " active" : "");
+    btn.textContent = `#${p.number} ${p.name}`;
+    btn.addEventListener("click", () => {
+      state.selectedId = p.id;
+      updateFsPlayerBar();
+    });
+    list.appendChild(btn);
+  });
+  setShotType(state.shotType || "goal");
 }
 document.addEventListener("fullscreenchange", () => {
   updateFsPlayerBar();
@@ -3059,8 +3101,6 @@ function init() {
   document.getElementById("btn-zones").addEventListener("click",toggleZones);
   document.getElementById("btn-fullscreen-field").addEventListener("click",()=>{updateFsPlayerBar();enterFullscreen(document.getElementById("tab-heatmap"));});
   document.getElementById("btn-fullscreen-team").addEventListener("click",()=>enterFullscreen(document.getElementById("team-field-container")));
-  document.getElementById("fs-prev-player").addEventListener("click",()=>{navigatePlayer(-1);updateFsPlayerBar();});
-  document.getElementById("fs-next-player").addEventListener("click",()=>{navigatePlayer(1);updateFsPlayerBar();});
   document.getElementById("fs-exit-fullscreen").addEventListener("click",()=>{if(document.exitFullscreen)document.exitFullscreen();});
 
   // Shortcuts modal
@@ -3079,10 +3119,7 @@ function init() {
   document.getElementById("modal-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("modal-overlay"))closeModal();});
   document.getElementById("new-name").addEventListener("keydown",e=>{if(e.key==="Enter")addPlayer();if(e.key==="Escape")closeModal();});
 
-  document.querySelectorAll(".shot-type-btn").forEach(b=>b.addEventListener("click",()=>{
-    document.querySelectorAll(".shot-type-btn").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active"); state.shotType=b.dataset.type;
-  }));
+  document.querySelectorAll(".shot-type-btn").forEach(b=>b.addEventListener("click",()=>setShotType(b.dataset.type)));
   document.getElementById("heatmap-toggle").addEventListener("change",e=>{state.heatmapEnabled=e.target.checked;drawField();});
   document.getElementById("btn-clear-shots").addEventListener("click",()=>{
     if(!state.selectedId||!confirm("Clear all shots?")) return;
