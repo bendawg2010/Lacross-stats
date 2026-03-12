@@ -2,20 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="LaxStats"/>
-<meta name="theme-color" content="#005a2b"/>
 <link rel="manifest" href="manifest.json"/>
-<link rel="apple-touch-icon" sizes="192x192" href="assets/icon-192.png"/>
-<link rel="apple-touch-icon" sizes="512x512" href="assets/icon-512.png"/>
-<!-- iPad splash screens (landscape) -->
-<link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="assets/icon-512.png"/>
-<link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="assets/icon-512.png"/>
-<link rel="apple-touch-startup-image" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="assets/icon-512.png"/>
-<link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="assets/icon-512.png"/>
+<link rel="apple-touch-icon" href="assets/icon-192.png"/>
 <title>CGLacrossStats</title>
 <style>
 /* ─── Bishop England Colors ────────────────────── */
@@ -973,126 +966,10 @@ kbd {
   transition: background 0.15s;
 }
 #btn-install-guide:hover { background: var(--be-green-lite); }
-
-/* ═══════════════════════════════════════════════════════════
-   iPad / Touch Optimizations
-   ═══════════════════════════════════════════════════════════ */
-
-/* iOS height fix — 100vh is wrong in Safari; use fill-available */
-html { height: -webkit-fill-available; }
-body { min-height: 100vh; min-height: -webkit-fill-available; }
-#app  { height: 100vh; height: -webkit-fill-available; }
-
-/* Safe-area insets for Face ID iPad / home indicator */
-#sidebar { padding-bottom: env(safe-area-inset-bottom, 0px); }
-#main-panel {
-  padding-right: env(safe-area-inset-right, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-body { padding-left: env(safe-area-inset-left, 0px); }
-
-/* Remove tap flash & callout on all interactive elements */
-button, a, .player-item, .stat-btn, .quick-btn,
-.shot-type-btn, .fs-player-chip, .tab-btn, .qtr-btn,
-.qtr-filter-btn, .footer-btn {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  user-select: none;
-}
-
-/* Momentum scrolling on iOS for every scroll container */
-#player-list, .tab-content, #shot-list, #match-list,
-#penalty-list, #comparison-body { -webkit-overflow-scrolling: touch; }
-
-/* Prevent iOS from zooming into inputs (need font-size >= 16px) */
-#game-info input, #player-search, select,
-input[type="text"], input[type="date"],
-input[type="number"] { font-size: 16px !important; }
-
-/* Larger tap targets on touch devices */
-@media (pointer: coarse) {
-  .stat-btn          { width: 44px; height: 44px; font-size: 22px; }
-  .tab-btn           { padding: 16px 20px; }
-  .shot-type-btn     { padding: 14px 20px; font-size: 15px; }
-  .player-item       { padding: 12px 14px; }
-  .qtr-btn           { padding: 8px 14px; }
-  .fs-player-chip    { padding: 8px 16px; font-size: 15px; }
-  #fs-exit-fullscreen { width: 44px; height: 44px; }
-}
-
-/* ── Sidebar toggle (hamburger) ─────────────────────────── */
-#sidebar-toggle {
-  display: none;
-  position: fixed; top: env(safe-area-inset-top, 8px); left: 10px;
-  width: 44px; height: 44px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 10px; color: var(--text); font-size: 22px;
-  cursor: pointer; z-index: 600;
-  align-items: center; justify-content: center;
-  -webkit-tap-highlight-color: transparent;
-}
-#sidebar-backdrop {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.55); z-index: 350;
-}
-
-/* ── Portrait / narrow layout ───────────────────────────── */
-@media (max-width: 900px) {
-  :root { --sidebar-w: 260px; }
-
-  #sidebar-toggle { display: flex; }
-
-  #sidebar {
-    position: fixed; left: 0; top: 0; bottom: 0;
-    z-index: 400; width: var(--sidebar-w);
-    transform: translateX(-110%);
-    transition: transform 0.25s cubic-bezier(.4,0,.2,1);
-    box-shadow: none;
-  }
-  #sidebar.open {
-    transform: translateX(0);
-    box-shadow: 6px 0 28px rgba(0,0,0,0.6);
-  }
-  #sidebar-backdrop.open { display: block; }
-
-  /* Shift main content to fill full width */
-  #main-panel { width: 100%; }
-
-  /* Player header: compact on small screens */
-  #player-header { padding: 12px 16px 10px; gap: 12px; }
-  #player-number-badge { width: 52px; height: 52px; font-size: 20px; }
-  #player-name-display { font-size: 18px; }
-
-  /* Tab bar: scrollable horizontal */
-  #tabs { padding: 0 8px; overflow-x: auto; white-space: nowrap;
-          -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
-  .tab-btn { padding: 14px 16px; font-size: 14px; }
-
-  /* Stats grid: fewer columns */
-  #stats-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; padding: 14px 12px; }
-
-  /* Quick add buttons: bigger for thumbs */
-  .quick-btn { padding: 14px 18px; font-size: 16px; }
-
-  /* Shot map controls: stack vertically */
-  #heatmap-controls { flex-direction: column; align-items: flex-start; }
-  #heatmap-row2 { flex-wrap: wrap; padding: 8px 10px; gap: 6px; }
-  #shot-list-panel { display: none; } /* hide shot log in narrow; use fullscreen */
-}
-
-/* ── Extra small (phones / portrait iPad mini) ──────────── */
-@media (max-width: 600px) {
-  #stats-grid { grid-template-columns: repeat(2, 1fr); }
-  #player-header { flex-wrap: wrap; }
-}
 </style>
 </head>
 <body>
 <div id="app">
-  <!-- Sidebar toggle (portrait / narrow mode) -->
-  <button id="sidebar-toggle" title="Open menu">&#9776;</button>
-  <div id="sidebar-backdrop"></div>
-
   <!-- Sidebar -->
   <aside id="sidebar">
     <div id="sidebar-header">
@@ -2237,10 +2114,8 @@ function drawHeatmap(ctx, shots) {
 }
 
 function canvasCoords(canvas, e) {
-  const r = canvas.getBoundingClientRect();
-  // Support both mouse events and touch events
-  const src = e.changedTouches ? e.changedTouches[0] : (e.touches ? e.touches[0] : e);
-  return { x: (src.clientX - r.left) * (FW / r.width), y: (src.clientY - r.top) * (FH / r.height) };
+  const r=canvas.getBoundingClientRect();
+  return { x:(e.clientX-r.left)*(FW/r.width), y:(e.clientY-r.top)*(FH/r.height) };
 }
 
 const undoStack = [];
@@ -3261,35 +3136,6 @@ function init() {
   document.getElementById("field-canvas").addEventListener("click",e=>{
     const{x,y}=canvasCoords(document.getElementById("field-canvas"),e);
     addShot(x,y);
-  });
-  // Touch support for field canvas (iPad)
-  document.getElementById("field-canvas").addEventListener("touchend",e=>{
-    e.preventDefault();
-    const{x,y}=canvasCoords(document.getElementById("field-canvas"),e);
-    addShot(x,y);
-  },{passive:false});
-
-  // Touch support for team field canvas (iPad)
-  document.getElementById("team-field-canvas").addEventListener("touchend",e=>{
-    e.preventDefault();
-    const{x,y}=canvasCoords(document.getElementById("team-field-canvas"),e);
-    addTeamShot(x,y);
-  },{passive:false});
-
-  // Sidebar toggle (portrait / narrow mode)
-  function openSidebar() {
-    document.getElementById("sidebar").classList.add("open");
-    document.getElementById("sidebar-backdrop").classList.add("open");
-  }
-  function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("open");
-    document.getElementById("sidebar-backdrop").classList.remove("open");
-  }
-  document.getElementById("sidebar-toggle").addEventListener("click", openSidebar);
-  document.getElementById("sidebar-backdrop").addEventListener("click", closeSidebar);
-  // Close sidebar when a player is selected (on narrow screens)
-  document.getElementById("player-list").addEventListener("click", () => {
-    if (window.innerWidth <= 900) closeSidebar();
   });
 
   document.addEventListener("keydown",e=>{
