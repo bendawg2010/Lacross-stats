@@ -123,7 +123,7 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 
 #sidebar-footer {
   display: flex; gap: 8px; padding: 10px 14px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border); align-items: center;
 }
 .footer-btn {
   flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -666,6 +666,12 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   background: rgba(181,151,58,0.12); color: var(--be-gold-lite); transition: background 0.1s;
 }
 #btn-mgr-restore:hover { background: rgba(181,151,58,0.25); }
+#btn-mgr-share-link {
+  flex: 1; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700;
+  cursor: pointer; border: 1.5px solid #60a5fa;
+  background: rgba(96,165,250,0.1); color: #60a5fa; transition: background 0.1s;
+}
+#btn-mgr-share-link:hover { background: rgba(96,165,250,0.22); }
 
 #btn-new-match-open {
   padding: 10px; border-radius: 9px; border: 1.5px dashed var(--border);
@@ -1001,6 +1007,169 @@ kbd {
   transition: background 0.15s;
 }
 #btn-install-guide:hover { background: var(--be-green-lite); }
+
+/* ═══════════════════════════════════════════════════════════
+   NEW FEATURES CSS
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Auto-save indicator ─────────────────────────────────── */
+#autosave-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--be-green-lite); opacity: 0;
+  transition: opacity 0.3s; flex-shrink: 0;
+}
+#autosave-dot.saving { animation: savePulse 1s ease forwards; }
+@keyframes savePulse {
+  0%   { opacity: 1; transform: scale(1.3); }
+  60%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; }
+}
+
+/* ── Scoring run indicator ───────────────────────────────── */
+#run-indicator {
+  display: none; align-items: center; justify-content: center;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
+  margin: 0 auto; text-align: center;
+}
+#run-indicator.run-be  { display: flex; background: rgba(0,140,69,0.25); color: #6ee89b; border: 1px solid rgba(0,140,69,0.4); }
+#run-indicator.run-opp { display: flex; background: rgba(248,113,113,0.2); color: #fca5a5; border: 1px solid rgba(248,113,113,0.35); }
+
+/* ── DNP badge on player list ────────────────────────────── */
+.player-item.dnp { opacity: 0.45; }
+.dnp-badge {
+  font-size: 9px; font-weight: 800; background: rgba(248,113,113,0.2);
+  color: #f87171; border-radius: 4px; padding: 1px 5px; letter-spacing: 0.5px;
+}
+
+/* ── Game Log tab ────────────────────────────────────────── */
+#tab-log { padding: 0; }
+#log-container { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; }
+.log-entry {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px;
+  background: var(--surface); border-left: 3px solid transparent;
+  font-size: 13px;
+}
+.log-entry.log-goal   { border-left-color: #008c45; }
+.log-entry.log-sog    { border-left-color: #60a5fa; }
+.log-entry.log-miss   { border-left-color: #f87171; }
+.log-entry.log-ast    { border-left-color: #d4af44; }
+.log-entry.log-gb     { border-left-color: #fbbf24; }
+.log-entry.log-stat-up   { border-left-color: var(--be-green-lite); }
+.log-entry.log-stat-down { border-left-color: rgba(248,113,113,0.6); }
+.log-entry.log-penalty { border-left-color: #c084fc; }
+.log-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+.log-label { flex: 1; color: var(--text); }
+.log-meta  { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.log-empty { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 13px; }
+
+/* ── Match notes ─────────────────────────────────────────── */
+#match-notes-section { margin-top: 6px; }
+#match-notes-section label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; display: block; margin-bottom: 5px; }
+#match-notes-input {
+  width: 100%; background: var(--surface3); border: 1px solid var(--border);
+  color: var(--text); border-radius: 8px; padding: 8px 10px;
+  font-size: 13px; resize: vertical; min-height: 60px; max-height: 120px;
+  font-family: inherit;
+}
+#match-notes-input:focus { outline: none; border-color: var(--be-green-lite); }
+
+/* ── Opponent shot map toggle ────────────────────────────── */
+#opp-shot-toggle-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-top: 1px solid var(--border);
+  background: var(--surface); flex-shrink: 0;
+}
+.map-mode-btn {
+  padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; border: 1.5px solid var(--border);
+  background: transparent; color: var(--text-muted); transition: all 0.12s;
+}
+.map-mode-btn.active { background: rgba(0,140,69,0.2); border-color: var(--be-green-lite); color: var(--be-green-lite); }
+.map-mode-btn.opp.active { background: rgba(248,113,113,0.15); border-color: #f87171; color: #f87171; }
+#opp-shot-type-row {
+  display: none; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 6px 14px 8px; background: var(--surface); flex-shrink: 0;
+  border-top: 1px solid var(--border);
+}
+#opp-shot-type-row.visible { display: flex; }
+#opp-shot-summary {
+  display: none; padding: 6px 14px 8px; background: var(--surface);
+  font-size: 12px; color: var(--text-muted); flex-shrink: 0;
+  border-top: 1px solid var(--border);
+}
+#opp-shot-summary.visible { display: block; }
+
+/* ── Season per-player table ─────────────────────────────── */
+#season-player-table-wrap { padding: 0 24px 20px; overflow-x: auto; }
+.season-table {
+  width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap;
+}
+.season-table th {
+  background: var(--surface2); color: var(--text-muted); font-size: 10px;
+  font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;
+  padding: 7px 10px; text-align: right; position: sticky; top: 0;
+}
+.season-table th:first-child { text-align: left; }
+.season-table td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--border); color: var(--text); }
+.season-table td:first-child { text-align: left; font-weight: 600; }
+.season-table tr:hover td { background: var(--surface2); }
+.season-table .highlight { color: var(--be-gold-lite); font-weight: 800; }
+
+/* ── Face-off section in charts ──────────────────────────── */
+#fo-section { padding: 0 24px 20px; }
+#fo-section h3 { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 12px; }
+.fo-player-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.fo-name { width: 130px; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fo-bar-track { flex: 1; height: 18px; background: var(--surface2); border-radius: 9px; overflow: hidden; position: relative; }
+.fo-bar-win  { height: 100%; background: var(--be-green-lite); border-radius: 9px; display: flex; align-items: center; padding-left: 7px; font-size: 10px; font-weight: 800; color: #fff; white-space: nowrap; transition: width 0.4s ease; }
+.fo-pct { font-size: 12px; font-weight: 700; color: var(--text-muted); width: 44px; text-align: right; }
+.fo-record { font-size: 11px; color: var(--text-muted); width: 60px; text-align: right; }
+
+/* ── Live Share dialog ───────────────────────────────────── */
+#share-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+#share-overlay.open { opacity: 1; pointer-events: all; }
+#share-dialog {
+  background: var(--surface2); border: 1px solid var(--be-gold);
+  border-radius: 14px; padding: 26px 28px; max-width: 560px; width: 94%;
+}
+#share-dialog h2 { color: var(--be-gold-lite); margin: 0 0 6px; font-size: 18px; }
+#share-dialog .share-sub { color: var(--text-muted); font-size: 12px; margin-bottom: 18px; }
+#share-url-box {
+  display: flex; gap: 8px; margin-bottom: 14px;
+}
+#share-url-input {
+  flex: 1; background: var(--surface3); border: 1px solid var(--border);
+  color: var(--text); border-radius: 8px; padding: 9px 12px; font-size: 12px;
+  font-family: monospace; overflow: hidden; text-overflow: ellipsis;
+}
+#btn-copy-share-url {
+  padding: 9px 16px; background: var(--be-green-mid); color: #fff;
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+}
+#btn-copy-share-url:hover { background: var(--be-green-lite); }
+#share-note { font-size: 11px; color: var(--text-muted); line-height: 1.6; margin-bottom: 18px; }
+#share-note code { background: var(--surface3); border-radius: 3px; padding: 1px 5px; color: var(--be-gold); font-size: 11px; }
+#btn-close-share { width: 100%; padding: 10px; background: var(--surface3); color: var(--text-muted); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+#btn-close-share:hover { background: var(--surface); }
+#share-generating { color: var(--text-muted); font-size: 12px; text-align: center; padding: 10px; }
+
+/* ── Enhanced penalty summary ────────────────────────────── */
+#penalty-summary {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 12px 20px 0;
+}
+.pen-summary-chip {
+  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  background: rgba(192,132,252,0.15); border: 1px solid rgba(192,132,252,0.35);
+  color: #c084fc;
+}
 </style>
 </head>
 <body>
@@ -1061,6 +1230,7 @@ kbd {
         <button class="sb-btn" id="btn-opp-plus">+</button>
       </div>
     </div>
+    <div id="run-indicator"></div>
   </div>
 
   <div id="search-box">
@@ -1087,6 +1257,7 @@ kbd {
         </svg>
         Save
       </button>
+      <div id="autosave-dot" title="Saved"></div>
     </div>
   </aside>
 
@@ -1137,6 +1308,7 @@ kbd {
         <button class="tab-btn" data-tab="heatmap">Shot Map</button>
         <button class="tab-btn" data-tab="penalties">Penalties</button>
         <button class="tab-btn" data-tab="profile">Profile</button>
+        <button class="tab-btn" data-tab="log">&#128220; Log</button>
       </div>
 
       <!-- Stats Tab -->
@@ -1293,10 +1465,26 @@ kbd {
               <input type="checkbox" id="edit-on-field" /> Currently on field
             </label>
           </div>
+          <div class="form-row">
+            <label>Status</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="edit-dnp" /> DNP (Did Not Play)
+            </label>
+          </div>
           <button id="btn-save-profile" class="btn-be">Save Profile</button>
           <button id="btn-delete-player" class="btn-danger">Delete Player</button>
         </div>
       </div>
+
+      <!-- Log tab -->
+      <div id="tab-log" class="tab-content hidden">
+        <div id="log-container">
+          <div id="game-log-list">
+            <div class="log-empty">No activity logged yet for this player.</div>
+          </div>
+        </div>
+      </div>
+
     </div>
     </div><!-- end #player-view -->
 
@@ -1326,6 +1514,11 @@ kbd {
           <button class="tm-qtr-btn" data-q="4">Q4</button>
         </div>
         <div class="tm-controls-row">
+          <span>Map:</span>
+          <button class="map-mode-btn active" id="btn-map-mode-be" data-mode="be">BE Offense</button>
+          <button class="map-mode-btn opp" id="btn-map-mode-opp" data-mode="opp">Opp Shots vs BE</button>
+        </div>
+        <div class="tm-controls-row" id="be-add-shot-row">
           <span>Add Shot:</span>
           <span id="tm-selected-player-label" style="font-size:12px;color:var(--be-gold-lite);font-weight:700;">Select a player from the sidebar</span>
           <button class="tm-shot-btn active" data-type="goal" style="--c:#008c45">Goal</button>
@@ -1333,6 +1526,13 @@ kbd {
           <button class="tm-shot-btn" data-type="ast"  style="--c:#d4af44">Assist</button>
           <button class="tm-shot-btn" data-type="miss" style="--c:#f87171">Miss</button>
           <button class="tm-shot-btn" data-type="gb"   style="--c:#fbbf24">GB</button>
+        </div>
+        <div class="tm-controls-row" id="opp-add-shot-row" style="display:none;">
+          <span>Opp Shot:</span>
+          <button class="opp-shot-type-btn active" data-type="goal" style="--c:#f87171">Goal vs BE</button>
+          <button class="opp-shot-type-btn" data-type="sog" style="--c:#fbbf24">SOG vs BE</button>
+          <button class="opp-shot-type-btn" data-type="miss" style="--c:#7aaa87">Miss</button>
+          <button id="btn-clear-opp-shots" class="btn-danger-sm" style="margin-left:auto;">Clear</button>
         </div>
       </div>
       <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
@@ -1376,6 +1576,10 @@ kbd {
         <div class="chart-title">Face-Off Wins (FOGO / Midfield)</div>
         <div id="chart-fo"></div>
       </div>
+      <div class="chart-section" id="fo-section">
+        <div class="chart-title">Face-Off Win Rate</div>
+        <div id="fo-rate-chart"></div>
+      </div>
     </div>
 
     <!-- Season View -->
@@ -1397,6 +1601,18 @@ kbd {
       <div class="season-section">
         <div class="season-section-title">Season Leaders</div>
         <div id="season-leaders"></div>
+      </div>
+      <div class="season-section">
+        <div class="season-section-title">Player Season Totals</div>
+        <div id="season-player-table-wrap">
+          <table class="season-table" id="season-player-table">
+            <thead><tr>
+              <th>Player</th><th>G</th><th>A</th><th>PTS</th><th>SOG</th><th>SH%</th>
+              <th>GB</th><th>TO</th><th>FOW</th><th>FOL</th><th>FO%</th><th>SV</th>
+            </tr></thead>
+            <tbody id="season-player-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -1502,6 +1718,10 @@ kbd {
           <input type="text" id="match-name-edit" placeholder="e.g. vs Wando 3/4" />
           <button id="btn-match-rename">Rename</button>
         </div>
+        <div id="match-notes-section">
+          <label>Match Notes</label>
+          <textarea id="match-notes-input" placeholder="Weather, field conditions, key moments…"></textarea>
+        </div>
       </div>
       <div id="match-mgr-export-row">
         <button id="btn-mgr-export-html">&#9660; Save as HTML File</button>
@@ -1510,9 +1730,10 @@ kbd {
       </div>
 
       <div id="match-mgr-backup-section">
-        <div class="match-mgr-section-label">&#128190; Backup &amp; Restore</div>
-        <p class="match-mgr-section-desc">Transfer all matches &amp; stats to another computer. Export saves a <code>.laxstats</code> file; Import loads it back.</p>
+        <div class="match-mgr-section-label">&#128190; Backup &amp; Restore &amp; Share</div>
+        <p class="match-mgr-section-desc">Transfer all matches to another device. <strong style="color:var(--be-gold-lite);">Share Link</strong> creates a URL you can open anywhere — no file needed.</p>
         <div id="match-mgr-backup-row">
+          <button id="btn-mgr-share-link">&#128279; Share Link</button>
           <button id="btn-mgr-backup">&#8679; Export Backup</button>
           <button id="btn-mgr-restore">&#8681; Import Backup</button>
         </div>
@@ -1595,8 +1816,8 @@ const DEFAULT_PLAYERS = [
   { id: 29, number:  0, name: "Charlie Godfrey",  grade: "Sophomore", pos: "",         team: "Manager", notes: "" },
 ];
 
-function emptyStats() { return { G:0, A:0, SOG:0, GB:0, TO:0, FTO:0, FOW:0, FOL:0, SV:0, shots:[], onField:false }; }
-function emptyGame() { return { opponent:"", date:"", beScore:0, oppScore:0, currentQuarter:1, penalties:[], subs:[] }; }
+function emptyStats() { return { G:0, A:0, SOG:0, GB:0, TO:0, FTO:0, FOW:0, FOL:0, SV:0, shots:[], log:[], onField:false, dnp:false }; }
+function emptyGame() { return { opponent:"", date:"", beScore:0, oppScore:0, currentQuarter:1, penalties:[], subs:[], oppShots:[], notes:"", scoreLog:[] }; }
 
 // ─── State ────────────────────────────────────────────────────────────────
 let state = {
@@ -1686,7 +1907,7 @@ let autoSaveTimer;
 function autoSave() {
   markUnsaved();
   clearTimeout(autoSaveTimer);
-  autoSaveTimer = setTimeout(() => saveData(true), 80);
+  autoSaveTimer = setTimeout(() => { saveData(true); flashSaveDot(); }, 80);
 }
 window.addEventListener("visibilitychange", () => { if (document.hidden) saveData(true); });
 window.addEventListener("beforeunload", () => saveData(true));
@@ -1967,6 +2188,11 @@ function adjustStat(pid, stat, delta) {
     }
   }
 
+  // Append to game log
+  if (!state.stats[pid].log) state.stats[pid].log = [];
+  const statLabels = {G:"Goal",A:"Assist",SOG:"Shot on Goal",GB:"Ground Ball",TO:"Turnover",FTO:"Forced TO",FOW:"FO Win",FOL:"FO Loss",SV:"Save"};
+  state.stats[pid].log.push({ type:"stat", stat, label:statLabels[stat]||stat, delta, val:state.stats[pid][stat], quarter:state.game.currentQuarter||1, ts:Date.now() });
+
   const p = state.players.find(x => x.id === pid);
   if (p) { renderStatsTab(p); renderPlayerList(document.getElementById("player-search").value); }
 
@@ -1994,6 +2220,7 @@ function renderProfileTab(p) {
   document.getElementById("edit-team").value     = p.team;
   document.getElementById("edit-notes").value    = p.notes || "";
   document.getElementById("edit-on-field").checked = !!(state.stats[p.id]?.onField);
+  document.getElementById("edit-dnp").checked = !!(state.stats[p.id]?.dnp);
   // Photo
   const big = document.getElementById("player-photo-big");
   if (p.photo) {
@@ -2014,8 +2241,12 @@ function saveProfile() {
   p.pos    = document.getElementById("edit-position").value;
   p.team   = document.getElementById("edit-team").value;
   p.notes  = document.getElementById("edit-notes").value.trim();
-  if (state.stats[p.id]) state.stats[p.id].onField = document.getElementById("edit-on-field").checked;
+  if (state.stats[p.id]) {
+    state.stats[p.id].onField = document.getElementById("edit-on-field").checked;
+    state.stats[p.id].dnp     = document.getElementById("edit-dnp").checked;
+  }
   renderPlayerList(document.getElementById("player-search").value);
+  setTimeout(renderDnpInList, 50);
   selectPlayer(p.id);
   showToast("Profile updated!"); autoSave();
 }
@@ -2187,6 +2418,10 @@ function addShot(x,y) {
   else if (sh.type==="miss") { state.stats[pid].SOG++; }
   else if (sh.type==="gb")   { state.stats[pid].GB++;  }
   else if (sh.type==="ast")  { state.stats[pid].A++;   }
+  // Game log entry
+  if (!state.stats[pid].log) state.stats[pid].log = [];
+  const shotLabels={goal:"Goal",sog:"Shot on Goal",miss:"Miss",gb:"Ground Ball",ast:"Assist"};
+  state.stats[pid].log.push({ type:"shot", shotType:sh.type, label:shotLabels[sh.type]||sh.type, quarter:sh.quarter, ts:sh.ts });
   renderShotList(); drawField();
   if (document.getElementById("team-map-view").classList.contains("active")) drawTeamMap();
   if (teamMapSelectedPid === pid) renderTmShotList(pid);
@@ -2384,6 +2619,284 @@ function exportShotMapPNG() {
   showToast("Shot map exported!");
 }
 
+// ─── Auto-save indicator ──────────────────────────────────────────────────
+function flashSaveDot() {
+  const dot = document.getElementById("autosave-dot");
+  dot.classList.remove("saving");
+  void dot.offsetWidth; // reflow to restart animation
+  dot.classList.add("saving");
+}
+
+// ─── Scoring run indicator ────────────────────────────────────────────────
+function updateRunIndicator() {
+  const log = state.game.scoreLog || [];
+  const el  = document.getElementById("run-indicator");
+  if (log.length < 2) { el.className = ""; el.textContent = ""; return; }
+  // Count consecutive scoring from the same team at end of log
+  const last = log[log.length - 1];
+  let run = 1;
+  for (let i = log.length - 2; i >= 0; i--) {
+    if (log[i].team === last.team && log[i].delta > 0) run++;
+    else break;
+  }
+  if (run < 2) { el.className = ""; el.textContent = ""; return; }
+  const teamName = last.team === "be" ? "BE" : (document.getElementById("score-opp-name").textContent || "OPP");
+  el.className = `run-indicator run-${last.team}`;
+  el.textContent = `${teamName} on a ${run}-0 run`;
+}
+
+// ─── Game Log ─────────────────────────────────────────────────────────────
+const LOG_ICONS = { goal:"⚽", sog:"🥍", miss:"✕", gb:"🏒", ast:"🎯", stat:"📊", penalty:"🟥" };
+const SHOT_COLORS = { goal:"log-goal", sog:"log-sog", miss:"log-miss", gb:"log-gb", ast:"log-ast" };
+
+function renderGameLog() {
+  const pid = state.selectedId;
+  const el  = document.getElementById("game-log-list");
+  if (!pid || !el) return;
+  const log = (state.stats[pid]?.log || []).slice().reverse();
+  if (!log.length) {
+    el.innerHTML = `<div class="log-empty">No activity logged yet for this player.</div>`;
+    return;
+  }
+  el.innerHTML = log.map(entry => {
+    let cls = "log-entry";
+    let icon = "·";
+    let label = "";
+    let meta = `Q${entry.quarter} · ${new Date(entry.ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;
+
+    if (entry.type === "shot") {
+      cls += " " + (SHOT_COLORS[entry.shotType] || "");
+      icon = LOG_ICONS[entry.shotType] || "🥍";
+      label = entry.label;
+    } else if (entry.type === "stat") {
+      cls += entry.delta > 0 ? " log-stat-up" : " log-stat-down";
+      icon = entry.delta > 0 ? "▲" : "▼";
+      label = `${entry.label}: ${entry.delta > 0 ? "+" : ""}${entry.delta} → ${entry.val}`;
+    } else if (entry.type === "penalty") {
+      cls += " log-penalty";
+      icon = "🟥";
+      label = `Penalty: ${entry.label}`;
+    }
+    return `<div class="${cls}">
+      <span class="log-icon">${icon}</span>
+      <span class="log-label">${label}</span>
+      <span class="log-meta">${meta}</span>
+    </div>`;
+  }).join("");
+}
+
+// ─── DNP handling ─────────────────────────────────────────────────────────
+function renderDnpInList() {
+  document.querySelectorAll(".player-item").forEach(el => {
+    const pid = parseInt(el.dataset.pid);
+    const dnp = state.stats[pid]?.dnp;
+    el.classList.toggle("dnp", !!dnp);
+    let badge = el.querySelector(".dnp-badge");
+    if (dnp && !badge) {
+      badge = document.createElement("span");
+      badge.className = "dnp-badge";
+      badge.textContent = "DNP";
+      el.appendChild(badge);
+    } else if (!dnp && badge) {
+      badge.remove();
+    }
+  });
+}
+
+// ─── Match notes ──────────────────────────────────────────────────────────
+function saveMatchNotes() {
+  const val = document.getElementById("match-notes-input").value;
+  state.game.notes = val;
+  autoSave();
+}
+function loadMatchNotes() {
+  const el = document.getElementById("match-notes-input");
+  if (el) el.value = state.game.notes || "";
+}
+
+// ─── Opponent shot map ────────────────────────────────────────────────────
+let mapMode = "be"; // "be" | "opp"
+let oppShotType = "goal";
+
+function setMapMode(mode) {
+  mapMode = mode;
+  document.getElementById("btn-map-mode-be").classList.toggle("active", mode === "be");
+  document.getElementById("btn-map-mode-opp").classList.toggle("active", mode === "opp");
+  document.getElementById("be-add-shot-row").style.display  = mode === "be"  ? "" : "none";
+  document.getElementById("opp-add-shot-row").style.display = mode === "opp" ? "" : "none";
+  drawTeamMap();
+}
+
+function addOppShot(x, y) {
+  if (!state.game.oppShots) state.game.oppShots = [];
+  state.game.oppShots.push({ type: oppShotType, x, y, ts: Date.now(), quarter: state.game.currentQuarter || 1 });
+  drawTeamMap();
+  autoSave();
+}
+
+// Override drawTeamMap to also handle opp mode
+const _origDrawTeamMap = typeof drawTeamMap === "function" ? drawTeamMap : null;
+
+function drawOppShotOverlay(canvas) {
+  const ctx = canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const shots = (state.game.oppShots || []);
+  const scale = canvas.width / (dpr * FW);
+  const dotColors = { goal:"#f87171", sog:"#fbbf24", miss:"#7aaa87" };
+  shots.forEach(sh => {
+    const cx = sh.x * scale * dpr / dpr;
+    const cy = sh.y * scale * dpr / dpr;
+    // convert from field coords
+    const rect = canvas.getBoundingClientRect();
+    const fw = rect.width; const fh = rect.height;
+    const sx = (sh.x / FW) * fw; const sy = (sh.y / FH) * fh;
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = dotColors[sh.type] || "#f87171";
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(sx * dpr, sy * dpr, 8 * dpr * scale, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.restore();
+  });
+}
+
+// ─── Face-off rate chart ──────────────────────────────────────────────────
+function renderFoRateChart() {
+  const el = document.getElementById("fo-rate-chart");
+  if (!el) return;
+  const players = state.players.filter(p => {
+    const s = state.stats[p.id] || {};
+    return (s.FOW || 0) + (s.FOL || 0) > 0;
+  });
+  if (!players.length) { el.innerHTML = `<div style="color:var(--text-muted);font-size:12px;padding:8px 0;">No face-off data recorded yet.</div>`; return; }
+  players.sort((a,b) => {
+    const sa = state.stats[a.id], sb = state.stats[b.id];
+    const wa = sa.FOW||0, la = sa.FOL||0, wb = sb.FOW||0, lb = sb.FOL||0;
+    return (wb/(wb+lb||1)) - (wa/(wa+la||1));
+  });
+  el.innerHTML = players.map(p => {
+    const s  = state.stats[p.id];
+    const w  = s.FOW || 0, l = s.FOL || 0, total = w + l;
+    const pct = total > 0 ? Math.round((w / total) * 100) : 0;
+    return `<div class="fo-player-row">
+      <div class="fo-name">#${p.number} ${p.name.split(" ").slice(-1)[0]}</div>
+      <div class="fo-bar-track">
+        <div class="fo-bar-win" style="width:${pct}%">${pct >= 20 ? pct+"%" : ""}</div>
+      </div>
+      <div class="fo-pct">${pct}%</div>
+      <div class="fo-record">${w}-${l}</div>
+    </div>`;
+  }).join("");
+}
+
+// ─── Season per-player table ──────────────────────────────────────────────
+function renderSeasonPlayerTable() {
+  const tbody = document.getElementById("season-player-tbody");
+  if (!tbody) return;
+  // Aggregate across all matches
+  const totals = {}; // pid-keyed but use name as key since pids vary per match
+  Object.values(allMatches).forEach(m => {
+    (m.players || []).forEach(p => {
+      const key = p.name;
+      if (!totals[key]) totals[key] = { name: p.name, number: p.number, G:0,A:0,SOG:0,GB:0,TO:0,FOW:0,FOL:0,SV:0 };
+      const s = (m.stats || {})[p.id] || {};
+      ["G","A","SOG","GB","TO","FOW","FOL","SV"].forEach(k => { totals[key][k] += s[k]||0; });
+    });
+  });
+  const rows = Object.values(totals).sort((a,b) => (b.G+b.A)-(a.G+a.A));
+  if (!rows.length) { tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:var(--text-muted);padding:16px;">No match data yet.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(r => {
+    const pts = r.G + r.A;
+    const shPct = r.SOG > 0 ? (r.G/r.SOG*100).toFixed(0)+"%" : "–";
+    const foTotal = r.FOW + r.FOL;
+    const foPct = foTotal > 0 ? (r.FOW/foTotal*100).toFixed(0)+"%" : "–";
+    const topPts = Math.max(...rows.map(x=>x.G+x.A));
+    const cls = pts === topPts && pts > 0 ? " highlight" : "";
+    return `<tr>
+      <td>#${r.number} ${r.name}</td>
+      <td>${r.G}</td><td>${r.A}</td>
+      <td class="${cls}">${pts}</td>
+      <td>${r.SOG}</td><td>${shPct}</td>
+      <td>${r.GB}</td><td>${r.TO}</td>
+      <td>${r.FOW}</td><td>${r.FOL}</td>
+      <td>${foPct}</td><td>${r.SV}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ─── Live share via URL ───────────────────────────────────────────────────
+async function compressToBase64(str) {
+  try {
+    const stream = new CompressionStream("gzip");
+    const writer = stream.writable.getWriter();
+    writer.write(new TextEncoder().encode(str));
+    writer.close();
+    const buf = await new Response(stream.readable).arrayBuffer();
+    // btoa with chunk splitting to avoid stack overflow on large data
+    const bytes = new Uint8Array(buf);
+    let bin = "";
+    for (let i = 0; i < bytes.length; i += 4096) {
+      bin += String.fromCharCode(...bytes.subarray(i, i + 4096));
+    }
+    return btoa(bin);
+  } catch { return null; }
+}
+
+async function decompressFromBase64(b64) {
+  try {
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const stream = new DecompressionStream("gzip");
+    const writer = stream.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    return await new Response(stream.readable).text();
+  } catch { return null; }
+}
+
+async function openShareDialog() {
+  document.getElementById("share-overlay").classList.add("open");
+  document.getElementById("share-url-box").style.display = "none";
+  document.getElementById("share-note").style.display = "none";
+  document.getElementById("share-generating").style.display = "block";
+  const raw = localStorage.getItem(STORE_KEY);
+  if (!raw) { document.getElementById("share-generating").textContent = "No data to share."; return; }
+  const b64 = await compressToBase64(raw);
+  if (!b64) { document.getElementById("share-generating").textContent = "Compression not supported in this browser."; return; }
+  const url = location.href.split("?")[0] + "?share=" + encodeURIComponent(b64);
+  document.getElementById("share-generating").style.display = "none";
+  document.getElementById("share-url-input").value = url;
+  document.getElementById("share-url-box").style.display = "flex";
+  document.getElementById("share-note").style.display = "block";
+}
+
+function closeShareDialog() {
+  document.getElementById("share-overlay").classList.remove("open");
+}
+
+async function checkShareParam() {
+  const params = new URLSearchParams(location.search);
+  const shareData = params.get("share");
+  if (!shareData) return;
+  try {
+    const json = await decompressFromBase64(decodeURIComponent(shareData));
+    if (!json) return;
+    const parsed = JSON.parse(json);
+    if (!parsed.matches) return;
+    const matchCount = Object.keys(parsed.matches).length;
+    const existing = localStorage.getItem(STORE_KEY);
+    if (existing && !confirm(`Load shared data? This replaces your current data with ${matchCount} match${matchCount!==1?"es":""} from the shared link.`)) {
+      history.replaceState(null,"",location.pathname);
+      return;
+    }
+    localStorage.setItem(STORE_KEY, json);
+    history.replaceState(null,"",location.pathname);
+    showToast("Shared data loaded — reloading…");
+    setTimeout(()=>location.reload(), 900);
+  } catch { /* ignore */ }
+}
+
 // ─── Tab Switching ────────────────────────────────────────────────────────
 function switchTab(tab) {
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
@@ -2395,6 +2908,7 @@ function switchTab(tab) {
   if(tab==="stats"&&state.selectedId){const p=state.players.find(x=>x.id===state.selectedId);if(p)renderStatsTab(p);}
   if(tab==="penalties"){populatePenPlayerSelect();renderPenaltyList();}
   if(tab==="profile"&&state.selectedId){const p=state.players.find(x=>x.id===state.selectedId);if(p)renderProfileTab(p);}
+  if(tab==="log"){renderGameLog();}
 }
 
 function navigatePlayer(dir) {
@@ -2499,6 +3013,24 @@ function drawTeamMap() {
     ctx.textAlign = "left";
     ctx.fillText(fname, lx, sh.y + 1);
   });
+
+  // Draw opponent shots if in opp mode
+  if (mapMode === "opp") {
+    const oppDotColors = { goal:"#f87171", sog:"#fbbf24", miss:"#7aaa87" };
+    (state.game.oppShots || []).forEach(sh => {
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = oppDotColors[sh.type] || "#f87171";
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 1.5;
+      // Draw an X shape for opp shots to distinguish from BE dots
+      const s = 7;
+      ctx.beginPath(); ctx.moveTo(sh.x-s,sh.y-s); ctx.lineTo(sh.x+s,sh.y+s);
+      ctx.moveTo(sh.x+s,sh.y-s); ctx.lineTo(sh.x-s,sh.y+s);
+      ctx.lineWidth = 3; ctx.strokeStyle = oppDotColors[sh.type] || "#f87171"; ctx.stroke();
+      ctx.restore();
+    });
+  }
 }
 
 function addTeamShot(x, y) {
@@ -2558,6 +3090,7 @@ function renderTmShotList(pid) {
 function openMatchManager() {
   const m = allMatches[activeMatchId];
   document.getElementById("match-name-edit").value = m?.name || "";
+  loadMatchNotes();
   renderMatchList();
   document.getElementById("match-mgr-overlay").classList.remove("hidden");
 }
@@ -2626,6 +3159,8 @@ function loadMatchById(id) {
   document.getElementById("player-detail").classList.add("hidden");
   renderPlayerList(document.getElementById("player-search").value);
   renderPenaltyList();
+  loadMatchNotes();
+  updateRunIndicator();
   showView("player");
   document.querySelectorAll(".main-nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view==="player"));
   closeMatchManager();
@@ -2730,6 +3265,11 @@ function adjustScore(team, delta) {
   else              state.game.oppScore = Math.max(0,(state.game.oppScore||0)+delta);
   document.getElementById("score-be").textContent  = state.game.beScore;
   document.getElementById("score-opp").textContent = state.game.oppScore;
+  if (delta !== 0) {
+    if (!state.game.scoreLog) state.game.scoreLog = [];
+    state.game.scoreLog.push({ team, delta, be:state.game.beScore, opp:state.game.oppScore, quarter:state.game.currentQuarter||1, ts:Date.now() });
+    updateRunIndicator();
+  }
   if (team==="be" && delta > 0) triggerGoalAnim();
   autoSave();
 }
@@ -2897,7 +3437,13 @@ function logPenalty() {
   const type = document.getElementById("pen-type-select").value;
   const quarter = parseInt(document.getElementById("pen-quarter-select").value) || state.game.currentQuarter || 1;
   if (!state.game.penalties) state.game.penalties = [];
-  state.game.penalties.push({pid, type, quarter, ts: Date.now()});
+  const penTs = Date.now();
+  state.game.penalties.push({pid, type, quarter, ts: penTs});
+  // Also append to that player's game log
+  if (state.stats[pid]) {
+    if (!state.stats[pid].log) state.stats[pid].log = [];
+    state.stats[pid].log.push({ type:"penalty", label:type, quarter, ts:penTs });
+  }
   renderPenaltyList(); autoSave();
   showToast("Penalty logged","success");
 }
@@ -3042,6 +3588,7 @@ function renderSeasonView() {
        <span style="font-size:11px;color:var(--text-muted);">${p.SOG} SOG · ${p.GB} GB</span></div>`
     ).join("");
   }
+  renderSeasonPlayerTable();
 }
 
 // ─── Print Box Score ───────────────────────────────────────────────────────
@@ -3111,6 +3658,8 @@ function renderCharts() {
       return { label: p.name.split(" ")[0]+" #"+p.number, val: s.GB, val2: s.TO, sub: `${s.GB} GB / ${s.TO} TO` };
     }).filter(d=>d.val+d.val2>0).sort((a,b)=>(b.val+b.val2)-(a.val+a.val2)),
     "#fbbf24", 2);
+
+  renderFoRateChart();
 
   renderBarChart("chart-fo",
     players.map(p => {
@@ -3182,6 +3731,8 @@ function init() {
   if(state.game.date)     document.getElementById("game-date").value=state.game.date;
 
   updateMatchBar(); markSaved(); updateScoreboard();
+  loadMatchNotes();
+  updateRunIndicator();
   document.getElementById("player-search").addEventListener("input",e=>renderPlayerList(e.target.value));
   document.getElementById("opponent-input").addEventListener("input",e=>{
     state.game.opponent=e.target.value;
@@ -3192,15 +3743,43 @@ function init() {
   document.getElementById("btn-save").addEventListener("click",()=>saveData(false));
   document.getElementById("btn-export").addEventListener("click",exportCSV);
 
-  // Backup / Restore
+  // Backup / Restore / Share
   document.getElementById("btn-mgr-backup").addEventListener("click", backupAllData);
   document.getElementById("btn-mgr-restore").addEventListener("click", () => {
     document.getElementById("restore-file-input").click();
   });
   document.getElementById("restore-file-input").addEventListener("change", e => {
     restoreFromBackup(e.target.files[0]);
-    e.target.value = ""; // reset so same file can be re-picked
+    e.target.value = "";
   });
+  document.getElementById("btn-mgr-share-link").addEventListener("click", () => {
+    closeMatchManager(); openShareDialog();
+  });
+  document.getElementById("btn-copy-share-url").addEventListener("click", () => {
+    const inp = document.getElementById("share-url-input");
+    navigator.clipboard.writeText(inp.value).then(() => {
+      showToast("Link copied to clipboard!");
+    }).catch(() => { inp.select(); document.execCommand("copy"); showToast("Link copied!"); });
+  });
+  document.getElementById("btn-close-share").addEventListener("click", closeShareDialog);
+
+  // Match notes auto-save
+  document.getElementById("match-notes-input").addEventListener("input", saveMatchNotes);
+
+  // Opponent shot map mode toggle
+  document.getElementById("btn-map-mode-be").addEventListener("click", () => setMapMode("be"));
+  document.getElementById("btn-map-mode-opp").addEventListener("click", () => setMapMode("opp"));
+  document.querySelectorAll(".opp-shot-type-btn").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".opp-shot-type-btn").forEach(x => x.classList.remove("active"));
+    b.classList.add("active"); oppShotType = b.dataset.type;
+  }));
+  document.getElementById("btn-clear-opp-shots").addEventListener("click", () => {
+    if (!confirm("Clear all opponent shots?")) return;
+    state.game.oppShots = []; drawTeamMap(); autoSave();
+  });
+
+  // Check for share URL param on load
+  checkShareParam();
 
   // Scoreboard
   document.getElementById("btn-be-plus").addEventListener("click",()=>adjustScore("be",1));
@@ -3250,7 +3829,8 @@ function init() {
   // Team map canvas click → add shot for selected player
   document.getElementById("team-field-canvas").addEventListener("click", e => {
     const {x,y} = canvasCoords(document.getElementById("team-field-canvas"), e);
-    addTeamShot(x, y);
+    if (mapMode === "opp") addOppShot(x, y);
+    else addTeamShot(x, y);
   });
 
   document.querySelectorAll(".tab-btn").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
@@ -3346,6 +3926,24 @@ if ('serviceWorker' in navigator) {
 </script>
 
 <!-- Install Guide FAB -->
+<!-- Share Link Dialog -->
+<div id="share-overlay" onclick="if(event.target===this)closeShareDialog()">
+  <div id="share-dialog">
+    <h2>&#128279; Share / Transfer Data</h2>
+    <p class="share-sub">Copy the link below and open it on any device to load all your match data instantly — no file needed.</p>
+    <div id="share-generating">Generating link…</div>
+    <div id="share-url-box" style="display:none">
+      <input type="text" id="share-url-input" readonly />
+      <button id="btn-copy-share-url">Copy</button>
+    </div>
+    <p id="share-note" style="display:none">
+      &#9888;&#65039; The URL contains <em>all</em> your data compressed. It may be long — use a link shortener if sharing via text. Anyone with the link can see your stats.<br><br>
+      On the other device: open the link → your data loads automatically. <code>.laxstats</code> backup files also work for this.
+    </p>
+    <button id="btn-close-share" onclick="closeShareDialog()">Close</button>
+  </div>
+</div>
+
 <button id="btn-install-guide" title="Install Guide / Tutorial" onclick="document.getElementById('install-overlay').classList.add('open')">?</button>
 
 <!-- Install Guide Modal -->
