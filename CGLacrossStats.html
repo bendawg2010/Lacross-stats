@@ -2647,7 +2647,7 @@ function updateRunIndicator() {
 
 // ─── Game Log ─────────────────────────────────────────────────────────────
 const LOG_ICONS = { goal:"⚽", sog:"🥍", miss:"✕", gb:"🏒", ast:"🎯", stat:"📊", penalty:"🟥" };
-const SHOT_COLORS = { goal:"log-goal", sog:"log-sog", miss:"log-miss", gb:"log-gb", ast:"log-ast" };
+const LOG_CSS_COLORS = { goal:"log-goal", sog:"log-sog", miss:"log-miss", gb:"log-gb", ast:"log-ast" };
 
 function renderGameLog() {
   const pid = state.selectedId;
@@ -2665,7 +2665,7 @@ function renderGameLog() {
     let meta = `Q${entry.quarter} · ${new Date(entry.ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;
 
     if (entry.type === "shot") {
-      cls += " " + (SHOT_COLORS[entry.shotType] || "");
+      cls += " " + (LOG_CSS_COLORS[entry.shotType] || "");
       icon = LOG_ICONS[entry.shotType] || "🥍";
       label = entry.label;
     } else if (entry.type === "stat") {
@@ -2733,9 +2733,6 @@ function addOppShot(x, y) {
   drawTeamMap();
   autoSave();
 }
-
-// Override drawTeamMap to also handle opp mode
-const _origDrawTeamMap = typeof drawTeamMap === "function" ? drawTeamMap : null;
 
 function drawOppShotOverlay(canvas) {
   const ctx = canvas.getContext("2d");
