@@ -3167,7 +3167,7 @@ function addTeamShot(x, y) {
   const sh = { type: teamMapShotType, x, y, ts: Date.now(), quarter: state.game.currentQuarter||1 };
   state.stats[pid].shots.push(sh);
   undoStack.push({pid,ts:sh.ts});
-  if (sh.type==="goal") { state.stats[pid].G++; state.stats[pid].SOG++; }
+  if (sh.type==="goal") { state.stats[pid].G++; state.stats[pid].SOG++; adjustScore("be", 1); }
   else if (sh.type==="sog")  { state.stats[pid].SOG++; }
   else if (sh.type==="miss") { state.stats[pid].SOG++; }
   else if (sh.type==="gb")   { state.stats[pid].GB++;  }
@@ -3199,7 +3199,7 @@ function renderTmShotList(pid) {
     el.querySelector(".shot-entry-del").addEventListener("click", e => {
       const idx = parseInt(e.currentTarget.dataset.idx);
       const s = state.stats[pid].shots[idx];
-      if (s.type==="goal")  { state.stats[pid].G=Math.max(0,state.stats[pid].G-1); state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
+      if (s.type==="goal")  { state.stats[pid].G=Math.max(0,state.stats[pid].G-1); state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); adjustScore("be", -1); }
       else if (s.type==="sog")  { state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
       else if (s.type==="ast")  { state.stats[pid].A=Math.max(0,state.stats[pid].A-1); }
       else if (s.type==="gb")   { state.stats[pid].GB=Math.max(0,state.stats[pid].GB-1); }
