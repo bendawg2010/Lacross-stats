@@ -343,6 +343,12 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   color: #f87171; border-radius: 8px; padding: 10px 16px;
   font-size: 14px; cursor: pointer;
 }
+.btn-sm-green {
+  background: rgba(0,140,69,0.15); border: 1px solid var(--be-green-lite);
+  color: var(--be-green-lite); border-radius: 8px; padding: 10px 16px;
+  font-size: 14px; cursor: pointer; font-weight: 600; transition: background 0.1s;
+}
+.btn-sm-green:hover { background: rgba(0,140,69,0.3); }
 
 #field-container {
   flex: 1; display: flex; align-items: center; justify-content: center;
@@ -1151,6 +1157,7 @@ kbd {
             <label id="heatmap-toggle-label">
               <input type="checkbox" id="heatmap-toggle" /> Heat Map Overlay
             </label>
+            <button id="btn-export-shotmap" class="btn-sm-green">&#8681; Export PNG</button>
             <button id="btn-clear-shots" class="btn-danger-sm">Clear All</button>
           </div>
         </div>
@@ -2222,6 +2229,91 @@ function exportCSV() {
   a.click(); showToast("CSV exported!");
 }
 
+// ─── Shot Map PNG Export ──────────────────────────────────────────────────
+function exportShotMapPNG() {
+  const pid = state.selectedId;
+  const fieldCanvas = document.getElementById("field-canvas");
+  if (!pid) { showToast("Select a player first"); return; }
+
+  const player  = state.players.find(p => p.id === pid);
+  const stats   = state.stats[pid] || emptyStats();
+  const shots   = stats.shots || [];
+  const match   = state.currentMatchName || "Match";
+  const dateStr = document.getElementById("game-date").value || new Date().toISOString().slice(0,10);
+  const opp     = document.getElementById("opponent-input").value || "Opponent";
+
+  // Count shot types
+  const counts = shots.reduce((acc, s) => { acc[s.type] = (acc[s.type]||0)+1; return acc; }, {});
+  const shotSummary = [
+    counts.goal  ? `${counts.goal} Goal${counts.goal>1?"s":""}` : null,
+    counts.sog   ? `${counts.sog} SOG` : null,
+    counts.ast   ? `${counts.ast} Assist${counts.ast>1?"s":""}` : null,
+    counts.miss  ? `${counts.miss} Miss` : null,
+    counts.gb    ? `${counts.gb} GB` : null,
+  ].filter(Boolean).join("  ·  ") || "No shots recorded";
+
+  const HEADER = 90;
+  const FOOTER = 32;
+  const PAD    = 16;
+  const fw = fieldCanvas.width  / (window.devicePixelRatio || 1);
+  const fh = fieldCanvas.height / (window.devicePixelRatio || 1);
+  const totalW = fw + PAD * 2;
+  const totalH = fh + HEADER + FOOTER + PAD;
+
+  const out = document.createElement("canvas");
+  out.width  = totalW * 2;   // 2x for sharpness
+  out.height = totalH * 2;
+  const ctx  = out.getContext("2d");
+  ctx.scale(2, 2);
+
+  // Background
+  ctx.fillStyle = "#0a1a0f";
+  ctx.fillRect(0, 0, totalW, totalH);
+
+  // Gold top border
+  ctx.fillStyle = "#b5973a";
+  ctx.fillRect(0, 0, totalW, 3);
+
+  // Header: school + match info
+  ctx.font = "700 11px -apple-system, sans-serif";
+  ctx.fillStyle = "#7aaa87";
+  ctx.fillText("BISHOP ENGLAND LACROSSE", PAD, 22);
+
+  ctx.font = "800 20px -apple-system, sans-serif";
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText(`#${player.number} ${player.name}`, PAD, 46);
+
+  ctx.font = "600 12px -apple-system, sans-serif";
+  ctx.fillStyle = "#7aaa87";
+  ctx.fillText(`vs. ${opp}  ·  ${dateStr}  ·  ${match}`, PAD, 64);
+
+  // Shot type legend dots + summary
+  const dotColors = { goal:"#008c45", sog:"#60a5fa", ast:"#d4af44", miss:"#f87171", gb:"#fbbf24" };
+  ctx.font = "600 11px -apple-system, sans-serif";
+  ctx.fillStyle = "#aac4b0";
+  ctx.fillText(shotSummary, PAD, 82);
+
+  // Field canvas image
+  ctx.drawImage(fieldCanvas, PAD, HEADER, fw, fh);
+
+  // Footer
+  ctx.font = "500 10px -apple-system, sans-serif";
+  ctx.fillStyle = "#3a6b47";
+  ctx.fillText("CGLacross Stats  ·  Bishop England HS", PAD, HEADER + fh + PAD + 14);
+
+  // Gold bottom border
+  ctx.fillStyle = "#b5973a";
+  ctx.fillRect(0, totalH - 3, totalW, 3);
+
+  // Download
+  const playerSlug = player.name.replace(/\s+/g, "-").toLowerCase();
+  const a = document.createElement("a");
+  a.href     = out.toDataURL("image/png");
+  a.download = `shotmap-${playerSlug}-${dateStr}.png`;
+  a.click();
+  showToast("Shot map exported!");
+}
+
 // ─── Tab Switching ────────────────────────────────────────────────────────
 function switchTab(tab) {
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
@@ -3103,6 +3195,7 @@ function init() {
     document.querySelectorAll(".qtr-filter-btn").forEach(x=>x.classList.remove("active"));
     b.classList.add("active"); shotQuarterFilter=b.dataset.q; drawField();
   }));
+  document.getElementById("btn-export-shotmap").addEventListener("click", exportShotMapPNG);
   document.getElementById("btn-undo-shot").addEventListener("click",undoLastShot);
   document.getElementById("btn-zones").addEventListener("click",toggleZones);
   document.getElementById("btn-fullscreen-field").addEventListener("click",()=>{updateFsPlayerBar();enterFullscreen(document.getElementById("tab-heatmap"));});
