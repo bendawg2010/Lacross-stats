@@ -1171,6 +1171,29 @@ kbd {
 #btn-close-share:hover { background: var(--surface); }
 #share-generating { color: var(--text-muted); font-size: 12px; text-align: center; padding: 10px; }
 
+/* ── Shot delete popup ───────────────────────────────────── */
+#shot-delete-popup {
+  position: fixed; z-index: 8000;
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 8px 0; min-width: 170px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+  display: none;
+}
+#shot-delete-popup.open { display: block; }
+.sdp-header {
+  padding: 6px 14px 8px; border-bottom: 1px solid var(--border);
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.6px; color: var(--text-muted);
+}
+.sdp-btn {
+  display: block; width: 100%; padding: 10px 16px;
+  background: none; border: none; text-align: left;
+  font-size: 14px; font-weight: 600; cursor: pointer; color: var(--text);
+}
+.sdp-btn:hover { background: var(--surface3); }
+.sdp-btn.danger { color: #f87171; }
+.sdp-btn.danger:hover { background: rgba(248,113,113,0.12); }
+
 /* ── Enhanced penalty summary ────────────────────────────── */
 #penalty-summary {
   display: flex; gap: 8px; flex-wrap: wrap;
@@ -2326,7 +2349,6 @@ function drawField() {
   ctx.beginPath(); ctx.moveTo(MID_X, TOP_SIDE); ctx.lineTo(MID_X, BOT_SIDE); ctx.stroke();
   ctx.beginPath(); ctx.arc(MID_X, MID_Y, 32, 0, Math.PI*2); ctx.stroke();
   ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(MID_X, MID_Y, 3, 0, Math.PI*2); ctx.fill();
-  drawBishopEmblem(ctx, MID_X, MID_Y);
 
   // Goals & crease (on the endlines)
   drawGoal(ctx, LEFT_END,  MID_Y);
@@ -2366,51 +2388,6 @@ function drawField() {
     ctx.fillStyle=(SHOT_COLORS[sh.type]||"#fff")+"cc"; ctx.fill();
     ctx.strokeStyle=SHOT_COLORS[sh.type]||"#fff"; ctx.lineWidth=1.5; ctx.stroke();
   });
-}
-
-// ─── Bishop Emblem (center field) ────────────────────────────────────────
-function drawBishopEmblem(ctx, cx, cy) {
-  ctx.save();
-  ctx.globalAlpha = 0.55;
-  const G = ctx.createLinearGradient(cx, cy - 22, cx, cy + 22);
-  G.addColorStop(0, "#d4af44");
-  G.addColorStop(1, "#8a6f1e");
-  ctx.fillStyle = G;
-  ctx.strokeStyle = "rgba(0,0,0,0.4)";
-  ctx.lineWidth = 0.8;
-  // Base disc (bottom)
-  ctx.beginPath();
-  ctx.ellipse(cx, cy + 19, 10, 4, 0, 0, Math.PI * 2);
-  ctx.fill(); ctx.stroke();
-  // Shaft
-  ctx.beginPath();
-  ctx.moveTo(cx - 5, cy + 17);
-  ctx.bezierCurveTo(cx - 7, cy + 5, cx - 6, cy - 4, cx - 4, cy - 8);
-  ctx.lineTo(cx + 4, cy - 8);
-  ctx.bezierCurveTo(cx + 6, cy - 4, cx + 7, cy + 5, cx + 5, cy + 17);
-  ctx.closePath();
-  ctx.fill(); ctx.stroke();
-  // Collar ring
-  ctx.beginPath();
-  ctx.ellipse(cx, cy - 8, 7, 3, 0, 0, Math.PI * 2);
-  ctx.fill(); ctx.stroke();
-  // Head (sphere)
-  ctx.beginPath();
-  ctx.arc(cx, cy - 15, 8, 0, Math.PI * 2);
-  ctx.fill(); ctx.stroke();
-  // Mitre notch
-  ctx.fillStyle = "rgba(0,0,0,0.35)";
-  ctx.beginPath();
-  ctx.moveTo(cx - 2, cy - 22);
-  ctx.lineTo(cx, cy - 18);
-  ctx.lineTo(cx + 2, cy - 22);
-  ctx.closePath();
-  ctx.fill();
-  // Cross on top
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(cx - 1, cy - 29, 2, 8);
-  ctx.fillRect(cx - 4, cy - 26, 8, 2);
-  ctx.restore();
 }
 
 function drawGoal(ctx, x, y) {
@@ -2954,6 +2931,94 @@ async function checkShareParam() {
   } catch { /* ignore */ }
 }
 
+// ─── Shot Delete Popup ────────────────────────────────────────────────────
+let _sdpTarget = null; // { pid, ts } of the shot to delete
+
+function openShotDeletePopup(pageX, pageY, pid, shot) {
+  _sdpTarget = { pid, ts: shot.ts };
+  const typeLabels = { goal:"Goal", sog:"Shot on Goal", miss:"Miss", gb:"Ground Ball", ast:"Assist" };
+  document.getElementById("sdp-title").textContent =
+    `Q${shot.quarter} · ${typeLabels[shot.type] || shot.type}`;
+  const pop = document.getElementById("shot-delete-popup");
+  pop.classList.add("open");
+  // Position near tap, keep on-screen
+  const pw = 180, ph = 90;
+  const left = Math.min(pageX + 8, window.innerWidth  - pw - 8);
+  const top  = Math.min(pageY + 8, window.innerHeight - ph - 8);
+  pop.style.left = left + "px";
+  pop.style.top  = top  + "px";
+}
+
+function closeShotDeletePopup() {
+  document.getElementById("shot-delete-popup").classList.remove("open");
+  _sdpTarget = null;
+}
+
+function confirmDeleteShot() {
+  if (!_sdpTarget) { closeShotDeletePopup(); return; }
+  // Opponent shot path
+  if (_sdpTarget.oppIdx !== undefined) {
+    const idx = _sdpTarget.oppIdx;
+    closeShotDeletePopup();
+    if (state.game.oppShots && state.game.oppShots[idx] !== undefined) {
+      state.game.oppShots.splice(idx, 1);
+      drawTeamMap(); autoSave();
+      showToast("Opponent shot deleted", "success");
+    }
+    return;
+  }
+  // Player shot path
+  const { pid, ts } = _sdpTarget;
+  closeShotDeletePopup();
+  const shots = state.stats[pid]?.shots;
+  if (!shots) return;
+  const idx = shots.findLastIndex(s => s.ts === ts);
+  if (idx === -1) return;
+  const sh = shots[idx];
+  _applyShotStats(pid, sh, -1);
+  shots.splice(idx, 1);
+  _refreshAfterShotChange(pid);
+  showToast("Shot deleted", "success");
+}
+
+// Hit-test: find the nearest shot to canvas coords (x,y) within radius
+function findShotNear(pid, x, y, radius = 14) {
+  const shots = state.stats[pid]?.shots || [];
+  let best = null, bestD = radius * radius;
+  shots.forEach(sh => {
+    const dx = sh.x - x, dy = sh.y - y;
+    const d2 = dx*dx + dy*dy;
+    if (d2 < bestD) { bestD = d2; best = sh; }
+  });
+  return best;
+}
+
+// Same for opp shots
+function findOppShotNear(x, y, radius = 14) {
+  const shots = state.game.oppShots || [];
+  let best = null, bestD = radius * radius, bestIdx = -1;
+  shots.forEach((sh, i) => {
+    const dx = sh.x - x, dy = sh.y - y;
+    const d2 = dx*dx + dy*dy;
+    if (d2 < bestD) { bestD = d2; best = sh; bestIdx = i; }
+  });
+  return bestIdx >= 0 ? { shot: best, idx: bestIdx } : null;
+}
+
+function openOppShotDeletePopup(pageX, pageY, idx, shot) {
+  _sdpTarget = { oppIdx: idx };
+  document.getElementById("sdp-title").textContent =
+    `Q${shot.quarter || "?"} · Opponent Shot`;
+  const pop = document.getElementById("shot-delete-popup");
+  // Replace delete handler temporarily to handle opp shot
+  pop.classList.add("open");
+  const pw = 180, ph = 90;
+  const left = Math.min(pageX + 8, window.innerWidth  - pw - 8);
+  const top  = Math.min(pageY + 8, window.innerHeight - ph - 8);
+  pop.style.left = left + "px";
+  pop.style.top  = top  + "px";
+}
+
 // ─── Tab Switching ────────────────────────────────────────────────────────
 function switchTab(tab) {
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
@@ -3016,7 +3081,6 @@ function drawTeamMap() {
   ctx.beginPath(); ctx.moveTo(MID_X,TOP_SIDE); ctx.lineTo(MID_X,BOT_SIDE); ctx.stroke();
   ctx.beginPath(); ctx.arc(MID_X,MID_Y,32,0,Math.PI*2); ctx.stroke();
   ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(MID_X,MID_Y,3,0,Math.PI*2); ctx.fill();
-  drawBishopEmblem(ctx, MID_X, MID_Y);
   drawGoal(ctx,LEFT_END,MID_Y); drawGoal(ctx,RIGHT_END,MID_Y);
   ctx.strokeStyle="rgba(255,255,255,0.8)"; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.arc(LEFT_END,MID_Y,60,-Math.PI/2,Math.PI/2); ctx.stroke();
@@ -3177,11 +3241,15 @@ function renderMatchList() {
     const div = document.createElement("div");
     div.className = "match-item" + (m.id === activeMatchId ? " active-match" : "");
     const dt = m.game?.date || (m.updatedAt ? new Date(m.updatedAt).toLocaleDateString() : "");
-    const opp = m.game?.opponent ? ` · ${m.game.opponent}` : "";
+    const opp = m.game?.opponent || "";
+    const be  = m.game?.beScore ?? "";
+    const op  = m.game?.oppScore ?? "";
+    const scoreStr = (be !== "" && op !== "") ? `BE ${be}–${op}` : "";
+    const metaParts = [dt, opp, scoreStr].filter(Boolean).join(" · ");
     div.innerHTML = `
       <div class="match-item-info">
         <div class="match-item-name">${escHtml(m.name)}</div>
-        <div class="match-item-meta">${escHtml(dt)}${escHtml(opp)}</div>
+        <div class="match-item-meta">${escHtml(metaParts)}</div>
       </div>
       ${m.id===activeMatchId ? '<span class="match-item-active-badge">ACTIVE</span>' : `<button class="btn-match-load" data-id="${m.id}">Load</button>`}
       <button class="btn-match-del" data-id="${m.id}" title="Delete match">&#x1F5D1;</button>`;
@@ -3839,6 +3907,17 @@ function init() {
   });
   document.getElementById("btn-close-share").addEventListener("click", closeShareDialog);
 
+  // Shot delete popup
+  document.getElementById("sdp-delete-btn").addEventListener("click", confirmDeleteShot);
+  document.getElementById("sdp-cancel-btn").addEventListener("click", closeShotDeletePopup);
+  document.addEventListener("click", e => {
+    const pop = document.getElementById("shot-delete-popup");
+    if (pop.classList.contains("open") && !pop.contains(e.target)) closeShotDeletePopup();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeShotDeletePopup();
+  });
+
   // Match notes auto-save
   document.getElementById("match-notes-input").addEventListener("input", saveMatchNotes);
 
@@ -3901,11 +3980,40 @@ function init() {
   }));
 
   // Team map canvas click → add shot for selected player
-  document.getElementById("team-field-canvas").addEventListener("click", e => {
-    const {x,y} = canvasCoords(document.getElementById("team-field-canvas"), e);
-    if (mapMode === "opp") addOppShot(x, y);
-    else addTeamShot(x, y);
-  });
+  // Team map — single click adds, double-click/tap deletes
+  (function() {
+    const tmCanvas = document.getElementById("team-field-canvas");
+    let tmLastTap = 0, tmLastPos = null;
+    function tmDblAction(e) {
+      const {x,y} = canvasCoords(tmCanvas, e);
+      const pageX = e.changedTouches ? e.changedTouches[0].pageX : e.pageX;
+      const pageY = e.changedTouches ? e.changedTouches[0].pageY : e.pageY;
+      // Check opp shots first if in opp mode
+      if (mapMode === "opp") {
+        const hit = findOppShotNear(x, y, 18);
+        if (hit) { openOppShotDeletePopup(pageX, pageY, hit.idx, hit.shot); return; }
+      }
+      // Then check all player shots
+      for (const p of state.players) {
+        const sh = findShotNear(p.id, x, y, 18);
+        if (sh) { openShotDeletePopup(pageX, pageY, p.id, sh); return; }
+      }
+    }
+    tmCanvas.addEventListener("dblclick", tmDblAction);
+    tmCanvas.addEventListener("touchstart", e => {
+      const now = Date.now();
+      const t = e.changedTouches[0];
+      if (tmLastTap && now - tmLastTap < 350 && tmLastPos &&
+          Math.abs(t.pageX - tmLastPos.x) < 22 && Math.abs(t.pageY - tmLastPos.y) < 22) {
+        e.preventDefault(); tmLastTap = 0; tmDblAction(e);
+      } else { tmLastTap = now; tmLastPos = {x: t.pageX, y: t.pageY}; }
+    }, { passive: false });
+    tmCanvas.addEventListener("click", e => {
+      const {x,y} = canvasCoords(tmCanvas, e);
+      if (mapMode === "opp") addOppShot(x, y);
+      else addTeamShot(x, y);
+    });
+  }());
 
   document.querySelectorAll(".tab-btn").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
   document.getElementById("btn-save-profile").addEventListener("click",saveProfile);
@@ -3961,10 +4069,32 @@ function init() {
     renderShotList(); drawField(); autoSave();
   });
 
-  document.getElementById("field-canvas").addEventListener("click",e=>{
-    const{x,y}=canvasCoords(document.getElementById("field-canvas"),e);
-    addShot(x,y);
-  });
+  // Player field canvas — single click adds shot, double-click/tap deletes
+  (function() {
+    const fc = document.getElementById("field-canvas");
+    let lastTap = 0, lastPos = null;
+    function fcDblAction(e) {
+      const {x,y} = canvasCoords(fc, e);
+      const pageX = e.changedTouches ? e.changedTouches[0].pageX : e.pageX;
+      const pageY = e.changedTouches ? e.changedTouches[0].pageY : e.pageY;
+      const pid = state.selectedId; if (!pid) return;
+      const sh = findShotNear(pid, x, y, 18);
+      if (sh) openShotDeletePopup(pageX, pageY, pid, sh);
+    }
+    fc.addEventListener("dblclick", fcDblAction);
+    fc.addEventListener("touchstart", e => {
+      const now = Date.now();
+      const t = e.changedTouches[0];
+      if (lastTap && now - lastTap < 350 && lastPos &&
+          Math.abs(t.pageX - lastPos.x) < 22 && Math.abs(t.pageY - lastPos.y) < 22) {
+        e.preventDefault(); lastTap = 0; fcDblAction(e);
+      } else { lastTap = now; lastPos = {x: t.pageX, y: t.pageY}; }
+    }, { passive: false });
+    fc.addEventListener("click", e => {
+      const{x,y}=canvasCoords(fc,e);
+      addShot(x,y);
+    });
+  }());
 
   document.addEventListener("keydown",e=>{
     // Ctrl+Z / Cmd+Z → undo; Ctrl+Y / Cmd+Shift+Z → redo
@@ -4005,16 +4135,36 @@ if ('serviceWorker' in navigator) {
 <!-- Share Link Dialog -->
 <div id="share-overlay" onclick="if(event.target===this)closeShareDialog()">
   <div id="share-dialog">
-    <h2>&#128279; Share / Transfer Data</h2>
-    <p class="share-sub">Copy the link below and open it on any device to load all your match data instantly — no file needed.</p>
+    <h2>&#128279; Transfer Data to Another Device</h2>
+    <p class="share-sub">Your data is stored locally on <em>this</em> device. To move it, choose a method below.</p>
+
+    <div style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.35);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;line-height:1.6;color:#fca5a5;">
+      &#9888;&#65039; <strong>The link only works if the other device also has the CGLacrossStats HTML file.</strong>
+      The link carries your stats data — the other device still needs the app file to open it.
+    </div>
+
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Step 1 — Send the HTML file to the other device</div>
+    <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:14px;">
+      AirDrop, email, or copy <code style="background:var(--surface3);padding:1px 5px;border-radius:3px;color:var(--be-gold);">CGLacrossStats.html</code> to the other device first.
+    </div>
+
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Step 2 — Transfer your stats (choose one)</div>
+    <div style="background:var(--surface3);border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px;line-height:1.7;">
+      <strong style="color:var(--be-gold-lite);">Option A — Backup file (easiest):</strong><br>
+      Use <em>Export Backup</em> to save a <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;color:var(--be-gold);">.laxstats</code> file → send it → open the HTML on the other device → Import Backup.
+    </div>
+    <div style="background:var(--surface3);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;line-height:1.7;">
+      <strong style="color:#60a5fa;">Option B — Data link:</strong><br>
+      Copy the link below, open it in a browser on the other device <em>after</em> you've opened the HTML file there.
+    </div>
+
     <div id="share-generating">Generating link…</div>
     <div id="share-url-box" style="display:none">
       <input type="text" id="share-url-input" readonly />
       <button id="btn-copy-share-url">Copy</button>
     </div>
-    <p id="share-note" style="display:none">
-      &#9888;&#65039; The URL contains <em>all</em> your data compressed. It may be long — use a link shortener if sharing via text. Anyone with the link can see your stats.<br><br>
-      On the other device: open the link → your data loads automatically. <code>.laxstats</code> backup files also work for this.
+    <p id="share-note" style="display:none;font-size:11px;color:var(--text-muted);line-height:1.5;margin-top:8px;">
+      The link encodes all your match data. It starts with <code style="background:var(--surface3);padding:1px 4px;border-radius:3px;color:var(--be-gold);">file:///</code> — that's your local path. On the other device, open their copy of the HTML first, then paste the link.
     </p>
     <button id="btn-close-share" onclick="closeShareDialog()">Close</button>
   </div>
@@ -4065,6 +4215,13 @@ if ('serviceWorker' in navigator) {
 
     <button id="btn-close-install" onclick="document.getElementById('install-overlay').classList.remove('open')">Got it — Close Guide</button>
   </div>
+</div>
+
+<!-- Shot delete popup (shown on double-click/tap of any dot) -->
+<div id="shot-delete-popup">
+  <div class="sdp-header" id="sdp-title">Shot</div>
+  <button class="sdp-btn danger" id="sdp-delete-btn">🗑 Delete this shot</button>
+  <button class="sdp-btn" id="sdp-cancel-btn">Cancel</button>
 </div>
 
 </body>
