@@ -744,8 +744,19 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 .qtr-filter-btn { padding: 2px 8px; border-radius: 5px; border: 1.5px solid var(--border); background: transparent; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.1s; }
 .qtr-filter-btn.active { background: var(--be-green); color: #fff; border-color: var(--be-green); }
 .qtr-filter-btn:hover:not(.active) { border-color: var(--be-green-lite); color: var(--be-green-lite); }
-#btn-undo-shot { padding: 3px 9px; border-radius: 6px; border: 1.5px solid var(--border); background: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; margin-left: auto; }
-#btn-undo-shot:hover { border-color: #f87171; color: #f87171; }
+/* Big iPad-friendly undo/redo buttons */
+.undo-redo-btn {
+  padding: 8px 16px; border-radius: 9px; border: 1.5px solid var(--border);
+  background: var(--surface2); color: var(--text-muted);
+  font-size: 14px; font-weight: 800; cursor: pointer;
+  min-width: 72px; min-height: 38px;
+  transition: all 0.12s; user-select: none; -webkit-user-select: none;
+}
+.undo-redo-btn:hover, .undo-redo-btn:active { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.1); }
+.undo-redo-btn.redo:hover, .undo-redo-btn.redo:active { border-color: var(--be-green-lite); color: var(--be-green-lite); background: rgba(0,140,69,0.1); }
+#btn-undo-shot { margin-left: auto; }
+#btn-tm-undo { }
+#btn-tm-redo { }
 #btn-zones { padding: 3px 9px; border-radius: 6px; border: 1.5px solid var(--border); background: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; }
 #btn-zones.active { background: color-mix(in srgb,var(--be-gold) 18%,transparent); border-color: var(--be-gold); color: var(--be-gold-lite); }
 .fullscreen-btn { padding: 3px 7px; border-radius: 6px; border: 1.5px solid var(--border); background: none; color: var(--text-muted); font-size: 14px; cursor: pointer; }
@@ -1369,7 +1380,8 @@ kbd {
           <button class="qtr-filter-btn" data-q="2">Q2</button>
           <button class="qtr-filter-btn" data-q="3">Q3</button>
           <button class="qtr-filter-btn" data-q="4">Q4</button>
-          <button id="btn-undo-shot">↩ Undo</button>
+          <button id="btn-undo-shot" class="undo-redo-btn">↩ Undo</button>
+          <button id="btn-redo-shot" class="undo-redo-btn redo">↪ Redo</button>
           <button id="btn-zones">Zones</button>
           <button class="fullscreen-btn" id="btn-fullscreen-field" title="Fullscreen">⛶</button>
         </div>
@@ -1516,7 +1528,9 @@ kbd {
         <div class="tm-controls-row">
           <span>Map:</span>
           <button class="map-mode-btn active" id="btn-map-mode-be" data-mode="be">BE Offense</button>
-          <button class="map-mode-btn opp" id="btn-map-mode-opp" data-mode="opp">Opp Shots vs BE</button>
+          <button class="map-mode-btn opp" id="btn-map-mode-opp" data-mode="opp">Opp Shots</button>
+          <button id="btn-tm-undo" class="undo-redo-btn" style="margin-left:auto;">↩ Undo</button>
+          <button id="btn-tm-redo" class="undo-redo-btn redo">↪ Redo</button>
         </div>
         <div class="tm-controls-row" id="be-add-shot-row">
           <span>Add Shot:</span>
@@ -1528,11 +1542,9 @@ kbd {
           <button class="tm-shot-btn" data-type="gb"   style="--c:#fbbf24">GB</button>
         </div>
         <div class="tm-controls-row" id="opp-add-shot-row" style="display:none;">
-          <span>Opp Shot:</span>
-          <button class="opp-shot-type-btn active" data-type="goal" style="--c:#f87171">Goal vs BE</button>
-          <button class="opp-shot-type-btn" data-type="sog" style="--c:#fbbf24">SOG vs BE</button>
-          <button class="opp-shot-type-btn" data-type="miss" style="--c:#7aaa87">Miss</button>
-          <button id="btn-clear-opp-shots" class="btn-danger-sm" style="margin-left:auto;">Clear</button>
+          <span style="color:#f87171;font-weight:800;">Opponent</span>
+          <span style="font-size:12px;color:var(--text-muted);">Tap field to place shot</span>
+          <button id="btn-clear-opp-shots" class="btn-danger-sm" style="margin-left:auto;">Clear All</button>
         </div>
       </div>
       <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
@@ -2314,6 +2326,7 @@ function drawField() {
   ctx.beginPath(); ctx.moveTo(MID_X, TOP_SIDE); ctx.lineTo(MID_X, BOT_SIDE); ctx.stroke();
   ctx.beginPath(); ctx.arc(MID_X, MID_Y, 32, 0, Math.PI*2); ctx.stroke();
   ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(MID_X, MID_Y, 3, 0, Math.PI*2); ctx.fill();
+  drawBishopEmblem(ctx, MID_X, MID_Y);
 
   // Goals & crease (on the endlines)
   drawGoal(ctx, LEFT_END,  MID_Y);
@@ -2353,6 +2366,51 @@ function drawField() {
     ctx.fillStyle=(SHOT_COLORS[sh.type]||"#fff")+"cc"; ctx.fill();
     ctx.strokeStyle=SHOT_COLORS[sh.type]||"#fff"; ctx.lineWidth=1.5; ctx.stroke();
   });
+}
+
+// ─── Bishop Emblem (center field) ────────────────────────────────────────
+function drawBishopEmblem(ctx, cx, cy) {
+  ctx.save();
+  ctx.globalAlpha = 0.55;
+  const G = ctx.createLinearGradient(cx, cy - 22, cx, cy + 22);
+  G.addColorStop(0, "#d4af44");
+  G.addColorStop(1, "#8a6f1e");
+  ctx.fillStyle = G;
+  ctx.strokeStyle = "rgba(0,0,0,0.4)";
+  ctx.lineWidth = 0.8;
+  // Base disc (bottom)
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 19, 10, 4, 0, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+  // Shaft
+  ctx.beginPath();
+  ctx.moveTo(cx - 5, cy + 17);
+  ctx.bezierCurveTo(cx - 7, cy + 5, cx - 6, cy - 4, cx - 4, cy - 8);
+  ctx.lineTo(cx + 4, cy - 8);
+  ctx.bezierCurveTo(cx + 6, cy - 4, cx + 7, cy + 5, cx + 5, cy + 17);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  // Collar ring
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - 8, 7, 3, 0, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+  // Head (sphere)
+  ctx.beginPath();
+  ctx.arc(cx, cy - 15, 8, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+  // Mitre notch
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.beginPath();
+  ctx.moveTo(cx - 2, cy - 22);
+  ctx.lineTo(cx, cy - 18);
+  ctx.lineTo(cx + 2, cy - 22);
+  ctx.closePath();
+  ctx.fill();
+  // Cross on top
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(cx - 1, cy - 29, 2, 8);
+  ctx.fillRect(cx - 4, cy - 26, 8, 2);
+  ctx.restore();
 }
 
 function drawGoal(ctx, x, y) {
@@ -2396,6 +2454,7 @@ function canvasCoords(canvas, e) {
 }
 
 const undoStack = [];
+const redoStack = []; // {pid, shot} — stores full shot object for redo
 let shotQuarterFilter = "all";
 let zonesEnabled = false;
 
@@ -2413,6 +2472,7 @@ function addShot(x,y) {
   const sh={type:state.shotType,x,y,ts:Date.now(),quarter:state.game.currentQuarter||1};
   state.stats[pid].shots.push(sh);
   undoStack.push({pid,ts:sh.ts});
+  redoStack.length = 0; // new action clears redo history
   if (sh.type==="goal") { state.stats[pid].G++; state.stats[pid].SOG++; }
   else if (sh.type==="sog")  { state.stats[pid].SOG++; }
   else if (sh.type==="miss") { state.stats[pid].SOG++; }
@@ -2729,7 +2789,7 @@ function setMapMode(mode) {
 
 function addOppShot(x, y) {
   if (!state.game.oppShots) state.game.oppShots = [];
-  state.game.oppShots.push({ type: oppShotType, x, y, ts: Date.now(), quarter: state.game.currentQuarter || 1 });
+  state.game.oppShots.push({ x, y, ts: Date.now(), quarter: state.game.currentQuarter || 1 });
   drawTeamMap();
   autoSave();
 }
@@ -2956,6 +3016,7 @@ function drawTeamMap() {
   ctx.beginPath(); ctx.moveTo(MID_X,TOP_SIDE); ctx.lineTo(MID_X,BOT_SIDE); ctx.stroke();
   ctx.beginPath(); ctx.arc(MID_X,MID_Y,32,0,Math.PI*2); ctx.stroke();
   ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(MID_X,MID_Y,3,0,Math.PI*2); ctx.fill();
+  drawBishopEmblem(ctx, MID_X, MID_Y);
   drawGoal(ctx,LEFT_END,MID_Y); drawGoal(ctx,RIGHT_END,MID_Y);
   ctx.strokeStyle="rgba(255,255,255,0.8)"; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.arc(LEFT_END,MID_Y,60,-Math.PI/2,Math.PI/2); ctx.stroke();
@@ -3011,23 +3072,23 @@ function drawTeamMap() {
     ctx.fillText(fname, lx, sh.y + 1);
   });
 
-  // Draw opponent shots if in opp mode
-  if (mapMode === "opp") {
-    const oppDotColors = { goal:"#f87171", sog:"#fbbf24", miss:"#7aaa87" };
-    (state.game.oppShots || []).forEach(sh => {
-      ctx.save();
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle = oppDotColors[sh.type] || "#f87171";
-      ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 1.5;
-      // Draw an X shape for opp shots to distinguish from BE dots
-      const s = 7;
-      ctx.beginPath(); ctx.moveTo(sh.x-s,sh.y-s); ctx.lineTo(sh.x+s,sh.y+s);
-      ctx.moveTo(sh.x+s,sh.y-s); ctx.lineTo(sh.x-s,sh.y+s);
-      ctx.lineWidth = 3; ctx.strokeStyle = oppDotColors[sh.type] || "#f87171"; ctx.stroke();
-      ctx.restore();
-    });
-  }
+  // Draw opponent shots (always shown as red X marks, visible in both modes)
+  (state.game.oppShots || []).forEach(sh => {
+    ctx.save();
+    ctx.globalAlpha = mapMode === "opp" ? 0.9 : 0.4;
+    const s = 7;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#f87171";
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(sh.x-s,sh.y-s); ctx.lineTo(sh.x+s,sh.y+s);
+    ctx.moveTo(sh.x+s,sh.y-s); ctx.lineTo(sh.x-s,sh.y+s);
+    ctx.stroke();
+    // White halo for visibility
+    ctx.lineWidth = 5; ctx.strokeStyle = "rgba(0,0,0,0.35)"; ctx.globalAlpha = 0.3;
+    ctx.stroke();
+    ctx.restore();
+  });
 }
 
 function addTeamShot(x, y) {
@@ -3312,6 +3373,21 @@ function setQuarter(q) {
 }
 
 // ─── Undo ─────────────────────────────────────────────────────────────────
+function _applyShotStats(pid, sh, delta) {
+  if (sh.type==="goal")  { state.stats[pid].G=Math.max(0,state.stats[pid].G+delta); state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG+delta); }
+  else if (sh.type==="sog")  { state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG+delta); }
+  else if (sh.type==="ast")  { state.stats[pid].A=Math.max(0,state.stats[pid].A+delta); }
+  else if (sh.type==="gb")   { state.stats[pid].GB=Math.max(0,state.stats[pid].GB+delta); }
+  else if (sh.type==="miss") { state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG+delta); }
+}
+function _refreshAfterShotChange(pid) {
+  renderShotList(); drawField();
+  if (document.getElementById("team-map-view").classList.contains("active")) drawTeamMap();
+  if (teamMapSelectedPid===pid) renderTmShotList(pid);
+  const p = state.players.find(x=>x.id===pid);
+  if (p) { renderStatsTab(p); renderPlayerList(document.getElementById("player-search").value); }
+  autoSave();
+}
 function undoLastShot() {
   if (!undoStack.length) { showToast("Nothing to undo","error"); return; }
   const {pid, ts} = undoStack.pop();
@@ -3319,19 +3395,22 @@ function undoLastShot() {
   if (!shots) return;
   const idx = shots.findLastIndex(s => s.ts === ts);
   if (idx === -1) return;
-  const s = shots[idx];
-  if (s.type==="goal")  { state.stats[pid].G=Math.max(0,state.stats[pid].G-1); state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
-  else if (s.type==="sog")  { state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
-  else if (s.type==="ast")  { state.stats[pid].A=Math.max(0,state.stats[pid].A-1); }
-  else if (s.type==="gb")   { state.stats[pid].GB=Math.max(0,state.stats[pid].GB-1); }
-  else if (s.type==="miss") { state.stats[pid].SOG=Math.max(0,state.stats[pid].SOG-1); }
-  shots.splice(idx,1);
-  renderShotList(); drawField();
-  if (document.getElementById("team-map-view").classList.contains("active")) drawTeamMap();
-  if (teamMapSelectedPid===pid) renderTmShotList(pid);
-  const p = state.players.find(x=>x.id===pid);
-  if (p) { renderStatsTab(p); renderPlayerList(document.getElementById("player-search").value); }
-  showToast("Undo!","success"); autoSave();
+  const sh = shots[idx];
+  _applyShotStats(pid, sh, -1);
+  redoStack.push({pid, shot: {...sh}});
+  shots.splice(idx, 1);
+  _refreshAfterShotChange(pid);
+  showToast("Undo!","success");
+}
+function redoLastShot() {
+  if (!redoStack.length) { showToast("Nothing to redo","error"); return; }
+  const {pid, shot} = redoStack.pop();
+  if (!state.stats[pid]) return;
+  state.stats[pid].shots.push(shot);
+  undoStack.push({pid, ts: shot.ts});
+  _applyShotStats(pid, shot, +1);
+  _refreshAfterShotChange(pid);
+  showToast("Redo!","success");
 }
 
 // ─── Zone Overlay ─────────────────────────────────────────────────────────
@@ -3766,14 +3845,12 @@ function init() {
   // Opponent shot map mode toggle
   document.getElementById("btn-map-mode-be").addEventListener("click", () => setMapMode("be"));
   document.getElementById("btn-map-mode-opp").addEventListener("click", () => setMapMode("opp"));
-  document.querySelectorAll(".opp-shot-type-btn").forEach(b => b.addEventListener("click", () => {
-    document.querySelectorAll(".opp-shot-type-btn").forEach(x => x.classList.remove("active"));
-    b.classList.add("active"); oppShotType = b.dataset.type;
-  }));
   document.getElementById("btn-clear-opp-shots").addEventListener("click", () => {
     if (!confirm("Clear all opponent shots?")) return;
     state.game.oppShots = []; drawTeamMap(); autoSave();
   });
+  document.getElementById("btn-tm-undo").addEventListener("click", undoLastShot);
+  document.getElementById("btn-tm-redo").addEventListener("click", redoLastShot);
 
   // Check for share URL param on load
   checkShareParam();
@@ -3854,6 +3931,7 @@ function init() {
   }));
   document.getElementById("btn-export-shotmap").addEventListener("click", exportShotMapPNG);
   document.getElementById("btn-undo-shot").addEventListener("click",undoLastShot);
+  document.getElementById("btn-redo-shot").addEventListener("click",redoLastShot);
   document.getElementById("btn-zones").addEventListener("click",toggleZones);
   document.getElementById("btn-fullscreen-field").addEventListener("click",()=>{updateFsPlayerBar();enterFullscreen(document.getElementById("tab-heatmap"));});
   document.getElementById("btn-fullscreen-team").addEventListener("click",()=>enterFullscreen(document.getElementById("team-field-container")));
@@ -3889,8 +3967,9 @@ function init() {
   });
 
   document.addEventListener("keydown",e=>{
-    // Ctrl+Z / Cmd+Z → undo last shot (works anywhere)
-    if ((e.ctrlKey||e.metaKey) && e.key==="z") { e.preventDefault(); undoLastShot(); return; }
+    // Ctrl+Z / Cmd+Z → undo; Ctrl+Y / Cmd+Shift+Z → redo
+    if ((e.ctrlKey||e.metaKey) && e.key==="z" && !e.shiftKey) { e.preventDefault(); undoLastShot(); return; }
+    if ((e.ctrlKey||e.metaKey) && (e.key==="y" || (e.key==="z" && e.shiftKey))) { e.preventDefault(); redoLastShot(); return; }
     if(["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) return;
     if(e.key==="?") { openShortcuts(); return; }
     if(!state.selectedId) return;
