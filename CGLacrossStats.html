@@ -638,6 +638,35 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   border: 1.5px solid var(--border); }
 #btn-mgr-export-html:hover,#btn-mgr-export-csv:hover { opacity: 0.8; }
 
+#match-mgr-backup-section {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+}
+.match-mgr-section-label {
+  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--be-green-lite);
+}
+.match-mgr-section-desc {
+  font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0;
+}
+.match-mgr-section-desc code {
+  background: var(--surface3); border-radius: 4px; padding: 1px 5px;
+  font-size: 11px; color: var(--be-gold);
+}
+#match-mgr-backup-row { display: flex; gap: 8px; }
+#btn-mgr-backup {
+  flex: 1; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700;
+  cursor: pointer; border: 1.5px solid var(--be-green-lite);
+  background: rgba(0,140,69,0.12); color: var(--be-green-lite); transition: background 0.1s;
+}
+#btn-mgr-backup:hover { background: rgba(0,140,69,0.25); }
+#btn-mgr-restore {
+  flex: 1; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700;
+  cursor: pointer; border: 1.5px solid var(--be-gold);
+  background: rgba(181,151,58,0.12); color: var(--be-gold-lite); transition: background 0.1s;
+}
+#btn-mgr-restore:hover { background: rgba(181,151,58,0.25); }
+
 #btn-new-match-open {
   padding: 10px; border-radius: 9px; border: 1.5px dashed var(--border);
   background: none; color: var(--text-muted); font-size: 13px; font-weight: 700;
@@ -1479,6 +1508,16 @@ kbd {
         <button id="btn-mgr-export-csv">&#9660; Export CSV</button>
         <button id="btn-mgr-print">&#9113; Print Box Score</button>
       </div>
+
+      <div id="match-mgr-backup-section">
+        <div class="match-mgr-section-label">&#128190; Backup &amp; Restore</div>
+        <p class="match-mgr-section-desc">Transfer all matches &amp; stats to another computer. Export saves a <code>.laxstats</code> file; Import loads it back.</p>
+        <div id="match-mgr-backup-row">
+          <button id="btn-mgr-backup">&#8679; Export Backup</button>
+          <button id="btn-mgr-restore">&#8681; Import Backup</button>
+        </div>
+        <input type="file" id="restore-file-input" accept=".laxstats,.json" style="display:none"/>
+      </div>
       <button id="btn-new-match-open">+ New Match</button>
       <div id="new-match-form" class="hidden">
         <label>Match Name (e.g. "vs Wando")</label>
@@ -2209,6 +2248,37 @@ function addPlayer() {
     team:document.getElementById("new-team").value,notes:""};
   state.players.push(p); state.stats[p.id]=emptyStats();
   closeModal(); renderPlayerList(); selectPlayer(p.id); autoSave();
+}
+
+// ─── Backup / Restore (localStorage transfer) ────────────────────────────
+function backupAllData() {
+  const raw = localStorage.getItem(STORE_KEY);
+  if (!raw) { showToast("Nothing to backup yet"); return; }
+  const date = new Date().toISOString().slice(0,10);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([raw], { type: "application/json" }));
+  a.download = `laxstats-backup-${date}.laxstats`;
+  a.click();
+  showToast("Backup saved!");
+}
+
+function restoreFromBackup(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.matches) throw new Error();
+      const matchCount = Object.keys(parsed.matches).length;
+      if (!confirm(`Load backup? This replaces ALL current data with ${matchCount} match${matchCount!==1?"es":""} from the file.`)) return;
+      localStorage.setItem(STORE_KEY, e.target.result);
+      showToast("Backup restored — reloading…");
+      setTimeout(() => location.reload(), 900);
+    } catch {
+      showToast("Invalid backup file");
+    }
+  };
+  reader.readAsText(file);
 }
 
 // ─── CSV Export ───────────────────────────────────────────────────────────
@@ -3121,6 +3191,16 @@ function init() {
   document.getElementById("game-date").addEventListener("change",e=>{state.game.date=e.target.value;autoSave();});
   document.getElementById("btn-save").addEventListener("click",()=>saveData(false));
   document.getElementById("btn-export").addEventListener("click",exportCSV);
+
+  // Backup / Restore
+  document.getElementById("btn-mgr-backup").addEventListener("click", backupAllData);
+  document.getElementById("btn-mgr-restore").addEventListener("click", () => {
+    document.getElementById("restore-file-input").click();
+  });
+  document.getElementById("restore-file-input").addEventListener("change", e => {
+    restoreFromBackup(e.target.files[0]);
+    e.target.value = ""; // reset so same file can be re-picked
+  });
 
   // Scoreboard
   document.getElementById("btn-be-plus").addEventListener("click",()=>adjustScore("be",1));
