@@ -293,6 +293,34 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
 #tab-heatmap:fullscreen #heatmap-controls,
 #tab-heatmap:-webkit-full-screen #heatmap-controls,
 #tab-heatmap.is-fullscreen #heatmap-controls { display: none; }
+
+/* Team map fullscreen bar */
+#tm-fs-bar {
+  display: none; position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+  flex-direction: column; gap: 8px; padding: 10px 14px;
+  background: rgba(10,26,15,0.97); border-bottom: 2px solid var(--be-gold);
+}
+#team-field-container:fullscreen,
+#team-field-container:-webkit-full-screen,
+#team-field-container.is-tm-fullscreen { background: var(--bg); display: flex; align-items: center; justify-content: center; padding-top: 110px; }
+#team-field-container:fullscreen #tm-fs-bar,
+#team-field-container:-webkit-full-screen #tm-fs-bar,
+#team-field-container.is-tm-fullscreen #tm-fs-bar { display: flex; }
+#tm-fs-player-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+#tm-fs-player-list { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+.tm-fs-chip {
+  padding: 4px 10px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: var(--surface2); color: var(--text); font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.tm-fs-chip.active { background: var(--be-green); border-color: var(--be-green); color: #fff; }
+.tm-fs-chip:hover { background: rgba(255,255,255,0.12); }
+#tm-fs-exit {
+  padding: 4px 10px; border-radius: 8px; border: 1.5px solid #f87171;
+  background: none; color: #f87171; font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+}
+#tm-fs-exit:hover { background: rgba(248,113,113,0.2); }
+#tm-fs-shot-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+#tm-fs-shot-row span { font-size: 12px; color: var(--text-muted); }
 #fs-top-row { display: flex; align-items: center; gap: 8px; }
 #fs-player-list { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
 .fs-player-chip {
@@ -1572,6 +1600,20 @@ kbd {
       </div>
       <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
         <div id="team-field-container">
+          <div id="tm-fs-bar">
+            <div id="tm-fs-player-row">
+              <div id="tm-fs-player-list"></div>
+              <button id="tm-fs-exit" title="Exit fullscreen">✕ Exit</button>
+            </div>
+            <div id="tm-fs-shot-row">
+              <span>Add Shot:</span>
+              <button class="tm-shot-btn active" data-type="goal" style="--c:#008c45">Goal</button>
+              <button class="tm-shot-btn" data-type="sog"  style="--c:#60a5fa">SOG</button>
+              <button class="tm-shot-btn" data-type="ast"  style="--c:#d4af44">Assist</button>
+              <button class="tm-shot-btn" data-type="miss" style="--c:#f87171">Miss</button>
+              <button class="tm-shot-btn" data-type="gb"   style="--c:#fbbf24">GB</button>
+            </div>
+          </div>
           <canvas id="team-field-canvas"></canvas>
           <button class="fullscreen-btn" id="btn-fullscreen-team" title="Fullscreen" style="position:absolute;top:10px;right:10px;">⛶</button>
           <div style="position:absolute;bottom:22px;right:44px;background:rgba(10,26,15,0.92);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">
@@ -3626,10 +3668,30 @@ function updateFsPlayerBar() {
   });
   setShotType(state.shotType || "goal");
 }
+function updateTmFsBar() {
+  const list = document.getElementById("tm-fs-player-list");
+  list.innerHTML = "";
+  state.players.filter(p => p.team !== "Manager").forEach(p => {
+    const btn = document.createElement("button");
+    btn.className = "tm-fs-chip" + (p.id === teamMapSelectedPid ? " active" : "");
+    btn.textContent = `#${p.number} ${p.name}`;
+    btn.addEventListener("click", () => {
+      teamMapSelectedPid = p.id;
+      document.getElementById("tm-selected-player-label").textContent = `#${p.number} ${p.name}`;
+      renderTmShotList(p.id);
+      updateTmFsBar();
+    });
+    list.appendChild(btn);
+  });
+}
 function onFullscreenChange() {
-  const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
-  document.getElementById("tab-heatmap").classList.toggle("is-fullscreen", isFS);
+  const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+  const isFS = !!fsEl;
+  const isTmFS = fsEl === document.getElementById("team-field-container");
+  document.getElementById("tab-heatmap").classList.toggle("is-fullscreen", isFS && !isTmFS);
+  document.getElementById("team-field-container").classList.toggle("is-tm-fullscreen", isTmFS);
   updateFsPlayerBar();
+  if (isTmFS) updateTmFsBar();
   setTimeout(() => { drawField(); if (typeof drawTeamMap === "function") drawTeamMap(); }, 100);
 }
 document.addEventListener("fullscreenchange", onFullscreenChange);
@@ -4048,7 +4110,8 @@ function init() {
   document.getElementById("btn-redo-shot").addEventListener("click",redoLastShot);
   document.getElementById("btn-zones").addEventListener("click",toggleZones);
   document.getElementById("btn-fullscreen-field").addEventListener("click",()=>{updateFsPlayerBar();enterFullscreen(document.getElementById("tab-heatmap"));});
-  document.getElementById("btn-fullscreen-team").addEventListener("click",()=>enterFullscreen(document.getElementById("team-field-container")));
+  document.getElementById("btn-fullscreen-team").addEventListener("click",()=>{updateTmFsBar();enterFullscreen(document.getElementById("team-field-container"));});
+  document.getElementById("tm-fs-exit").addEventListener("click",()=>{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();});
   document.getElementById("fs-exit-fullscreen").addEventListener("click",()=>{if(document.exitFullscreen)document.exitFullscreen();});
 
   // Shortcuts modal
