@@ -520,6 +520,12 @@ body { background: var(--bg); color: var(--text); overflow: hidden; }
   font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.1s;
 }
 .tm-shot-btn.active { background: color-mix(in srgb, var(--c) 20%, transparent); }
+.opp-shot-btn {
+  padding: 4px 10px; border-radius: 6px; border: 1.5px solid var(--c,#888);
+  background: transparent; color: var(--c,#888);
+  font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.1s;
+}
+.opp-shot-btn.active { background: color-mix(in srgb, var(--c) 20%, transparent); }
 .tm-qtr-btn { padding: 4px 10px; border-radius: 6px; border: 1.5px solid var(--border); background: transparent; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.1s; }
 .tm-qtr-btn.active { background: rgba(0,140,69,0.2); border-color: var(--be-green-lite); color: var(--be-green-lite); }
 .tm-qtr-btn:hover { border-color: var(--be-gold); color: var(--be-gold-lite); }
@@ -1594,7 +1600,10 @@ kbd {
         </div>
         <div class="tm-controls-row" id="opp-add-shot-row" style="display:none;">
           <span style="color:#f87171;font-weight:800;">Opponent</span>
-          <span style="font-size:12px;color:var(--text-muted);">Tap field to place shot</span>
+          <span style="font-size:12px;color:var(--text-muted);">Tap field to place:</span>
+          <button class="opp-shot-btn active" data-type="goal" style="--c:#f87171">Goal</button>
+          <button class="opp-shot-btn" data-type="sog"  style="--c:#fbbf24">SOG</button>
+          <button class="opp-shot-btn" data-type="miss" style="--c:#7aaa87">Miss</button>
           <button id="btn-clear-opp-shots" class="btn-danger-sm" style="margin-left:auto;">Clear All</button>
         </div>
       </div>
@@ -2814,7 +2823,8 @@ function setMapMode(mode) {
 
 function addOppShot(x, y) {
   if (!state.game.oppShots) state.game.oppShots = [];
-  state.game.oppShots.push({ x, y, ts: Date.now(), quarter: state.game.currentQuarter || 1 });
+  state.game.oppShots.push({ type: oppShotType, x, y, ts: Date.now(), quarter: state.game.currentQuarter || 1 });
+  if (oppShotType === "goal") adjustScore("opp", 1);
   drawTeamMap();
   autoSave();
 }
@@ -3009,6 +3019,8 @@ function confirmDeleteShot() {
     const idx = _sdpTarget.oppIdx;
     closeShotDeletePopup();
     if (state.game.oppShots && state.game.oppShots[idx] !== undefined) {
+      const s = state.game.oppShots[idx];
+      if (s.type === "goal") adjustScore("opp", -1);
       state.game.oppShots.splice(idx, 1);
       drawTeamMap(); autoSave();
       showToast("Opponent shot deleted", "success");
@@ -3184,19 +3196,21 @@ function drawTeamMap() {
     ctx.fillText(fname, lx, sh.y + 1);
   });
 
-  // Draw opponent shots (always shown as red X marks, visible in both modes)
+  // Draw opponent shots (colored by type, visible in both modes)
+  const oppColors = { goal:"#f87171", sog:"#fbbf24", miss:"#7aaa87" };
   (state.game.oppShots || []).forEach(sh => {
     ctx.save();
     ctx.globalAlpha = mapMode === "opp" ? 0.9 : 0.4;
     const s = 7;
+    const col = oppColors[sh.type] || "#f87171";
     ctx.lineWidth = 3;
-    ctx.strokeStyle = "#f87171";
+    ctx.strokeStyle = col;
     ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(sh.x-s,sh.y-s); ctx.lineTo(sh.x+s,sh.y+s);
     ctx.moveTo(sh.x+s,sh.y-s); ctx.lineTo(sh.x-s,sh.y+s);
     ctx.stroke();
-    // White halo for visibility
+    // Halo for visibility
     ctx.lineWidth = 5; ctx.strokeStyle = "rgba(0,0,0,0.35)"; ctx.globalAlpha = 0.3;
     ctx.stroke();
     ctx.restore();
@@ -4045,6 +4059,12 @@ function init() {
   document.querySelectorAll(".tm-shot-btn").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll(".tm-shot-btn").forEach(x=>x.classList.remove("active"));
     b.classList.add("active"); teamMapShotType=b.dataset.type;
+  }));
+
+  // Opponent shot type buttons
+  document.querySelectorAll(".opp-shot-btn").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".opp-shot-btn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); oppShotType=b.dataset.type;
   }));
 
   // Team map canvas click → add shot for selected player
